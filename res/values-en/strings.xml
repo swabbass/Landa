@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="action_websearch">Web Search</string>
+    <string name="app_name">Landa</string>
+    <string name="courses">Workshops</string>
+    <string name="drawer_close">Close Navigation Menu</string>
+    <string name="drawer_open">Open Navigation Menu</string>
+    <string name="selected">Selected</string>
+    <string name="teachers">Tutors</string>
+    <string name="updates">News</string>
+
+</resources>

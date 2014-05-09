@@ -1,0 +1,62 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/updatesItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+  	android:background="?android:attr/activatedBackgroundIndicator"
+  	
+   >
+
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/update_timeLable"
+        android:paddingTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/title_updateLable"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:paddingRight="10dp"
+        android:text="25/11/92 14:25"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#666666"
+        android:textStyle="bold" />
+
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/title_updateLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/contentTextBox"
+        android:layout_toRightOf="@+id/update_timeLable"
+        android:padding="3dp"
+        android:text="עדכון"
+        android:textColor="#666666"
+        android:textSize="17sp" />
+
+    <ward.landa.ExpandableTextView
+        android:id="@+id/contentTextBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/title_updateLable"
+        android:layout_toLeftOf="@+id/imgAttention"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:paddingLeft="3dp"
+        android:text="news news news!!"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#BDBDBD"
+       />
+
+    <ImageView
+        android:id="@+id/imgAttention"
+        android:layout_width="89dp"
+        android:layout_height="92dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:padding="10dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/update_icon_new" />
+
+</RelativeLayout>

@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">مشروع لنده</string>
+    <string name="courses">ورشات</string>
+    <string name="drawer_close">اغلق القائمه</string>
+    <string name="drawer_open">افتح القائمه</string>
+    <string name="selected">"اختيار   "</string>
+    <string name="teachers">مدرسون</string>
+    <string name="updates">مستجدات</string>
+
+</resources>

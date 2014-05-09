@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">לנדא</string>
+    <string name="courses">סדנאות</string>
+    <string name="drawer_close">סגור רשימה</string>
+    <string name="drawer_open">פתח רשימה</string>
+    <string name="selected">"נבחר "</string>
+    <string name="teachers">מסדנתים</string>
+    <string name="updates">עדכונים</string>
+
+</resources>

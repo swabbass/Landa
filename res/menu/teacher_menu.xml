@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/teacher_menu_search"
+        android:actionLayout="@layout/search_layout"
+        android:icon="@drawable/action_search"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="Search"/>
+     <item
+        android:id="@+id/teacher_menu_filter"      
+        android:icon="@drawable/filter_action_white"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="Filter"/>
+    
+
+</menu>
