@@ -28,7 +28,7 @@
         android:id="@+id/courseTeachers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/languageLable"
         android:dividerHeight="1dp" >
 
     </ListView>
@@ -66,7 +66,7 @@
         android:src="@drawable/feedback_icon" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/languageLable"
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

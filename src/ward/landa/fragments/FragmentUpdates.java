@@ -1,28 +1,19 @@
 package ward.landa.fragments;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import ward.landa.ExpandableTextView;
 import ward.landa.R;
 import ward.landa.Update;
-import ward.landa.R.id;
-import ward.landa.R.layout;
-import ward.landa.R.menu;
-import ward.landa.R.string;
-
-import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
-
+import ward.landa.activities.SettingsActivity;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Paint;
-import android.net.wifi.p2p.WifiP2pManager.ActionListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils.TruncateAt;
+import android.support.v4.app.FragmentManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -30,23 +21,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 
 public class FragmentUpdates extends Fragment {
 
 	ListView l;
+	//SwipeListView l;
 	List<Update> ups;
 	List<Update> hidden;
 	// maybe more effiecent to deal with indexes of the active ones but first
@@ -101,45 +89,21 @@ public class FragmentUpdates extends Fragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
-		/*switch (item.getItemId()) {
-		case R.id.showall:
-			if (!showAll) {
-				this.showAll = true;
-				if (uAdapter.getCount() == 0) {
-
-					uAdapter = new updatesAdapter(active, ups, getActivity(),
-							callBack);
-					l.setAdapter(uAdapter);
-
-				}
-
-				uAdapter.setUpdates(ups);
-
-				uAdapter.notifyDataSetChanged();
-
-				item.setIcon(R.drawable.hide_icpn);
-				Fx.slideDown(getActivity(), item.getActionView());
-
-			} else {
-				this.showAll = false;
-				active = filterActive(ups);
-				uAdapter.setUpdates(active);
-				uAdapter.notifyDataSetChanged();
-				item.setIcon(R.drawable.show_icpn);
-				// /item.setIcon(R.drawable.search_icon);
-				Fx.slideUp(getActivity(), item.getActionView());
-			}
-			uAdapter.setShowall(this.showAll);
-			uAdapter.notifyDataSetInvalidated();
+		
+		switch (item.getItemId()) {
+		case R.id.settings:
+			Intent i=new Intent(getActivity(), SettingsActivity.class);
+			startActivity(i);
+			
 			break;
 
 		default:
 			break;
-		}*/
+		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
+	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
@@ -154,12 +118,13 @@ public class FragmentUpdates extends Fragment {
 		View root = inflater.inflate(R.layout.updates_frag_list, container,
 				false);
 		l = (ListView) root.findViewById(R.id.updates_listView);
+		//l = (SwipeListView) root.findViewById(R.id.updates_listView);
 		showAll = false;
-		String lo = "A proven pattern to handle this undo option is to offer a selection at the end of the screen. This selection vanishes after a predefined time or once the user continues to interact with the applicationnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.";
+		String lo = "לקראת תחילת תהליך החייאת השפה העברית, בעת שהיא שימשה רק כשפה שנייה בפי יהודים ושומרונים, היו לשפה שני ניבים - יהודי ושומרוני, כשהניב השומרוני היה על סף כליה גם כשפה שנייה, יחד עם העדה השומרונית עצמה. לניב היהודי היו שלוש דרכי הגיה עיקריות: אשכנזית, ספרדית ותימנית (יש המציינים גם הגייה עיראקית). עם החייאת השפה, בן-יהודה הכריז על ההגייה הספרדית כהגייה התקנית של העברית. אולם בפועל מחיי השפה דבקו בהגייה שהיא מעין פשרה בין הספרדית לאשכנזית וזו נשתרשה בעם.";
 		ups = new ArrayList<Update>();
 		ups.add(new Update("subject Dummy","25/11/1992 14:00","hey hey noce content"));
 		ups.add(new Update("subject Dummy","14/11/2001 14:00",
-				"veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy looooooooooooooooooooooooooooooooooooooonggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg texxxxxxxtttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"));
+				"בשל התחייה המאוחרת של השפה העברית, אין כמעט ניבים אזוריים עבריים. למעשה, השפה הנשמעת בפי דוברים ילידיים זהה כמעט בכל חלקי ישראל. אפשר להבחין בשוני בין הניבים המדוברים בפי עדות יהודיות שונות (אתנולקטים). אולם, שוני זה מתבטא בעיקר בפונולוגיה, ולא בתחביר או במורפולוגיה. עיקרי שוני זה הם בהשפעה ספרדית-תימנית על ההגייה המקובלת ולעתים בהשפעה אשכנזית על ההגייה המקובלת (למשל בקרב חלק מהעדה החרדית בירושלים ובברוקלין). שוני מסוים בתחביר ובמורפולוגיה קיים בין ניבים מעמדיים של השפה (סוציולקטים), אולם שוני זה אינו גדול יחסית."));
 		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo));
 		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo.substring(20)));
 		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo.substring(10, lo.length() - 1)));
@@ -170,7 +135,7 @@ public class FragmentUpdates extends Fragment {
 		ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
 		sc.setAbsListView(l);
 		l.setAdapter(sc);
-
+		
 		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		l.setOnItemClickListener(new OnItemClickListener() {
@@ -178,21 +143,7 @@ public class FragmentUpdates extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-
 				callBack.onUpdateClick(ups.get(arg2));
-				/*
-				 * int first = l.getFirstVisiblePosition(); View v =
-				 * l.getChildAt(arg2 - first); ExpandableTextView tv =
-				 * (ExpandableTextView) v .findViewById(R.id.contentText); if
-				 * (!tv.isExpanded()) {
-				 * 
-				 * Fx.slideDown(getActivity(), v); tv.setEllipsize(null);
-				 * tv.setMaxLines(20); tv.setExpanded(true);
-				 * 
-				 * } else { Fx.slideUp(getActivity(), v);
-				 * tv.setEllipsize(TruncateAt.END); tv.setMaxLines(2);
-				 * tv.setExpanded(false); }
-				 */
 			}
 
 		});
@@ -356,7 +307,11 @@ public class FragmentUpdates extends Fragment {
 		}
 
 	}
-
+	public int convertDpToPixel(float dp) {
+	       DisplayMetrics metrics = getResources().getDisplayMetrics();
+	       float px = dp * (metrics.densityDpi / 160f);
+	       return (int) px;
+	   }
 	private static List<Update> filterActive(List<Update> updates) {
 		List<Update> result = new ArrayList<Update>();
 		for (Update u : updates) {

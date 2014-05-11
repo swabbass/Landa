@@ -7,11 +7,13 @@ import ward.landa.LoginFragment;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
+import ward.landa.Utilities;
 import ward.landa.fragments.CourseFragment;
 import ward.landa.fragments.FragmentCourses;
 import ward.landa.fragments.FragmentTeachers;
 import ward.landa.fragments.FragmentUpdates;
 import ward.landa.fragments.teacherFragment;
+import Utilites.Settings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +29,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,13 +44,11 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements
 		FragmentCourses.OnCourseSelected, FragmentTeachers.callbackTeacher,
-		FragmentUpdates.updateCallback,
-		OnBackStackChangedListener {
-
-	static final int COURSES = 0;
-	static final int UPDATES = 2;
-	static final int TEACHERS = 1;
-
+		FragmentUpdates.updateCallback, OnBackStackChangedListener {
+	
+	String localLang;
+	boolean isUpdateNotify;
+	boolean isCourseNotify;
 	SectionsPagerAdapter mSectionsPagerAdapter;
 	ViewPager mViewPager;
 	PagerTitleStrip strip;
@@ -71,6 +70,15 @@ public class MainActivity extends FragmentActivity implements
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		Log.e("Fragment", "Main Activity started");
+		loadSettings();
+		setLocalLang();
+		setTitle(R.string.app_name);
+		initlizeFragments();
+		initlizeDrawerNavigation();
+		overridePendingTransition(android.R.anim.fade_in,
+				android.R.anim.fade_out);
+		initlizePager();
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onStart();
 	}
 
@@ -105,58 +113,39 @@ public class MainActivity extends FragmentActivity implements
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
-		outState.putInt("pageIndex", loadsavedPageIndex());
-	}
-
-	private void saveCurentPage(int index) {
-		SharedPreferences sh = getPreferences(MODE_PRIVATE);
-		SharedPreferences.Editor ed = sh.edit();
-		ed.putInt("page", index);
-		ed.commit();
-	}
-
-	private void loadsavedPage() {
-		SharedPreferences sh = getPreferences(MODE_PRIVATE);
-		if (sh.getInt("page", -1) != -1) {
-			mViewPager.setCurrentItem(sh.getInt("page", -1));
-		}
-	}
-
-	private int loadsavedPageIndex() {
-		SharedPreferences sh = getPreferences(MODE_PRIVATE);
-
-		return sh.getInt("page", -1);
 
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Log.e("Fragment", "Main Activity Created");
-		String languageToLoad = "he"; // your language
-		Locale locale = new Locale(languageToLoad);
+	private void loadSettings() {
+		Settings.initlizeSettings(getApplicationContext());
+		this.localLang=Settings.getLocalLang();
+		this.isCourseNotify=Settings.isToNotifyCourse();
+		this.isUpdateNotify=Settings.isToNotifyUpdates();
+		
+	}
+
+	private void setLocalLang() {
+		Locale locale = new Locale(localLang);
 		Locale.setDefault(locale);
 		Configuration config = new Configuration();
 		config.locale = locale;
 		getBaseContext().getResources().updateConfiguration(config,
 				getBaseContext().getResources().getDisplayMetrics());
+	}
 
-		setContentView(R.layout.activity_main);
-		setTitle(R.string.app_name);
+	private void initlizeFragments() {
+
 		pages = new Fragment[3];
 		pages[0] = new FragmentCourses();
 		pages[1] = new FragmentTeachers();
 		pages[2] = new FragmentUpdates();
-		getSupportFragmentManager().addOnBackStackChangedListener(this);
-		this.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+	}
 
+	private void initlizeDrawerNavigation() {
 		drawertitles = new String[] {
 				getResources().getString(R.string.updates),
 				getResources().getString(R.string.teachers),
 				getResources().getString(R.string.courses) };
-		overridePendingTransition(android.R.anim.fade_in,
-				android.R.anim.fade_out);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		draweList = (ListView) findViewById(R.id.left_drawer);
 		draweAdapter dAdapter = new draweAdapter(getApplicationContext(),
@@ -191,8 +180,9 @@ public class MainActivity extends FragmentActivity implements
 		};
 
 		drawerLayout.setDrawerListener(drawertoggle);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		// getActionBar().setHomeButtonEnabled(true);
+	}
+
+	private void initlizePager() {
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
 				getSupportFragmentManager(), getResources(), pages);
 
@@ -202,46 +192,19 @@ public class MainActivity extends FragmentActivity implements
 
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int pos) {
-
-				saveCurentPage(pos);
-				switch (pos) {
-
-				case 0:
-
-					// strip.setBackgroundColor(Color.parseColor("#33b5e5"));
-					break;
-				case 1:
-					// #8ec127
-					// strip.setBackgroundColor(Color.parseColor("#8ec127"));
-					break;
-				case 2:
-					// strip.setBackgroundColor(Color.parseColor("#f47835"));
-					break;
-				case 3:
-					// #ffc425
-					// strip.setBackgroundColor(Color.parseColor("#ffc425"));
-					break;
-				}
-
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-
-			}
-		});
-
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
+		this.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		mViewPager.setCurrentItem(2);
 
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.activity_main);
+		
 	}
 
 	@Override

@@ -7,31 +7,17 @@
    >
 
     <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:id="@+id/update_timeLable"
-        android:paddingTop="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/title_updateLable"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:paddingRight="10dp"
-        android:text="25/11/92 14:25"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#666666"
-        android:textStyle="bold" />
-
-    <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/title_updateLable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/contentTextBox"
-        android:layout_toRightOf="@+id/update_timeLable"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
         android:padding="3dp"
         android:text="עדכון"
-        android:textColor="#666666"
+        android:textColor="#33b5e5"
         android:textSize="17sp" />
 
     <ward.landa.ExpandableTextView
@@ -42,14 +28,15 @@
         android:layout_below="@+id/title_updateLable"
         android:layout_toLeftOf="@+id/imgAttention"
         android:ellipsize="end"
-        android:maxLines="2"
+        android:fontFamily="davidNew.tff"
+        android:maxLines="3"
         android:paddingLeft="3dp"
         android:text="news news news!!"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#BDBDBD"
-       />
+        android:textColor="#BDBDBD" />
 
     <ImageView
+        android:contentDescription="Update Avatar"
         android:id="@+id/imgAttention"
         android:layout_width="89dp"
         android:layout_height="92dp"
@@ -58,5 +45,20 @@
         android:padding="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/update_icon_new" />
+
+    <TextView
+        android:id="@+id/update_timeLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/contentTextBox"
+        android:fontFamily="davidNew.tff"
+        android:gravity="bottom|left"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="25/11/92 14:25"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#949493" />
 
 </RelativeLayout>

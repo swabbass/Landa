@@ -26,6 +26,7 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
+    <string name="settings">הגדרות</string>
   <string name="app_name">לנדא</string>
     <string name="courses">סדנאות</string>
     <string name="drawer_close">סגור רשימה</string>

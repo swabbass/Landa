@@ -7,35 +7,26 @@ import java.util.List;
 import ward.landa.Course;
 import ward.landa.R;
 import ward.landa.Teacher;
-import ward.landa.R.drawable;
-import ward.landa.R.id;
-import ward.landa.R.layout;
-
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingRightInAnimationAdapter;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
+
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingRightInAnimationAdapter;
 
 public class CourseFragment extends Fragment {
 
@@ -61,14 +52,12 @@ public class CourseFragment extends Fragment {
 	@Override
 	public void onPause() {
 		Log.e("Fragment", "fragment course is paused");
-		// TODO Auto-generated method stub
 		super.onPause();
 	}
 
 	@Override
 	public void onStop() {
 		Log.e("Fragment", "fragment course is stopped");
-		// TODO Auto-generated method stub
 		super.onStop();
 	}
 
@@ -80,15 +69,12 @@ public class CourseFragment extends Fragment {
 
 	@Override
 	public void onDetach() {
-
-		// TODO Auto-generated method stub
 		Log.e("Fragment", "fragment course is deattached");
 		super.onDetach();
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		setHasOptionsMenu(true);
 	}
@@ -101,8 +87,7 @@ public class CourseFragment extends Fragment {
 		ab.setDisplayShowHomeEnabled(true);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
-
-
+	
 	private void initlizeTeachers() {
 		teachers = new ArrayList<Teacher>();
 		Teacher t1 = new Teacher(0000, R.drawable.ward, "Ward Abbass",
@@ -176,7 +161,7 @@ public class CourseFragment extends Fragment {
 		initlizeTeachers();
 		adapter ad = new adapter(getActivity(), teachers, getResources(),
 				courseName);
-		SwingRightInAnimationAdapter sRin=new SwingRightInAnimationAdapter(ad);
+		SwingRightInAnimationAdapter sRin = new SwingRightInAnimationAdapter(ad);
 		sRin.setAbsListView(l);
 		l.setAdapter(sRin);
 		return root;

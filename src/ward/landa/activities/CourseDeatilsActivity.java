@@ -1,11 +1,8 @@
 package ward.landa.activities;
 
 import ward.landa.R;
-import ward.landa.R.id;
-import ward.landa.R.layout;
-import ward.landa.R.menu;
 import ward.landa.fragments.CourseFragment;
-import android.app.Activity;
+import Utilites.Settings;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -38,7 +35,7 @@ public class CourseDeatilsActivity extends FragmentActivity {
 		fetchArguments();
 		Intent result = new Intent(getApplicationContext(), MainActivity.class);
 		setTitle(courseName);
-		setResult(MainActivity.COURSES, result);
+		setResult(Settings.COURSES, result);
 		overridePendingTransition(android.R.anim.slide_in_left,
 				android.R.anim.slide_out_right);
 		if (savedInstanceState == null) {
@@ -74,7 +71,7 @@ public class CourseDeatilsActivity extends FragmentActivity {
 			Intent result = new Intent(getApplicationContext(),
 					MainActivity.class);
 
-			setResult(MainActivity.COURSES, result);
+			setResult(Settings.COURSES, result);
 			finish();
 		}
 
