@@ -2,7 +2,6 @@ package ward.landa.activities;
 
 import ward.landa.R;
 import ward.landa.fragments.CourseFragment;
-import Utilites.Settings;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

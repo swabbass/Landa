@@ -2,7 +2,7 @@ package ward.landa.fragments;
 
 
 import ward.landa.R;
-import Utilites.Settings;
+import ward.landa.activities.Settings;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

@@ -6,14 +6,15 @@ import java.util.List;
 import ward.landa.ExpandableTextView;
 import ward.landa.R;
 import ward.landa.Update;
+import ward.landa.activities.Settings;
 import ward.landa.activities.SettingsActivity;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -29,29 +30,34 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 
 public class FragmentUpdates extends Fragment {
 
+	GoogleCloudMessaging gcm;
+	boolean isReg;
+	String regKey;
 	ListView l;
-	//SwipeListView l;
 	List<Update> ups;
-	List<Update> hidden;
-	// maybe more effiecent to deal with indexes of the active ones but first
-	// solve adapter issues
-	List<Update> active;
 	boolean isExpanded = false;
 	updateCallback callBack;
 	boolean showAll;
 	updatesAdapter uAdapter;
+	updateReciever uR;
 
 	public interface updateCallback {
-		public void onUpdateClick(Update u) ;
+		public void onUpdateClick(Update u);
 	}
 
 	@Override
 	public void onResume() {
 		Log.d("Fragment", "on resume updates");
+
+		uR = new updateReciever();
+		getActivity().registerReceiver(uR,
+				new IntentFilter(Settings.DISPLAY_MESSAGE_ACTION));
+
 		super.onResume();
 	}
 
@@ -63,12 +69,24 @@ public class FragmentUpdates extends Fragment {
 
 	@Override
 	public void onStart() {
+
+		uAdapter = new updatesAdapter(ups, ups, getActivity(), callBack);
+		uAdapter.setShowall(false);
+		ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
+		sc.setAbsListView(l);
+		l.setAdapter(sc);
+
+		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		Log.d("Fragment", "on start updates");
 		super.onStart();
 	}
 
 	@Override
 	public void onPause() {
+		if (uR != null) {
+
+			getActivity().unregisterReceiver(uR);
+		}
 		Log.d("Fragment", "on pause updates");
 		super.onPause();
 	}
@@ -89,12 +107,12 @@ public class FragmentUpdates extends Fragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+
 		switch (item.getItemId()) {
 		case R.id.settings:
-			Intent i=new Intent(getActivity(), SettingsActivity.class);
+			Intent i = new Intent(getActivity(), SettingsActivity.class);
 			startActivity(i);
-			
+
 			break;
 
 		default:
@@ -102,8 +120,7 @@ public class FragmentUpdates extends Fragment {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
@@ -117,26 +134,11 @@ public class FragmentUpdates extends Fragment {
 		Log.d("Fragment", "on create updates");
 		View root = inflater.inflate(R.layout.updates_frag_list, container,
 				false);
-		l = (ListView) root.findViewById(R.id.updates_listView);
-		//l = (SwipeListView) root.findViewById(R.id.updates_listView);
-		showAll = false;
-		String lo = "לקראת תחילת תהליך החייאת השפה העברית, בעת שהיא שימשה רק כשפה שנייה בפי יהודים ושומרונים, היו לשפה שני ניבים - יהודי ושומרוני, כשהניב השומרוני היה על סף כליה גם כשפה שנייה, יחד עם העדה השומרונית עצמה. לניב היהודי היו שלוש דרכי הגיה עיקריות: אשכנזית, ספרדית ותימנית (יש המציינים גם הגייה עיראקית). עם החייאת השפה, בן-יהודה הכריז על ההגייה הספרדית כהגייה התקנית של העברית. אולם בפועל מחיי השפה דבקו בהגייה שהיא מעין פשרה בין הספרדית לאשכנזית וזו נשתרשה בעם.";
-		ups = new ArrayList<Update>();
-		ups.add(new Update("subject Dummy","25/11/1992 14:00","hey hey noce content"));
-		ups.add(new Update("subject Dummy","14/11/2001 14:00",
-				"בשל התחייה המאוחרת של השפה העברית, אין כמעט ניבים אזוריים עבריים. למעשה, השפה הנשמעת בפי דוברים ילידיים זהה כמעט בכל חלקי ישראל. אפשר להבחין בשוני בין הניבים המדוברים בפי עדות יהודיות שונות (אתנולקטים). אולם, שוני זה מתבטא בעיקר בפונולוגיה, ולא בתחביר או במורפולוגיה. עיקרי שוני זה הם בהשפעה ספרדית-תימנית על ההגייה המקובלת ולעתים בהשפעה אשכנזית על ההגייה המקובלת (למשל בקרב חלק מהעדה החרדית בירושלים ובברוקלין). שוני מסוים בתחביר ובמורפולוגיה קיים בין ניבים מעמדיים של השפה (סוציולקטים), אולם שוני זה אינו גדול יחסית."));
-		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo));
-		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo.substring(20)));
-		ups.add(new Update("subject Dummy","14/11/2001 14:00",lo.substring(10, lo.length() - 1)));
 
-		
-		uAdapter = new updatesAdapter(ups, ups, getActivity(), callBack);
-		uAdapter.setShowall(false);
-		ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
-		sc.setAbsListView(l);
-		l.setAdapter(sc);
-		
-		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		l = (ListView) root.findViewById(R.id.updates_listView);
+		// l = (SwipeListView) root.findViewById(R.id.updates_listView);
+		showAll = false;
+		ups = new ArrayList<Update>();
 
 		l.setOnItemClickListener(new OnItemClickListener() {
 
@@ -167,7 +169,10 @@ public class FragmentUpdates extends Fragment {
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				mode.getMenuInflater().inflate(R.menu.update_contextual_menu,
 						menu);
-				mode.setTitle(count +" "+ getActivity().getResources().getString(R.string.selected));
+				mode.setTitle(count
+						+ " "
+						+ getActivity().getResources().getString(
+								R.string.selected));
 				return true;
 			}
 
@@ -307,19 +312,24 @@ public class FragmentUpdates extends Fragment {
 		}
 
 	}
-	public int convertDpToPixel(float dp) {
-	       DisplayMetrics metrics = getResources().getDisplayMetrics();
-	       float px = dp * (metrics.densityDpi / 160f);
-	       return (int) px;
-	   }
-	private static List<Update> filterActive(List<Update> updates) {
-		List<Update> result = new ArrayList<Update>();
-		for (Update u : updates) {
-			if (u.isActive()) {
-				result.add(u);
+
+	class updateReciever extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			if (arg1.getAction().toString()
+					.compareTo(Settings.DISPLAY_MESSAGE_ACTION) == 0) {
+				Bundle extras = arg1.getExtras();
+				String title = extras.getString(Settings.EXTRA_TITLE);
+				String msg = extras.getString(Settings.EXTRA_MESSAGE);
+				String date = extras.getString(Settings.EXTRA_Date);
+				Update u = new Update(title, date, msg);
+				ups.add(u);
+				uAdapter.notifyDataSetChanged();
 			}
+
 		}
-		return result;
+
 	}
 
 }

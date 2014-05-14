@@ -1,18 +1,17 @@
 package ward.landa;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 
 public class Teacher {
 
 	private int ID;
 	private int imgId;
-	private String name;
+	private String imageUrl;
+	private String imageLocalPath;
+	private String last_name;
+	private String id_number;
+	private String first_name;
 	private String email;
-	private String phone;
 	private String position;
 	private String faculty;
 	public HashMap<String, Course> getCourses() {
@@ -30,12 +29,22 @@ public class Teacher {
 		setImgId(imgId);
 		setName(name);
 		setEmail(email);
-		setPhone(phone);
 		setPosition(pos);
 		setFaculty(faculty);
 		courses = new HashMap<String, Course>();
 	}
+	public Teacher(String fname,String lname, String email, String id_number,
+			String pos, String faculty) {
 
+		setId_number(id_number);
+		setName(fname);
+		setLast_name(lname);
+		setEmail(email);
+		setPosition(pos);
+		setFaculty(faculty);
+		setImageUrl("http://nlanda.technion.ac.il/LandaSystem/pics/"+id_number+".jpg");
+		courses = new HashMap<String, Course>();
+	}
 	public HashMap<String, String> getCourseDetailsToShow(String courseName)
 	{
 		Course c=getCourses().get(courseName);
@@ -87,11 +96,11 @@ public class Teacher {
 	}
 
 	public String getName() {
-		return name;
+		return first_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.first_name = name;
 	}
 
 	public String getEmail() {
@@ -102,13 +111,7 @@ public class Teacher {
 		this.email = email;
 	}
 
-	public String getPhone() {
-		return phone;
-	}
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
 
 	
 
@@ -126,5 +129,37 @@ public class Teacher {
 
 	public void setFaculty(String faculty) {
 		this.faculty = faculty;
+	}
+
+	public String getLast_name() {
+		return last_name;
+	}
+
+	public void setLast_name(String last_name) {
+		this.last_name = last_name;
+	}
+
+	public String getId_number() {
+		return id_number;
+	}
+
+	public void setId_number(String id_number) {
+		this.id_number = id_number;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getImageLocalPath() {
+		return imageLocalPath;
+	}
+
+	public void setImageLocalPath(String imageLocalPath) {
+		this.imageLocalPath = imageLocalPath;
 	}
 }

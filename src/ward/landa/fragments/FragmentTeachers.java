@@ -1,19 +1,11 @@
 package ward.landa.fragments;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.ImageUtilities.BitmapUtils;
-import ward.landa.R.drawable;
-import ward.landa.R.id;
-import ward.landa.R.layout;
-import ward.landa.R.menu;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -35,34 +27,33 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+
 public class FragmentTeachers extends Fragment {
 
 	List<Teacher> teachers;
 	List<Teacher> searched;
 	callbackTeacher tCallback;
-	
 	gridAdabter gAdapter;
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		getActivity().getMenuInflater().inflate(R.menu.teacher_menu, menu);
-		View v=(View)menu.findItem(R.id.teacher_menu_search).getActionView();
-		
-		EditText search=(EditText)v.findViewById(R.id.teacher_txt_search);
+	public interface callbackTeacher {
+		public void OnTeacherItemClick(Teacher t);
+	}
+	
+	private void initlizeSearchEngine(View v) {
+
+		EditText search = (EditText) v.findViewById(R.id.teacher_txt_search);
 		search.addTextChangedListener(new TextWatcher() {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 				Log.d("text", "text now changed");
-				if(s.length()!=0)
-				{
-					gAdapter.setL(search(s.toString()),1);
+				if (s.length() != 0) {
+					gAdapter.setL(search(s.toString()), 1);
 					gAdapter.notifyDataSetChanged();
-					
-				}
-				else{
-					gAdapter.setL(teachers,0);
+
+				} else {
+					gAdapter.setL(teachers, 0);
 					gAdapter.notifyDataSetChanged();
 				}
 
@@ -70,14 +61,12 @@ public class FragmentTeachers extends Fragment {
 
 			private List<Teacher> search(String string) {
 				searched.clear();
-				for(Teacher t :teachers)
-				{
-					if(t.getName().contains(string))
-					{
+				for (Teacher t : teachers) {
+					if (t.getName().contains(string)) {
 						searched.add(t);
 					}
 				}
-				
+
 				return searched;
 			}
 
@@ -85,26 +74,26 @@ public class FragmentTeachers extends Fragment {
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
 				Log.d("text", "before text now changed");
-				
 
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
 				Log.d("text", "after text now changed");
-				
 
 			}
 		});
-		
-		
+
 	}
-	public interface callbackTeacher {
-		public void OnTeacherItemClick(Teacher t);
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		getActivity().getMenuInflater().inflate(R.menu.teacher_menu, menu);
+		View v = (View) menu.findItem(R.id.teacher_menu_search).getActionView();
+		initlizeSearchEngine(v);
 	}
-	
-	
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		try {
@@ -117,15 +106,8 @@ public class FragmentTeachers extends Fragment {
 		super.onAttach(activity);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		View root = inflater.inflate(R.layout.teacher_custom_grid, container,
-				false);
-		teachers = new ArrayList<Teacher>();
-		searched=new ArrayList<Teacher>();
-		
+	private void runDemo() {
+
 		// ////////////////////Testing//////////////////////////
 		Teacher t1 = new Teacher(0000, R.drawable.ward, "ward",
 				"mail@ward.com", "0555", "חברתי", "CS");
@@ -154,11 +136,25 @@ public class FragmentTeachers extends Fragment {
 		teachers.add(t7);
 		teachers.add(t8);
 		teachers.add(t9);
-		gAdapter=new gridAdabter(root.getContext(), teachers,
-				getResources(),0);
+
+	}
+	
+	
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		View root = inflater.inflate(R.layout.teacher_custom_grid, container,
+				false);
+		teachers = new ArrayList<Teacher>();
+		searched = new ArrayList<Teacher>();
+		runDemo();
+		gAdapter = new gridAdabter(root.getContext(), teachers, getResources(),
+				0);
 		GridView gridView = (GridView) root.findViewById(R.id.gridview);
-		AlphaInAnimationAdapter alphaAdapter=new AlphaInAnimationAdapter(gAdapter);
-		SwingBottomInAnimationAdapter sb=new SwingBottomInAnimationAdapter(gAdapter);
+		SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+				gAdapter);
 		sb.setAbsListView(gridView);
 		gridView.setAdapter(sb);
 
@@ -167,12 +163,12 @@ public class FragmentTeachers extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				tCallback.OnTeacherItemClick(gAdapter.searched == 0 ? teachers.get(arg2) : searched.get(arg2));
+				tCallback.OnTeacherItemClick(gAdapter.searched == 0 ? teachers
+						.get(arg2) : searched.get(arg2));
 
 			}
 		});
-		
-		
+
 		return root;
 	}
 
@@ -182,17 +178,20 @@ public class FragmentTeachers extends Fragment {
 		List<Teacher> l;
 		Resources res;
 		BitmapUtils bmpUtils;
-		int searched=0;
-		public void setL(List<Teacher> l,int search) {
+		int searched = 0;
+
+		public void setL(List<Teacher> l, int search) {
 			this.l = l;
-			this.searched=search;
+			this.searched = search;
 		}
-		public gridAdabter(Context context, List<Teacher> l, Resources res,int search) {
+
+		public gridAdabter(Context context, List<Teacher> l, Resources res,
+				int search) {
 			this.inflater = LayoutInflater.from(context);
 			this.l = l;
 			this.res = res;
-			this.searched=search;
-			this.bmpUtils=new BitmapUtils(context);
+			this.searched = search;
+			this.bmpUtils = new BitmapUtils(context);
 			// TODO Auto-generated constructor stub
 		}
 
@@ -232,8 +231,10 @@ public class FragmentTeachers extends Fragment {
 
 			Teacher teacher = (Teacher) getItem(pos);
 			bmpUtils.loadBitmap(teacher.getImgId(), picture);
-			/*picture.setImageBitmap(Utilities.decodeSampledBitmapFromResource(
-					res, teacher.getImgId(), 150, 150));*/
+			/*
+			 * picture.setImageBitmap(Utilities.decodeSampledBitmapFromResource(
+			 * res, teacher.getImgId(), 150, 150));
+			 */
 			name.setText(teacher.toString());
 
 			return v;

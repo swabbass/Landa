@@ -1,24 +1,31 @@
 package ward.landa.activities;
 
+import java.io.IOException;
 import java.util.Locale;
 
+
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import utilites.DBManager;
 import ward.landa.Course;
+import ward.landa.GCMUtils;
 import ward.landa.LoginFragment;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
-import ward.landa.Utilities;
 import ward.landa.fragments.CourseFragment;
 import ward.landa.fragments.FragmentCourses;
 import ward.landa.fragments.FragmentTeachers;
 import ward.landa.fragments.FragmentUpdates;
 import ward.landa.fragments.teacherFragment;
-import Utilites.Settings;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -45,7 +52,7 @@ import android.widget.TextView;
 public class MainActivity extends FragmentActivity implements
 		FragmentCourses.OnCourseSelected, FragmentTeachers.callbackTeacher,
 		FragmentUpdates.updateCallback, OnBackStackChangedListener {
-	
+	GoogleCloudMessaging gcm;
 	String localLang;
 	boolean isUpdateNotify;
 	boolean isCourseNotify;
@@ -58,6 +65,9 @@ public class MainActivity extends FragmentActivity implements
 	String[] drawertitles;
 	int viewpagerid = -1;
 	Fragment[] pages;
+	boolean isReg;
+	String regKey;
+	utilites.DBManager db_mngr ;
 
 	@Override
 	protected void onDestroy() {
@@ -70,7 +80,9 @@ public class MainActivity extends FragmentActivity implements
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		Log.e("Fragment", "Main Activity started");
+		initlizeDataBase();
 		loadSettings();
+		loadPrefrences();
 		setLocalLang();
 		setTitle(R.string.app_name);
 		initlizeFragments();
@@ -79,6 +91,7 @@ public class MainActivity extends FragmentActivity implements
 				android.R.anim.fade_out);
 		initlizePager();
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		initlizeGCM();
 		super.onStart();
 	}
 
@@ -101,6 +114,14 @@ public class MainActivity extends FragmentActivity implements
 		super.onResume();
 	}
 
+	private void initlizeGCM() {
+		gcm = GoogleCloudMessaging.getInstance(this);
+		if (!isReg) {
+			new registerGcm().execute();
+		}
+
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 122) {
@@ -118,10 +139,10 @@ public class MainActivity extends FragmentActivity implements
 
 	private void loadSettings() {
 		Settings.initlizeSettings(getApplicationContext());
-		this.localLang=Settings.getLocalLang();
-		this.isCourseNotify=Settings.isToNotifyCourse();
-		this.isUpdateNotify=Settings.isToNotifyUpdates();
-		
+		this.localLang = Settings.getLocalLang();
+		this.isCourseNotify = Settings.isToNotifyCourse();
+		this.isUpdateNotify = Settings.isToNotifyUpdates();
+
 	}
 
 	private void setLocalLang() {
@@ -133,6 +154,10 @@ public class MainActivity extends FragmentActivity implements
 				getBaseContext().getResources().getDisplayMetrics());
 	}
 
+	private void initlizeDataBase() {
+		db_mngr= new DBManager(getApplicationContext());
+
+	}
 	private void initlizeFragments() {
 
 		pages = new Fragment[3];
@@ -204,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-		
+
 	}
 
 	@Override
@@ -371,27 +396,6 @@ public class MainActivity extends FragmentActivity implements
 		Intent i = new Intent(this, CourseDeatilsActivity.class);
 		i.putExtras(extras);
 		startActivityForResult(i, 122);
-		// startActivityFromFragment(pages[0], i, 122);
-
-		/*
-		 * CourseFragment cf; FragmentManager fm = getSupportFragmentManager();
-		 * cf = (CourseFragment) fm.findFragmentByTag("CourseFragment"); if (cf
-		 * == null) {
-		 * 
-		 * cf = new CourseFragment();
-		 * 
-		 * Bundle extras = new Bundle(); extras.putString("name", c.getName());
-		 * extras.putInt("ImageID", c.getImgID()); extras.putInt("courseID",
-		 * c.getCourseID()); cf.setArguments(extras); FragmentTransaction
-		 * transaction = getSupportFragmentManager() .beginTransaction();
-		 * transaction
-		 * .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		 * transaction.replace(R.id.fragment_container, cf, "CourseFragment");
-		 * transaction
-		 * .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		 * transaction.addToBackStack(null); transaction.commit(); } else {
-		 * Log.d("hehe", "null"); }
-		 */
 
 	}
 
@@ -407,18 +411,6 @@ public class MainActivity extends FragmentActivity implements
 		Intent i = new Intent(this, TutorDetails.class);
 		i.putExtras(extras);
 		startActivityFromFragment(pages[1], i, 122);
-		/*
-		 * teacherFragment tf = new teacherFragment(); Bundle extras = new
-		 * Bundle(); extras.putInt("imgid", t.getImgId());
-		 * extras.putString("name", t.getName()); extras.putString("email",
-		 * t.getEmail()); extras.putString("faculty", t.getFaculty());
-		 * extras.putString("position", t.getPosition());
-		 * tf.setArguments(extras); FragmentTransaction transaction =
-		 * getSupportFragmentManager() .beginTransaction();
-		 * transaction.replace(R.id.fragment_container, tf, "TeacherFragment");
-		 * transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		 * transaction.addToBackStack(null); transaction.commit();
-		 */
 
 	}
 
@@ -478,13 +470,6 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtras(extras);
 		startActivityFromFragment(pages[2], i, 122);
 
-		/*
-		 * FragmentTransaction transaction
-		 * =android.support.v4.app.Fragment.getChildFragmentManager
-		 * ().beginTransaction(); transaction.replace(R.id.updates_listView, new
-		 * UpdateDetailFragment()); transaction.commit();
-		 */
-
 	}
 
 	@Override
@@ -492,6 +477,67 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
 		getActionBar().setDisplayHomeAsUpEnabled(canback);
+	}
+
+	/*
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+	private void loadPrefrences() {
+		SharedPreferences sh = getSharedPreferences(GCMUtils.DATA,
+				Activity.MODE_PRIVATE);
+		isReg = sh.getBoolean(GCMUtils.REGSITER, false);
+		regKey = sh.getString(GCMUtils.REG_KEY, null);
+
+	}
+
+	private void savePrefrences(boolean isReg, String regKey) {
+		SharedPreferences sh = getSharedPreferences(GCMUtils.DATA,
+				Activity.MODE_PRIVATE);
+		SharedPreferences.Editor ed = sh.edit();
+		ed.putBoolean(GCMUtils.REGSITER, isReg);
+		ed.putString(GCMUtils.REG_KEY, regKey);
+		ed.commit();
+	}
+
+	class registerGcm extends AsyncTask<String, String, String> {
+		String st = null;
+
+		@Override
+		protected String doInBackground(String... arg0) {
+			try {
+				st = gcm.register(GCMUtils.SENDER_ID);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Log.e(GCMUtils.TAG, e.toString());
+			}
+			if (!st.isEmpty() || st != null) {
+				isReg = true;
+				regKey = new String(st);
+				Log.d(GCMUtils.TAG, "regKey is : " + regKey);
+				GCMUtils.sendRegistrationIdToBackend(regKey);
+			}
+
+			return "";
+
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			if (isReg)
+				savePrefrences(true, st);
+			super.onPostExecute(result);
+		}
+
 	}
 
 }

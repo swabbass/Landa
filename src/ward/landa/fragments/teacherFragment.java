@@ -1,9 +1,9 @@
 package ward.landa.fragments;
 
 import ward.landa.R;
-import ward.landa.Utilities;
 import ward.landa.R.id;
 import ward.landa.R.layout;
+import ward.landa.activities.Utilities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

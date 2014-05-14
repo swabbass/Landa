@@ -1,6 +1,11 @@
-package Utilites;
+package ward.landa.activities;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import ward.landa.R;
+import ward.landa.R.id;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,6 +27,19 @@ public class Settings {
 	private static boolean toNotifyUpdates;
 	private static boolean toNotifyCourse;
 
+	public static final String DISPLAY_MESSAGE_ACTION = "ward.landa.DISPLAY_MESSAGE";
+	// public static final String ADD_CONVERSATION_ACTION =
+	// "ward.landa.ADD_CONVERSATION";
+	// public static final String DISPLAY_CONVERSATION_ACTION =
+	// "ward.landa.DISPLAY_CONVERSATION";
+	public static final String DISMISS_NOTIFICATION_ACTION = "ward.landa.DISMISS_NOTIFICATION";
+	public static final String EXTRA_MESSAGE = "message";
+	public static final String EXTRA_Date = "date";
+	public static final String EXTRA_TITLE = "title";
+
+	public static SimpleDateFormat sDf = new SimpleDateFormat(
+			"yyyy-MM-dd HH:mm");
+
 	public static void initlizeSettings(Context c) {
 		SharedPreferences settings = c.getSharedPreferences(SETTINGS,
 				Activity.MODE_PRIVATE);
@@ -30,8 +48,14 @@ public class Settings {
 		toNotifyUpdates = settings.getBoolean(TO_NOTIFY_UPDATE, true);
 	}
 
-	public static  void saveSettings(Context c, String local, boolean courseNotify,
-			boolean updateNotify) {
+	public static String getexactTime() {
+
+		Date cal = Calendar.getInstance().getTime();
+		return sDf.format(cal);
+	}
+
+	public static void saveSettings(Context c, String local,
+			boolean courseNotify, boolean updateNotify) {
 		SharedPreferences settings = c.getSharedPreferences(SETTINGS,
 				Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
