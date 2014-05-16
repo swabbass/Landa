@@ -17,6 +17,8 @@ public class GCMUtils {
 	public static final String DATA = "data";
 	public static final String SENDER_ID = "498258787681";
 	public static final String REGSITER = "isReg";
+	public static final String LOAD_TEACHERS="load_teachers";
+	public static final String LOAD_COURSES="load_courses";
 	public static final String REG_KEY = "REGKEY";
 	public static final String URL = "http://wabbass.byethost9.com/wordpress/";
 	public static final String TAG = "wordpress";

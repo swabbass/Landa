@@ -1,9 +1,14 @@
 package ward.landa;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Course {
+public class Course implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2267973230480147607L;
 	private String name;
 	private String day;
 	private String timeFrom;
@@ -13,7 +18,9 @@ public class Course {
 	private int imgID;
 	private int courseID;
 	private float rating;
-	private List<Teacher> teachers;
+	private String tutor_id;
+	
+	//private List<Teacher> teachers;
 	private int toShow;
 	public Course(int courseID,String name ,String dateString,String teacher,int imgId,float rate) {
 		setCourseID(courseID);
@@ -23,23 +30,23 @@ public class Course {
 		setImgID(imgId);
 		setRating(rate);
 		setToShow(1);
-		teachers=new ArrayList<Teacher>();
+	//	teachers=new ArrayList<Teacher>();
 	
 	}
-	public Course(int courseID,String name ,String dateString,String timeFrom,String timeTo,String place,int imgId,float rate) {
+	public Course(int courseID,String name ,String dateString,String timeFrom,String timeTo,String place,String tutor_id) {
 		setCourseID(courseID);
 		setName(name);
 		setDateTime(dateString);
 		setTimeFrom(timeFrom);
 		setTimeTo(timeTo);
 		setPlace(place);
-		setImgID(imgId);
-		setRating(rate);
-		setToShow(1);
-		teachers=new ArrayList<Teacher>();
+		setImgID(0);
+		setRating(0);
+		setTutor_id(tutor_id);
+	//	teachers=new ArrayList<Teacher>();
 	
 	}
-	public void addTeacher(Teacher t)
+	/*public void addTeacher(Teacher t)
 	{
 		if(t!=null)
 		{
@@ -60,14 +67,14 @@ public class Course {
 		{
 			teachers.remove(t);
 		}
-	}
+	}*/
 	@Override
 	public boolean equals(Object o) {
 		// TODO Auto-generated method stub
 		if(o instanceof Course)
 		{
 			Course tmp=(Course)o;
-			return tmp.getCourseID()==this.getCourseID();
+			return tmp.getName().equals(this.getName());
 		}
 		return false;
 	}
@@ -130,6 +137,12 @@ public class Course {
 	}
 	public void setTimeFrom(String timeFrom) {
 		this.timeFrom = timeFrom;
+	}
+	public String getTutor_id() {
+		return tutor_id;
+	}
+	public void setTutor_id(String tutor_id) {
+		this.tutor_id = tutor_id;
 	}
 	
 	

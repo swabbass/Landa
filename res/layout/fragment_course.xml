@@ -12,26 +12,25 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-<ImageView
-    android:id="@+id/courseAvatar"
-    android:layout_width="120dp"
-    android:layout_height="120dp"
-    android:layout_alignParentRight="true"
-    android:layout_alignParentTop="true"
-    android:layout_marginRight="5dp"
-    android:layout_marginTop="5dp"
-    android:contentDescription="Description"
-    android:scaleType="centerCrop"
-    android:src="@drawable/akgebramatrix" />
+    <ImageView
+        android:id="@+id/courseAvatar"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:contentDescription="Description"
+        android:scaleType="centerCrop"
+        android:src="@drawable/akgebramatrix" />
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/courseTeachers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/languageLable"
         android:dividerHeight="1dp" >
-
-    </ListView>
+    </ExpandableListView>
 
     <TextView
         android:id="@+id/courseLable"

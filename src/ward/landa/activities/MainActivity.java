@@ -1,13 +1,26 @@
 package ward.landa.activities;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
-
+import org.apache.http.NameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.wallet.LineItem.Role;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 import utilites.DBManager;
+import utilites.JSONParser;
 import ward.landa.Course;
 import ward.landa.GCMUtils;
 import ward.landa.LoginFragment;
@@ -25,8 +38,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -67,22 +82,69 @@ public class MainActivity extends FragmentActivity implements
 	Fragment[] pages;
 	boolean isReg;
 	String regKey;
-	utilites.DBManager db_mngr ;
+	utilites.DBManager db_mngr;
+	JSONParser jParser;
+	private  registerGcm task;
+	public static ImageLoaderConfiguration config;
+	public static ImageLoader image_loader;
+	public static PauseOnScrollListener listener;
+
+	private ImageLoaderConfiguration initilizeImageLoader(
+			DisplayImageOptions options) {
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+				getApplicationContext()).memoryCacheExtraOptions(120, 120)
+				.denyCacheImageMultipleSizesInMemory()
+				.memoryCache(new LruMemoryCache(2 * 1024 * 1024))
+				.memoryCacheSize(2 * 1024 * 1024)
+				.defaultDisplayImageOptions(options)
+				.discCacheSize(50 * 1024 * 1024).discCacheFileCount(100)
+				.writeDebugLogs().build();
+		return config;
+
+	}
+
+	private DisplayImageOptions initlizeImageDisplay() {
+		DisplayImageOptions options = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.ic_stub)
+				// resource or drawable
+				.showImageForEmptyUri(R.drawable.ic_empty)
+				// resource or drawable
+				.showImageOnFail(R.drawable.ic_error)
+				// resource or drawable
+				.resetViewBeforeLoading(false)
+				// default
+				.delayBeforeLoading(1000).cacheInMemory(true).cacheOnDisc(true)
+				.considerExifParams(false) // default
+				.imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
+				.bitmapConfig(Bitmap.Config.ARGB_8888) // default
+				.handler(new Handler()) // default
+				.build();
+		return options;
+	}
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		// saveCurentPage(2);
 		super.onDestroy();
+	}
+
+	private void initlizeImageLoad() {
+		config = initilizeImageLoader(initlizeImageDisplay());
+		image_loader = ImageLoader.getInstance();
+		image_loader.init(config);
+		boolean pauseOnScroll = false; // or true
+		boolean pauseOnFling = true; // or false
+		listener = new PauseOnScrollListener(image_loader, pauseOnScroll,
+				pauseOnFling);
+
 	}
 
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
 		Log.e("Fragment", "Main Activity started");
+		initlizeImageLoad();
 		initlizeDataBase();
 		loadSettings();
-		loadPrefrences();
+		loadRegsetrationData();
 		setLocalLang();
 		setTitle(R.string.app_name);
 		initlizeFragments();
@@ -98,6 +160,8 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
+	//	image_loader.clearDiscCache();
+	//	image_loader.clearMemoryCache();
 		Log.e("Fragment", "Main Activity stopped");
 		super.onStop();
 	}
@@ -117,7 +181,8 @@ public class MainActivity extends FragmentActivity implements
 	private void initlizeGCM() {
 		gcm = GoogleCloudMessaging.getInstance(this);
 		if (!isReg) {
-			new registerGcm().execute();
+			task = new registerGcm();
+			task.execute();
 		}
 
 	}
@@ -155,9 +220,10 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void initlizeDataBase() {
-		db_mngr= new DBManager(getApplicationContext());
+		db_mngr = new DBManager(getApplicationContext());
 
 	}
+
 	private void initlizeFragments() {
 
 		pages = new Fragment[3];
@@ -229,6 +295,7 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+		jParser = new JSONParser();
 
 	}
 
@@ -337,11 +404,12 @@ public class MainActivity extends FragmentActivity implements
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
 			Log.i("FragmentPosition", "Fposition = " + position);
+
 			switch (position) {
 			case 0:
-
 				return f[0];
 			case 1:
+
 				return f[1];
 			case 2:
 				return f[2];
@@ -492,7 +560,7 @@ public class MainActivity extends FragmentActivity implements
  * 
  * 
  */
-	private void loadPrefrences() {
+	private void loadRegsetrationData() {
 		SharedPreferences sh = getSharedPreferences(GCMUtils.DATA,
 				Activity.MODE_PRIVATE);
 		isReg = sh.getBoolean(GCMUtils.REGSITER, false);
@@ -500,7 +568,7 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	private void savePrefrences(boolean isReg, String regKey) {
+	private void saveRegstrationData(boolean isReg, String regKey) {
 		SharedPreferences sh = getSharedPreferences(GCMUtils.DATA,
 				Activity.MODE_PRIVATE);
 		SharedPreferences.Editor ed = sh.edit();
@@ -509,7 +577,7 @@ public class MainActivity extends FragmentActivity implements
 		ed.commit();
 	}
 
-	class registerGcm extends AsyncTask<String, String, String> {
+	public class registerGcm extends AsyncTask<String, String, String> {
 		String st = null;
 
 		@Override
@@ -533,11 +601,49 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		protected void onPostExecute(String result) {
-			if (isReg)
-				savePrefrences(true, st);
+			if (isReg) {
+				saveRegstrationData(true, st);
+			}
 			super.onPostExecute(result);
 		}
 
 	}
+
+	/*
+	 * class loadDataFromBackend extends AsyncTask<String, String, String> {
+	 * List<NameValuePair> params = new ArrayList<NameValuePair>(); boolean
+	 * allOk = false;
+	 * 
+	 * @Override protected String doInBackground(String... arg0) { JSONObject
+	 * jsonUsers = jParser.makeHttpRequest( Settings.URL_teachers, "GET",
+	 * params); JSONObject jsonCourses = jParser.makeHttpRequest(
+	 * Settings.URL_COURSES, "GET", params); Log.d("ward",
+	 * jsonUsers.toString()); Log.d("ward", jsonCourses.toString());
+	 * 
+	 * try {
+	 * 
+	 * JSONArray teachers = jsonUsers.getJSONArray("users"); JSONArray courses =
+	 * jsonCourses.getJSONArray("courses");
+	 * 
+	 * for (int i = 0; i < teachers.length(); i++) { JSONObject c =
+	 * teachers.getJSONObject(i); Teacher t = new Teacher(c.getString("fname"),
+	 * c.getString("lname"), c.getString("email"), c.getString("id"), "T",
+	 * c.getString("faculty")); MainActivity.teachers.add(t);
+	 * db_mngr.insertTeacher(t); } for (int i = 0; i < courses.length(); i++) {
+	 * JSONObject c = courses.getJSONObject(i); Course tmp = new Course(i,
+	 * c.getString("subject_name"), c.getString("day"),
+	 * c.getString("time_from"), c.getString("time_to"), c.getString("place"),
+	 * c.getString("tutor_id")); MainActivity.courses.add(tmp);
+	 * db_mngr.insertCourse(tmp); }
+	 * 
+	 * allOk = true; } catch (JSONException e) { e.printStackTrace();
+	 * 
+	 * } return ""; }
+	 * 
+	 * @Override protected void onPostExecute(String result) { if (allOk)
+	 * saveLoadedDataFlag(true); super.onPostExecute(result); }
+	 * 
+	 * }
+	 */
 
 }

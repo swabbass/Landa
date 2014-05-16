@@ -1,9 +1,18 @@
 package ward.landa;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class Teacher {
+import ward.landa.activities.Settings;
 
+public class Teacher implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4848852330456784447L;
 	private int ID;
 	private int imgId;
 	private String imageUrl;
@@ -14,15 +23,10 @@ public class Teacher {
 	private String email;
 	private String position;
 	private String faculty;
-	public HashMap<String, Course> getCourses() {
-		return courses;
-	}
+	private boolean downloadedImage;
+	private HashMap<String, List<String>> timesForEachCourse;
 
-	public void setCourses(HashMap<String, Course> courses) {
-		this.courses = courses;
-	}
-
-	private HashMap<String, Course> courses;
+	// private HashMap<String, Course> courses;
 	public Teacher(int ID, int imgId, String name, String email, String phone,
 			String pos, String faculty) {
 		setID(ID);
@@ -31,9 +35,10 @@ public class Teacher {
 		setEmail(email);
 		setPosition(pos);
 		setFaculty(faculty);
-		courses = new HashMap<String, Course>();
+		timesForEachCourse = new HashMap<String, List<String>>();
 	}
-	public Teacher(String fname,String lname, String email, String id_number,
+
+	public Teacher(String fname, String lname, String email, String id_number,
 			String pos, String faculty) {
 
 		setId_number(id_number);
@@ -42,43 +47,68 @@ public class Teacher {
 		setEmail(email);
 		setPosition(pos);
 		setFaculty(faculty);
-		setImageUrl("http://nlanda.technion.ac.il/LandaSystem/pics/"+id_number+".jpg");
-		courses = new HashMap<String, Course>();
+		setImageUrl("http://nlanda.technion.ac.il/LandaSystem/pics/"
+				+ id_number + ".jpg");
+		String t = Settings.picFromAbsoulotePath + id_number + ".jpg";
+		setImageLocalPath(t);
+		setDownloadedImage(false);
+		timesForEachCourse = new HashMap<String, List<String>>();
 	}
-	public HashMap<String, String> getCourseDetailsToShow(String courseName)
-	{
-		Course c=getCourses().get(courseName);
-		if(c!=null){
-		HashMap< String, String> details=new HashMap<String, String>(4);
-		details.put("day", c.getDateTime());
-		details.put("from",c.getTimeFrom());
-		details.put("to", c.getTimeTo());
-		details.put("place", c.getPlace());
-		return details;
-		}
-		else
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof Teacher)
 		{
-			throw new NullPointerException("Null Course");
-		}		
-	}
-	public void addCourse(Course c) {
-		if (courses != null) {
-			courses.put(c.getName(), c);
+			Teacher t=(Teacher)o;
+			return getId_number().equals(t.getId_number());
 		}
+		return false;
 	}
 
-	public void removeCourse(Course c) {
-		if (courses.containsValue(c)) {
-			courses.remove(c);
+	/*
+	 * public HashMap<String, String> getCourseDetailsToShow(String courseName)
+	 * { Course c=getCourses().get(courseName); if(c!=null){ HashMap< String,
+	 * String> details=new HashMap<String, String>(4); details.put("day",
+	 * c.getDateTime()); details.put("from",c.getTimeFrom()); details.put("to",
+	 * c.getTimeTo()); details.put("place", c.getPlace()); return details; }
+	 * else { throw new NullPointerException("Null Course"); } }
+	 */
+	public void addCourse(String course_name, List<String> times) {
+
+		timesForEachCourse.put(course_name, times);
+
+	}
+	public void addTimeToCourse(String name,String time)
+	{
+		List<String> times=timesForEachCourse.get(name);
+		if(times==null)
+		{
+			times=new ArrayList<String>();
+			timesForEachCourse.put(name, times);
 		}
+		times.add(time);
+	}
+	public void removeCourse(String course_name) {
+
+		timesForEachCourse.remove(course_name);
+
 	}
 
+	public List<String> getTimePlaceForCourse(String course_name)
+	{
+		return timesForEachCourse.get(course_name);
+	}
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return getName();
+		return getName() + " " + getLast_name();
 	}
 
+	/*
+	 * 
+	 * 
+	 * 
+	 * setters and getters
+	 */
 	public int getID() {
 		return ID;
 	}
@@ -100,7 +130,7 @@ public class Teacher {
 	}
 
 	public void setName(String name) {
-		this.first_name = name;
+		this.first_name = name.replaceAll("\\s", "");
 	}
 
 	public String getEmail() {
@@ -108,19 +138,15 @@ public class Teacher {
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		this.email = email.replaceAll("\\s", "");
 	}
-
-
-
-	
 
 	public String getPosition() {
 		return position;
 	}
 
 	public void setPosition(String position) {
-		this.position = position;
+		this.position = position.replaceAll("\\s", "");
 	}
 
 	public String getFaculty() {
@@ -128,7 +154,7 @@ public class Teacher {
 	}
 
 	public void setFaculty(String faculty) {
-		this.faculty = faculty;
+		this.faculty = faculty.replaceAll("\\s", "");
 	}
 
 	public String getLast_name() {
@@ -136,7 +162,7 @@ public class Teacher {
 	}
 
 	public void setLast_name(String last_name) {
-		this.last_name = last_name;
+		this.last_name = last_name.replaceAll("\\s", "");
 	}
 
 	public String getId_number() {
@@ -144,7 +170,7 @@ public class Teacher {
 	}
 
 	public void setId_number(String id_number) {
-		this.id_number = id_number;
+		this.id_number = id_number.replaceAll("\\s", "");
 	}
 
 	public String getImageUrl() {
@@ -161,5 +187,22 @@ public class Teacher {
 
 	public void setImageLocalPath(String imageLocalPath) {
 		this.imageLocalPath = imageLocalPath;
+	}
+
+	public boolean isDownloadedImage() {
+		return downloadedImage;
+	}
+
+	public void setDownloadedImage(boolean downloadedImage) {
+		this.downloadedImage = downloadedImage;
+	}
+
+	public HashMap<String, List<String>> getTimesForEachCourse() {
+		return timesForEachCourse;
+	}
+
+	public void setTimesForEachCourse(
+			HashMap<String, List<String>> timesForEachCourse) {
+		this.timesForEachCourse = timesForEachCourse;
 	}
 }

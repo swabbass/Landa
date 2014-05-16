@@ -1,5 +1,6 @@
 package ward.landa.activities;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,6 +10,7 @@ import ward.landa.R.id;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 public class Settings {
 
@@ -22,7 +24,16 @@ public class Settings {
 	public static final String HEBREW = "he";
 	public static final String ENGLISH = "en";
 	public static final String ARABIC = "ar";
-
+	public static final String URL_teachers = "http://nlanda.technion.ac.il/LandaSystem/tutors.aspx";
+	public static final String URL_COURSES = "http://nlanda.technion.ac.il/LandaSystem/courses.aspx";
+	public final static String picsPathDir = "Landa" + File.separator
+			+ "tutors" + File.separator;
+	public final static String picFromRoot = Environment
+			.getExternalStorageDirectory() + File.separator + picsPathDir;
+	public static final String picFromAbsoulotePath = Environment
+			.getExternalStorageDirectory().getAbsolutePath()
+			+ File.separator
+			+ picsPathDir;
 	private static String localLang;
 	private static boolean toNotifyUpdates;
 	private static boolean toNotifyCourse;

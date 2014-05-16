@@ -1,5 +1,10 @@
 package utilites;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ward.landa.Course;
+import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
 import android.content.ContentValues;
@@ -11,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBManager {
 	public static final String DB_NAME = "db_LANDA";// הניתונים מסד שם
-	public static final int DB_VER = 2;// הנתונים מס של הגרסה
+	public static final int DB_VER = 8;// הנתונים מס של הגרסה
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -32,15 +37,19 @@ public class DBManager {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			// TODO Auto-generated method stub
-			String sql, sql2;
+			String sql, sql2, sql3;
 			sql = String.format("drop table if exists %s;",
 					dbTeacher.TEACHERS_TABLE);
 			sql2 = String.format("drop table if exists %s;",
 					dbUpdate.UPDATES_TABLE);
+			sql3 = String.format("drop table if exists %s;",
+					dbCourse.COURSE_TABLE);
 			db.execSQL(sql);
 			db.execSQL(dbTeacher.CREATE);
 			db.execSQL(sql2);
 			db.execSQL(dbUpdate.CREATE);
+			db.execSQL(sql3);
+			db.execSQL(dbCourse.CREATE);
 
 		}
 
@@ -59,7 +68,10 @@ public class DBManager {
 		values.put(dbTeacher.FIRST_NAME, teacher.getName());
 		values.put(dbTeacher.LAST_NAME, teacher.getLast_name());
 		values.put(dbTeacher.EMAIL, teacher.getEmail());
+		values.put(dbTeacher.FACULTY, teacher.getFaculty());
 		values.put(dbTeacher.ROLE, teacher.getPosition());
+		values.put(dbTeacher.DOWNLOADED_IMAGE,
+				Boolean.toString(teacher.isDownloadedImage()));
 		values.put(dbTeacher.IMAGE_URL, teacher.getImageUrl());
 		values.put(dbTeacher.LOCAL_IMAGE_PATH, teacher.getImageLocalPath());
 		long id = teacher_db.insert(dbTeacher.TEACHERS_TABLE, null, values);
@@ -80,6 +92,21 @@ public class DBManager {
 		return id;
 	}
 
+	public long insertCourse(Course course) {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(dbCourse.COURSE_ID, course.getCourseID());
+		values.put(dbCourse.TEACHER_ID, course.getTutor_id());
+		values.put(dbCourse.COURSE_NAME, course.getName());
+		values.put(dbCourse.COURSE_PLACE, course.getPlace());
+		values.put(dbCourse.COURSE_DAY, course.getDateTime());
+		values.put(dbCourse.COURSE_TIME_FROM, course.getTimeFrom());
+		values.put(dbCourse.COURSE_TIME_TO, course.getTimeTo());
+		long id = db.insert(dbCourse.COURSE_TABLE, null, values);
+		db.close();
+		return id;
+	}
+
 	public boolean updateTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -89,9 +116,12 @@ public class DBManager {
 		values.put(dbTeacher.EMAIL, teacher.getEmail());
 		values.put(dbTeacher.ROLE, teacher.getPosition());
 		values.put(dbTeacher.IMAGE_URL, teacher.getImageUrl());
+		values.put(dbTeacher.DOWNLOADED_IMAGE,
+				Boolean.toString((teacher.isDownloadedImage())));
 		values.put(dbTeacher.LOCAL_IMAGE_PATH, teacher.getImageLocalPath());
-		boolean res = database.update(DB_NAME, values, dbTeacher.ID_NUMBER
-				+ " = " + getSQLText(teacher.getId_number()), null) > 0;
+		boolean res = database.update(dbTeacher.TEACHERS_TABLE, values,
+				dbTeacher.ID_NUMBER + " = "
+						+ getSQLText(teacher.getId_number()), null) > 0;
 		database.close();
 		return res;
 	}
@@ -126,22 +156,42 @@ public class DBManager {
 		return b;
 	}
 
-	
-
 	public String getSQLText(String text) {
 		char c = 34;
 		Character ch = Character.valueOf(c);
 		return ch.toString() + text + ch.toString();
 	}
 
-	public Cursor getCursorAllTeachers() {
+	public List<Teacher> getCursorAllTeachers() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(dbTeacher.TEACHERS_TABLE, new String[] {
 				dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
-				dbTeacher.ROLE, dbTeacher.EMAIL, dbTeacher.IMAGE_URL,
-				dbTeacher.LOCAL_IMAGE_PATH }, null, null, null, null, null);
-		return cursor;
+				dbTeacher.ROLE, dbTeacher.EMAIL, dbTeacher.FACULTY,
+				dbTeacher.IMAGE_URL, dbTeacher.LOCAL_IMAGE_PATH,
+				dbTeacher.DOWNLOADED_IMAGE }, null, null, null, null, null);
+
+		List<Teacher> res = new ArrayList<>(cursor.getCount());
+		// cursor.moveToFirst();
+		while (cursor.moveToNext()) {
+			String id_number = cursor.getString(0);
+			String first_name = cursor.getString(1);
+			String last_name = cursor.getString(2);
+			String role = cursor.getString(3);
+			String email = cursor.getString(4);
+			String faculty = cursor.getString(5);
+			String imageUrl = cursor.getString(6);
+			String localImgPath = cursor.getString(7);
+			String isDownloaded = cursor.getString(8);
+			Teacher t = new Teacher(first_name, last_name, email, id_number,
+					role, faculty);
+			t.setImageUrl(imageUrl);
+			t.setImageLocalPath(localImgPath);
+			t.setDownloadedImage(Boolean.valueOf(isDownloaded));
+			res.add(t);
+		}
+		return res;
+
 	}
 
 	public Cursor getCursorAllUpdates() {
@@ -154,25 +204,117 @@ public class DBManager {
 		return cursor;
 	}
 
+	public List<Course> getCursorAllWithCourses() {
+		Cursor cursor;
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		cursor = database.query(false,dbCourse.COURSE_TABLE, new String[] {
+				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.TEACHER_ID,
+				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
+				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO }, null,
+				null, dbCourse.COURSE_NAME, null, null,null);
+		List<Course> courses=new ArrayList<Course>();
+		while(cursor.moveToNext()) {
+			
+			Course c=new Course(0, cursor.getString(1), "", cursor.getString(2), R.drawable.ic_error, 0);
+			courses.add(c);
+		}
+		return courses;
+	}
+
+	public List<Teacher> getTeachersForCourse(String name) {
+		Cursor cursor;
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		List<Teacher> teachers = new ArrayList<Teacher>();
+		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
+				dbCourse.TEACHER_ID, dbCourse.COURSE_PLACE,
+				dbCourse.COURSE_DAY, dbCourse.COURSE_TIME_FROM,
+				dbCourse.COURSE_TIME_TO }, dbCourse.COURSE_NAME + " = "
+				+ getSQLText(name), null, null, null, null);
+		while (cursor.moveToNext()) {
+
+			String tID = cursor.getString(0);
+			Teacher t = getTeacherByIdNumber(tID);
+			if (!teachers.contains(t)) {
+				teachers.add(t);
+			}
+			t = teachers.get(teachers.indexOf(t));
+			String timeInfo = cursor.getString(1) + " " + cursor.getString(2)
+					+ " " + cursor.getString(3) + " - " + cursor.getString(4);
+			t.addTimeToCourse(name, timeInfo);
+			teachers.add(t);
+		}
+		return teachers;
+
+	}
+
+	public Teacher getTeacherByIdNumber(String idNum) {
+		Cursor cursor;
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		cursor = database.query(dbTeacher.TEACHERS_TABLE, new String[] {
+				dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
+				dbTeacher.FACULTY }, dbTeacher.ID_NUMBER + " = "
+				+ getSQLText(idNum), null, null, null, null);
+		cursor.moveToNext();
+		Teacher t = new Teacher(cursor.getString(1), cursor.getString(2), "",
+				idNum, "T", cursor.getString(3));
+		return t;
+	}
+
+	public Cursor getTeachersForCourse(String teacher_id, String course_name) {
+		Cursor cursor;
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		cursor = database.query(dbTeacher.TEACHERS_TABLE, new String[] {
+				dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
+				dbTeacher.EMAIL, dbTeacher.LOCAL_IMAGE_PATH, },
+				dbTeacher.ID_NUMBER + " = " + getSQLText(teacher_id), null,
+				null, null, null);
+		return cursor;
+	}
+
 }
 
 class dbTeacher {
 	public static final String TEACHERS_TABLE = "Teachers";// הטבלה שם
 	public static final String UID = "id";
 	public static final String ID_NUMBER = "id_number";
-	public static final String FIRST_NAME = "first_name";// המשימה של הטקסט
+	public static final String FIRST_NAME = "first_name";//
 	public static final String LAST_NAME = "last_name";// הטלפון מספר
 	public static final String EMAIL = "email";
+	public static final String FACULTY = "faculty";
 	public static final String IMAGE_URL = "image_url";
 	public static final String ROLE = "role";
+	public static final String DOWNLOADED_IMAGE = "cached_img";
 	public static final String LOCAL_IMAGE_PATH = "local_img_path";
 
 	public static final String CREATE = "create table " + TEACHERS_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + ID_NUMBER
 			+ " text not null, " + FIRST_NAME + " text not null, " + LAST_NAME
-			+ " text not null, " + EMAIL + " text not null, " + ROLE
+			+ " text not null, " + EMAIL + " text not null, " + FACULTY
+			+ " text not null, " + ROLE + " text not null, " + DOWNLOADED_IMAGE
 			+ " text not null, " + IMAGE_URL + " text not null, "
-			+ LOCAL_IMAGE_PATH + "text not null" + ");";
+			+ LOCAL_IMAGE_PATH + " text not null " + ");";
+	public static String ROLE_TEACHER = "T";
+	public static String ROLE_INSTRUCTOR = "I";
+
+}
+
+class dbCourse {
+	public static final String COURSE_TABLE = "Courses";
+	public static final String UID = "id";
+	public static final String COURSE_ID = "course_id";
+	public static final String TEACHER_ID = "id_number";
+	public static final String COURSE_NAME = "course_name";
+	public static final String COURSE_DAY = "course_day";
+	public static final String COURSE_PLACE = "course_place";
+	public static final String COURSE_DESCRIPTION = "course_description";
+	public static final String COURSE_TIME_FROM = "course_time_from";
+	public static final String COURSE_TIME_TO = "course_time_to";
+	public static final String CREATE = "create table " + COURSE_TABLE + " ("
+			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TEACHER_ID
+			+ " text not null, " + COURSE_ID + " text not null, " + COURSE_NAME
+			+ " text not null, " + COURSE_DAY + " text not null, "
+			+ COURSE_PLACE + " text not null, " + COURSE_TIME_FROM
+			+ " text not null, " + COURSE_TIME_TO + " text not null " + " );";
 }
 
 class dbUpdate {
@@ -184,9 +326,8 @@ class dbUpdate {
 	public static final String UPDATE_DATE = "date";// הטלפון מספר
 	public static final String UPDATE_URL = "url";
 	public final static String CREATE = "create table " + UPDATES_TABLE + " ("
-			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+ UPDATE_ID
-			+ " text not null, "  + UPDATE_SUBJECT
-			+ " text not null, " + UPDATE_CONTENT + " text not null, "
-			+ UPDATE_DATE + " text not null, " + UPDATE_URL + " text not null"
-			+ ");";
+			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + UPDATE_ID
+			+ " text not null, " + UPDATE_SUBJECT + " text not null, "
+			+ UPDATE_CONTENT + " text not null, " + UPDATE_DATE
+			+ " text not null, " + UPDATE_URL + " text not null" + ");";
 }
