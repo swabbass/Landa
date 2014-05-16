@@ -93,9 +93,9 @@ public class MainActivity extends FragmentActivity implements
 			DisplayImageOptions options) {
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				getApplicationContext()).memoryCacheExtraOptions(120, 120)
-				.denyCacheImageMultipleSizesInMemory()
+				.denyCacheImageMultipleSizesInMemory().threadPriority(Thread.MAX_PRIORITY)
 				.memoryCache(new LruMemoryCache(2 * 1024 * 1024))
-				.memoryCacheSize(2 * 1024 * 1024)
+				.memoryCacheSize(2 * 1024 * 1024).threadPoolSize(5)
 				.defaultDisplayImageOptions(options)
 				.discCacheSize(50 * 1024 * 1024).discCacheFileCount(100)
 				.writeDebugLogs().build();
@@ -113,10 +113,10 @@ public class MainActivity extends FragmentActivity implements
 				// resource or drawable
 				.resetViewBeforeLoading(false)
 				// default
-				.delayBeforeLoading(1000).cacheInMemory(true).cacheOnDisc(true)
+				.delayBeforeLoading(200).cacheInMemory(true).cacheOnDisc(true)
 				.considerExifParams(false) // default
 				.imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
-				.bitmapConfig(Bitmap.Config.ARGB_8888) // default
+				.bitmapConfig(Bitmap.Config.RGB_565) // default
 				.handler(new Handler()) // default
 				.build();
 		return options;

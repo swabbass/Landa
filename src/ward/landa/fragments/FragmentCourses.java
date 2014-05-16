@@ -267,7 +267,7 @@ public class FragmentCourses extends Fragment {
 
 				for (int i = 0; i < jsonCoursesArray.length(); i++) {
 					JSONObject c = jsonCoursesArray.getJSONObject(i);
-					Course tmp = new Course(i, c.getString("subject_name"),
+					Course tmp = new Course(i, DBManager.removeQoutes(c.getString("subject_name")),
 							c.getString("day"), c.getString("time_from"),
 							c.getString("time_to"), c.getString("place"),
 							c.getString("tutor_id"));

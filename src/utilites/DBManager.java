@@ -97,7 +97,7 @@ public class DBManager {
 		ContentValues values = new ContentValues();
 		values.put(dbCourse.COURSE_ID, course.getCourseID());
 		values.put(dbCourse.TEACHER_ID, course.getTutor_id());
-		values.put(dbCourse.COURSE_NAME, course.getName());
+		values.put(dbCourse.COURSE_NAME, removeQoutes(course.getName()));
 		values.put(dbCourse.COURSE_PLACE, course.getPlace());
 		values.put(dbCourse.COURSE_DAY, course.getDateTime());
 		values.put(dbCourse.COURSE_TIME_FROM, course.getTimeFrom());
@@ -230,8 +230,8 @@ public class DBManager {
 				dbCourse.COURSE_DAY, dbCourse.COURSE_TIME_FROM,
 				dbCourse.COURSE_TIME_TO }, dbCourse.COURSE_NAME + " = "
 				+ getSQLText(name), null, null, null, null);
-		while (cursor.moveToNext()) {
-
+		cursor.moveToNext();
+		do {
 			String tID = cursor.getString(0);
 			Teacher t = getTeacherByIdNumber(tID);
 			if (!teachers.contains(t)) {
@@ -241,10 +241,10 @@ public class DBManager {
 			String timeInfo = cursor.getString(1) + " " + cursor.getString(2)
 					+ " " + cursor.getString(3) + " - " + cursor.getString(4);
 			t.addTimeToCourse(name, timeInfo);
+			teachers.remove(t);
 			teachers.add(t);
-		}
+		}while(cursor.moveToNext());
 		return teachers;
-
 	}
 
 	public Teacher getTeacherByIdNumber(String idNum) {
@@ -270,6 +270,11 @@ public class DBManager {
 				null, null, null);
 		return cursor;
 	}
+	public static String removeQoutes(String s)
+	{
+		return s.replace("\"", "");
+	}
+	
 
 }
 

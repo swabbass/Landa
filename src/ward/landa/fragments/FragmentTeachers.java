@@ -244,41 +244,43 @@ public class FragmentTeachers extends Fragment {
 				}
 			} else {
 				if (!teacher.isDownloadedImage()) {
-					MainActivity.image_loader.loadImage(teacher.getImageUrl(),
-							new SimpleImageLoadingListener() {
-								@Override
-								public void onLoadingCancelled(String imageUri,
-										View view) {
-									teacher.setDownloadedImage(false);
-									picture.setImageResource(R.drawable.ic_error);
-									super.onLoadingCancelled(imageUri, view);
-								}
+					SimpleImageLoadingListener s=new SimpleImageLoadingListener() {
+						@Override
+						public void onLoadingCancelled(String imageUri,
+								View view) {
+							teacher.setDownloadedImage(false);
+							picture.setImageResource(R.drawable.ic_error);
+							super.onLoadingCancelled(imageUri, view);
+						}
 
-								@Override
-								public void onLoadingFailed(String imageUri,
-										View view, FailReason failReason) {
-									teacher.setDownloadedImage(false);
-									picture.setImageResource(R.drawable.ic_error);
-									Log.d("test", failReason.toString());
-									super.onLoadingFailed(imageUri, view,
-											failReason);
-								}
+						@Override
+						public void onLoadingFailed(String imageUri,
+								View view, FailReason failReason) {
+							teacher.setDownloadedImage(false);
+							picture.setImageResource(R.drawable.ic_error);
+							Log.d("test", failReason.toString());
+							super.onLoadingFailed(imageUri, view,
+									failReason);
+						}
 
-								@Override
-								public void onLoadingComplete(String imageUri,
-										View view, Bitmap loadedImage) {
-									picture.setImageBitmap(loadedImage);
-									Utilities.saveImageToSD(teacher,
-											loadedImage);
+						@Override
+						public void onLoadingComplete(String imageUri,
+								View view, Bitmap loadedImage) {
+							picture.setImageBitmap(loadedImage);
+							Utilities.saveImageToSD(teacher,
+									loadedImage);
 
-									teacher.setDownloadedImage(true);
-									db_mngr.updateTeacher(teacher);
-									super.onLoadingComplete(imageUri, view,
-											loadedImage);
-								}
-							});
+							teacher.setDownloadedImage(true);
+							db_mngr.updateTeacher(teacher);
+							super.onLoadingComplete(imageUri, view,
+									loadedImage);
+						}
+					};
+					MainActivity.image_loader.displayImage(teacher.getImageUrl(), picture, s);
+					//MainActivity.image_loader.loadImage(teacher.getImageUrl(),
+							
 				} else {
-					MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(), new SimpleImageLoadingListener() {
+					SimpleImageLoadingListener s2=new SimpleImageLoadingListener() {
 						@Override
 						public void onLoadingStarted(String imageUri, View view) {
 							Log.e("sd", "loading from sd is started");
@@ -297,9 +299,10 @@ public class FragmentTeachers extends Fragment {
 							Log.d("sd", "loading from sd is successfull ");
 							super.onLoadingComplete(imageUri, view, loadedImage);
 						}
-					});
-				//	MainActivity.image_loader.displayImage(
-					//		teacher.getImageLocalPath(), picture);
+					};
+					//MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(), 
+					MainActivity.image_loader.displayImage(
+							"file://"+teacher.getImageLocalPath(), picture,s2);
 
 				}
 			}

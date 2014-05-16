@@ -154,7 +154,7 @@ public class Teacher implements Serializable {
 	}
 
 	public void setFaculty(String faculty) {
-		this.faculty = faculty.replaceAll("\\s", "");
+		this.faculty = faculty;
 	}
 
 	public String getLast_name() {
