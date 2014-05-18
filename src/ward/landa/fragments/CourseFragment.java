@@ -344,26 +344,18 @@ public class CourseFragment extends Fragment {
 					v.findViewById(R.id.teacherFacultyLable));
 			v.setTag(R.id.teacherCourseName,
 					v.findViewById(R.id.teacherCourseName));
-			v.setTag(R.id.courseDay, v.findViewById(R.id.courseDay));
-			v.setTag(R.id.courseTimeTo, v.findViewById(R.id.courseTimeTo));
-			v.setTag(R.id.CourseTimeFrom,
-					v.findViewById(R.id.CourseTimeFrom));
-			v.setTag(R.id.CoursePlace, v.findViewById(R.id.CoursePlace));
+		
 			}
 			ImageView teacherAvatar = (ImageView) v
 					.getTag(R.id.tutorSmallAvatar);
 			ImageView alarmMe = (ImageView) v.getTag(R.id.alaramMe);
 			TextView faculty = (TextView) v.getTag(R.id.teacherFacultyLable);
 			TextView name = (TextView) v.getTag(R.id.teacherCourseName);
-			TextView day = (TextView) v.getTag(R.id.courseDay);
-			TextView timeFrom = (TextView) v.getTag(R.id.CourseTimeFrom);
-			TextView timeTo = (TextView) v.getTag(R.id.courseTimeTo);
-			TextView place = (TextView) v.getTag(R.id.CoursePlace);
 
 			Teacher t = (Teacher)_teachers.get(groupPosition);
 		//	HashMap<String, String> data = t.getCourseDetailsToShow(courseName);
 			teacherAvatar.setImageResource(t.getImgId());
-			name.setText(t.getName());
+			name.setText(t.getName()+" "+t.getLast_name());
 			faculty.setText(t.getFaculty());
 		//	day.setText(data.get("day"));
 			//timeFrom.setText(data.get("from"));

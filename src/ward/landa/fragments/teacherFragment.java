@@ -31,8 +31,10 @@ public class teacherFragment extends Fragment {
 			Bundle ext =getArguments();
 			if(ext!=null)
 			{
+				
 				Teacher t=(Teacher) ext.getSerializable("teacher");
 				img.setImageURI(t.getUriFromLocal());
+				getActivity().setTitle(t.getName());
 				name.setText(t.getName()+" "+t.getLast_name());
 				email.setText(t.getEmail());
 				faculty.setText(t.getFaculty());
