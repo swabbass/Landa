@@ -1,10 +1,13 @@
 package ward.landa;
 
+import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.net.Uri;
 import ward.landa.activities.Settings;
 
 public class Teacher implements Serializable {
@@ -148,6 +151,15 @@ public class Teacher implements Serializable {
 	public void setPosition(String position) {
 		this.position = position.replaceAll("\\s", "");
 	}
+	public String getRole()
+	{
+		switch(this.position)
+		{
+		case "T":return "חונך אקדמי";
+		case "C":return "רכז";
+		}
+		return null;
+	}
 
 	public String getFaculty() {
 		return faculty;
@@ -204,5 +216,10 @@ public class Teacher implements Serializable {
 	public void setTimesForEachCourse(
 			HashMap<String, List<String>> timesForEachCourse) {
 		this.timesForEachCourse = timesForEachCourse;
+	}
+	public Uri getUriFromLocal()
+	{
+		File f=new File(this.imageLocalPath);
+		return Uri.fromFile(f);
 	}
 }

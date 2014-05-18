@@ -3,7 +3,9 @@ package ward.landa.fragments;
 import ward.landa.R;
 import ward.landa.R.id;
 import ward.landa.R.layout;
+import ward.landa.Teacher;
 import ward.landa.activities.Utilities;
+import android.graphics.Picture;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 public class teacherFragment extends Fragment {
 
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -28,13 +31,12 @@ public class teacherFragment extends Fragment {
 			Bundle ext =getArguments();
 			if(ext!=null)
 			{
-				int imgid=ext.getInt("imgid");
-				img.setImageBitmap(Utilities.decodeSampledBitmapFromResource(
-						getResources(), imgid, 100, 100));
-				name.setText(ext.getString("name"));
-				email.setText(ext.getString("email"));
-				faculty.setText(ext.getString("faculty"));
-				position.setText(ext.getString("position"));
+				Teacher t=(Teacher) ext.getSerializable("teacher");
+				img.setImageURI(t.getUriFromLocal());
+				name.setText(t.getName()+" "+t.getLast_name());
+				email.setText(t.getEmail());
+				faculty.setText(t.getFaculty());
+				position.setText(t.getRole());
 			}
 			
 		return root;

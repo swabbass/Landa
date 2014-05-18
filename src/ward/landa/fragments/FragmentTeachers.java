@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
 import ward.landa.GCMUtils;
@@ -57,6 +58,7 @@ public class FragmentTeachers extends Fragment {
 	JSONParser jParser;
 	GridView gridView;
 	boolean toFetchDataFromDB;
+	ConnectionDetector connectionDetector;
 
 	public interface callbackTeacher {
 		public void OnTeacherItemClick(Teacher t);
@@ -134,44 +136,49 @@ public class FragmentTeachers extends Fragment {
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.teacher_custom_grid, container,
 				false);
-		db_mngr = new DBManager(getActivity());
-		SharedPreferences sh = getActivity().getSharedPreferences(
-				GCMUtils.DATA, Activity.MODE_PRIVATE);
-		toFetchDataFromDB = sh.getBoolean(GCMUtils.LOAD_TEACHERS, false);
-		jParser = new JSONParser();
+		connectionDetector = new ConnectionDetector(getActivity());
+		
+			db_mngr = new DBManager(getActivity());
+			SharedPreferences sh = getActivity().getSharedPreferences(
+					GCMUtils.DATA, Activity.MODE_PRIVATE);
+			toFetchDataFromDB = sh.getBoolean(GCMUtils.LOAD_TEACHERS, false);
+			jParser = new JSONParser();
 
-		searched = new ArrayList<Teacher>();
+			searched = new ArrayList<Teacher>();
 
-		gridView = (GridView) root.findViewById(R.id.gridview);
-		tutors = new ArrayList<Teacher>();
-		gAdapter = new gridAdabter(root.getContext(), tutors, getResources(), 0);
-		if (!toFetchDataFromDB) {
-			// fetch from internet
-			new loadDataFromBackend().execute();
-		} else {
-			// fetch from database
-			tutors = null;
-			tutors = db_mngr.getCursorAllTeachers();
+			gridView = (GridView) root.findViewById(R.id.gridview);
+			tutors = new ArrayList<Teacher>();
 			gAdapter = new gridAdabter(root.getContext(), tutors,
 					getResources(), 0);
-			SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
-					gAdapter);
-			sb.setAbsListView(gridView);
-			gridView.setAdapter(sb);
-			gAdapter.notifyDataSetChanged();
-		}
-
-		gridView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				tCallback.OnTeacherItemClick(gAdapter.searched == 0 ? tutors
-						.get(arg2) : searched.get(arg2));
-
+			boolean isConnected=connectionDetector.isConnectingToInternet();
+			if (!toFetchDataFromDB && isConnected) {
+				// fetch from internet
+				new loadDataFromBackend().execute();
+			} else {
+				// fetch from database
+				tutors = null;
+				tutors = db_mngr.getCursorAllTeachers();
+				gAdapter = new gridAdabter(root.getContext(), tutors,
+						getResources(), 0);
+				SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+						gAdapter);
+				sb.setAbsListView(gridView);
+				gridView.setAdapter(sb);
+				gAdapter.notifyDataSetChanged();
 			}
-		});
 
+			gridView.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					tCallback
+							.OnTeacherItemClick(gAdapter.searched == 0 ? tutors
+									.get(arg2) : searched.get(arg2));
+
+				}
+			});
+		
 		return root;
 	}
 
@@ -244,7 +251,7 @@ public class FragmentTeachers extends Fragment {
 				}
 			} else {
 				if (!teacher.isDownloadedImage()) {
-					SimpleImageLoadingListener s=new SimpleImageLoadingListener() {
+					SimpleImageLoadingListener s = new SimpleImageLoadingListener() {
 						@Override
 						public void onLoadingCancelled(String imageUri,
 								View view) {
@@ -254,44 +261,45 @@ public class FragmentTeachers extends Fragment {
 						}
 
 						@Override
-						public void onLoadingFailed(String imageUri,
-								View view, FailReason failReason) {
+						public void onLoadingFailed(String imageUri, View view,
+								FailReason failReason) {
 							teacher.setDownloadedImage(false);
 							picture.setImageResource(R.drawable.ic_error);
 							Log.d("test", failReason.toString());
-							super.onLoadingFailed(imageUri, view,
-									failReason);
+							super.onLoadingFailed(imageUri, view, failReason);
 						}
 
 						@Override
 						public void onLoadingComplete(String imageUri,
 								View view, Bitmap loadedImage) {
 							picture.setImageBitmap(loadedImage);
-							Utilities.saveImageToSD(teacher,
-									loadedImage);
+							Utilities.saveImageToSD(teacher, loadedImage);
 
 							teacher.setDownloadedImage(true);
 							db_mngr.updateTeacher(teacher);
-							super.onLoadingComplete(imageUri, view,
-									loadedImage);
+							super.onLoadingComplete(imageUri, view, loadedImage);
 						}
 					};
-					MainActivity.image_loader.displayImage(teacher.getImageUrl(), picture, s);
-					//MainActivity.image_loader.loadImage(teacher.getImageUrl(),
-							
+					MainActivity.image_loader.displayImage(
+							teacher.getImageUrl(), picture, s);
+					// MainActivity.image_loader.loadImage(teacher.getImageUrl(),
+
 				} else {
-					SimpleImageLoadingListener s2=new SimpleImageLoadingListener() {
+					SimpleImageLoadingListener s2 = new SimpleImageLoadingListener() {
 						@Override
 						public void onLoadingStarted(String imageUri, View view) {
 							Log.e("sd", "loading from sd is started");
 							super.onLoadingStarted(imageUri, view);
 						}
+
 						@Override
 						public void onLoadingFailed(String imageUri, View view,
 								FailReason failReason) {
-							Log.e("sd", "loading from sd is failed cause : "+failReason.getCause().getMessage());
+							Log.e("sd", "loading from sd is failed cause : "
+									+ failReason.getCause().getMessage());
 							super.onLoadingFailed(imageUri, view, failReason);
 						}
+
 						@Override
 						public void onLoadingComplete(String imageUri,
 								View view, Bitmap loadedImage) {
@@ -300,9 +308,10 @@ public class FragmentTeachers extends Fragment {
 							super.onLoadingComplete(imageUri, view, loadedImage);
 						}
 					};
-					//MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(), 
+					// MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(),
 					MainActivity.image_loader.displayImage(
-							"file://"+teacher.getImageLocalPath(), picture,s2);
+							"file://" + teacher.getImageLocalPath(), picture,
+							s2);
 
 				}
 			}

@@ -19,6 +19,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
+import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
 import ward.landa.Course;
@@ -33,7 +34,10 @@ import ward.landa.fragments.FragmentTeachers;
 import ward.landa.fragments.FragmentUpdates;
 import ward.landa.fragments.teacherFragment;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -63,6 +67,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
 		FragmentCourses.OnCourseSelected, FragmentTeachers.callbackTeacher,
@@ -84,16 +89,18 @@ public class MainActivity extends FragmentActivity implements
 	String regKey;
 	utilites.DBManager db_mngr;
 	JSONParser jParser;
-	private  registerGcm task;
+	private registerGcm task;
 	public static ImageLoaderConfiguration config;
 	public static ImageLoader image_loader;
 	public static PauseOnScrollListener listener;
+	ConnectionDetector connection_detector;
 
 	private ImageLoaderConfiguration initilizeImageLoader(
 			DisplayImageOptions options) {
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				getApplicationContext()).memoryCacheExtraOptions(120, 120)
-				.denyCacheImageMultipleSizesInMemory().threadPriority(Thread.MAX_PRIORITY)
+				.denyCacheImageMultipleSizesInMemory()
+				.threadPriority(Thread.MAX_PRIORITY)
 				.memoryCache(new LruMemoryCache(2 * 1024 * 1024))
 				.memoryCacheSize(2 * 1024 * 1024).threadPoolSize(5)
 				.defaultDisplayImageOptions(options)
@@ -141,6 +148,8 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onStart() {
 		Log.e("Fragment", "Main Activity started");
+		connection_detector = new ConnectionDetector(getApplicationContext());
+
 		initlizeImageLoad();
 		initlizeDataBase();
 		loadSettings();
@@ -153,15 +162,18 @@ public class MainActivity extends FragmentActivity implements
 				android.R.anim.fade_out);
 		initlizePager();
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		initlizeGCM();
+		String msg="First time ?! You will have to connect to internet in order to use Landa application";
+		String notFirstTome="You have no internet connection ,connect to internet to get last updates and information!";
+		if (connection_detector.isConnectingToInternet())
+			initlizeGCM();
+		else {
+			Toast.makeText(getApplicationContext(), isReg?notFirstTome:msg, Toast.LENGTH_LONG).show();
+		}
 		super.onStart();
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
-	//	image_loader.clearDiscCache();
-	//	image_loader.clearMemoryCache();
 		Log.e("Fragment", "Main Activity stopped");
 		super.onStop();
 	}
@@ -471,11 +483,7 @@ public class MainActivity extends FragmentActivity implements
 	public void OnTeacherItemClick(Teacher t) {
 
 		Bundle extras = new Bundle();
-		extras.putInt("imgid", t.getImgId());
-		extras.putString("name", t.getName());
-		extras.putString("email", t.getEmail());
-		extras.putString("faculty", t.getFaculty());
-		extras.putString("position", t.getPosition());
+		extras.putSerializable("teacher", t);
 		Intent i = new Intent(this, TutorDetails.class);
 		i.putExtras(extras);
 		startActivityFromFragment(pages[1], i, 122);

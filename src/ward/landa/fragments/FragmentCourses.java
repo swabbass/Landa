@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
+import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
 import ward.landa.Course;
@@ -70,6 +71,7 @@ public class FragmentCourses extends Fragment {
 	boolean loadFromDb;
 	DBManager db_mngr;
 	public JSONParser jParser;
+	ConnectionDetector connectionDetector;
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -131,40 +133,42 @@ public class FragmentCourses extends Fragment {
 
 		root = inflater.inflate(R.layout.courses_frag_grid, container, false);
 		g = (GridView) root.findViewById(R.id.gridviewcourses);
-		jParser = new JSONParser();
-		db_mngr = new DBManager(getActivity());
-		searced = new ArrayList<Course>();
-		courses = new ArrayList<Course>();
-		SharedPreferences sh = getActivity().getSharedPreferences(
-				GCMUtils.DATA, Activity.MODE_PRIVATE);
-		loadFromDb = sh.getBoolean(GCMUtils.LOAD_COURSES, false);
-		if (!loadFromDb) {
-			new loadDataFromBackend().execute();
-		} else {
-			courses = null;
-			courses = db_mngr.getCursorAllWithCourses();
-			uAdapter = new coursesAdapter(courses, getActivity(),
-					getResources(), 0);
+		connectionDetector = new ConnectionDetector(getActivity());
+			jParser = new JSONParser();
+			db_mngr = new DBManager(getActivity());
+			searced = new ArrayList<Course>();
+			courses = new ArrayList<Course>();
+			SharedPreferences sh = getActivity().getSharedPreferences(
+					GCMUtils.DATA, Activity.MODE_PRIVATE);
+			loadFromDb = sh.getBoolean(GCMUtils.LOAD_COURSES, false);
+			boolean isConnected=connectionDetector.isConnectingToInternet();
+			if (!loadFromDb && isConnected) {
+				new loadDataFromBackend().execute();
+			} else {
+				courses = null;
+				courses = db_mngr.getCursorAllWithCourses();
+				uAdapter = new coursesAdapter(courses, getActivity(),
+						getResources(), 0);
 
-			SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
-					uAdapter);
-			sb.setAbsListView(g);
-			g.setAdapter(sb);
+				SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+						uAdapter);
+				sb.setAbsListView(g);
+				g.setAdapter(sb);
 
-		}
-
-		g.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				callback.onCourseClick(uAdapter.searched == 0 ? courses
-						.get(arg2) : searced.get(arg2));
-				g.setItemChecked(arg2, true);
 			}
 
-		});
+			g.setOnItemClickListener(new OnItemClickListener() {
 
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					callback.onCourseClick(uAdapter.searched == 0 ? courses
+							.get(arg2) : searced.get(arg2));
+					g.setItemChecked(arg2, true);
+				}
+
+			});
+		
 		return root;
 	}
 
@@ -267,10 +271,10 @@ public class FragmentCourses extends Fragment {
 
 				for (int i = 0; i < jsonCoursesArray.length(); i++) {
 					JSONObject c = jsonCoursesArray.getJSONObject(i);
-					Course tmp = new Course(i, DBManager.removeQoutes(c.getString("subject_name")),
-							c.getString("day"), c.getString("time_from"),
-							c.getString("time_to"), c.getString("place"),
-							c.getString("tutor_id"));
+					Course tmp = new Course(i, DBManager.removeQoutes(c
+							.getString("subject_name")), c.getString("day"),
+							c.getString("time_from"), c.getString("time_to"),
+							c.getString("place"), c.getString("tutor_id"));
 					tmp.setImgID(R.drawable.ic_error);
 					if (!courses.contains(tmp))
 						courses.add(tmp);
