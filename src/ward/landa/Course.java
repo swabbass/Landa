@@ -17,9 +17,20 @@ public class Course implements Serializable {
 	private String Teacher;
 	private int imgID;
 	private int courseID;
+	private long course_db_id;
 	private float rating;
 	private String tutor_id;
+	private int notify;
 	
+	public Course(String name,String day,String timeFrom,String timeTo,String place)
+	{
+		this.name=name;
+		this.day=day;
+		this.timeFrom=timeFrom;
+		this.timeTo=timeTo;
+		this.place=place;
+		this.notify=1;
+	}
 	//private List<Teacher> teachers;
 	private int toShow;
 	public Course(int courseID,String name ,String dateString,String teacher,int imgId,float rate) {
@@ -143,6 +154,18 @@ public class Course implements Serializable {
 	}
 	public void setTutor_id(String tutor_id) {
 		this.tutor_id = tutor_id;
+	}
+	public int getNotify() {
+		return notify;
+	}
+	public void setNotify(int notify) {
+		this.notify = notify;
+	}
+	public long getCourse_db_id() {
+		return course_db_id;
+	}
+	public void setCourse_db_id(long course_db_id) {
+		this.course_db_id = course_db_id;
 	}
 	
 	

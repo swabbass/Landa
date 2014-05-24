@@ -25,6 +25,7 @@
 
     <uses-permission android:name="ward.landa.activities.permission.RECEIVE" />
     <uses-permission android:name="ward.landa.activities.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -45,7 +46,8 @@
             android:name="ward.landa.activities.Reciever"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
-
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_TICK" />
                 <!-- Receives the actual messages. -->
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <!-- Receives the registration id. -->

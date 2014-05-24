@@ -1,5 +1,17 @@
 package ward.landa.activities;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
+
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter.CountDownFormatter;
+
+import ward.landa.Course;
+import ward.landa.CourseNotification;
 import ward.landa.R;
 import ward.landa.fragments.CourseFragment;
 import android.content.Intent;
@@ -9,12 +21,16 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class CourseDeatilsActivity extends FragmentActivity {
+public class CourseDeatilsActivity extends FragmentActivity implements
+		CourseFragment.AlarmCallBack {
 
 	private String courseName;
 	private int imgId;
 	private int courseID;
+	Intent result;
 	private int parentIndex = -1;
+	private List<String> checkedCourses;
+	private CourseNotification courseNotification;
 
 	private void fetchArguments() {
 		Bundle ex = getIntent().getExtras();
@@ -32,7 +48,9 @@ public class CourseDeatilsActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_course_deatils);
 		fetchArguments();
-		Intent result = new Intent(getApplicationContext(), MainActivity.class);
+		courseNotification = new CourseNotification(courseName);
+		checkedCourses = new ArrayList<String>();
+		result = new Intent(getApplicationContext(), MainActivity.class);
 		setTitle(courseName);
 		setResult(Settings.COURSES, result);
 		overridePendingTransition(android.R.anim.slide_in_left,
@@ -69,9 +87,11 @@ public class CourseDeatilsActivity extends FragmentActivity {
 		if (id == android.R.id.home) {
 			Intent result = new Intent(getApplicationContext(),
 					MainActivity.class);
-
+			setAlarams();
+			result.putExtra("notfiy", courseNotification);
 			setResult(Settings.COURSES, result);
 			finish();
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -121,4 +141,55 @@ public class CourseDeatilsActivity extends FragmentActivity {
 		this.parentIndex = parentIndex;
 	}
 
+	@Override
+	public void onTimeChecked(String time, boolean isChecked) {
+		if (isChecked)
+			checkedCourses.add(time);
+		else
+			checkedCourses.remove(time);
+
+		courseNotification.setCourse(setAlarams());
+		result.putExtra("notfiy", courseNotification);
+		setResult(Settings.COURSES, result);
+	}
+
+	
+
+	private List<Course> setAlarams() {
+		List<Course> list = new ArrayList<Course>(checkedCourses.size());
+		for (String time : checkedCourses) {
+			String[] info = time.split(Pattern.quote(" - "));
+			int lastIndex = info.length - 3;
+			String day = info[lastIndex - 2];
+			String timeFrom = info[lastIndex - 1];
+			String tumeTo = info[lastIndex];
+			String place = info[lastIndex - 3];
+			String notify=info[lastIndex+1];
+			String id=info[lastIndex+2];
+			for (int i = lastIndex - 4; i >= 0; --i) {
+				place += " " + info[i];
+			}
+
+			Course c = new Course(courseName, day, timeFrom, tumeTo, place);
+			c.setNotify(1);
+			c.setCourseID(Integer.parseInt(id));
+			list.add(c);
+
+		}
+
+		return list;
+	}
+
 }
+
+/*
+ * 
+ * 
+ * int dayNum=dayWeekNumber(day); int
+ * hourFrom=Integer.parseInt(timeFrom.split(":")[0]); int
+ * minFrom=Integer.parseInt(timeFrom.split(":")[1]); Calendar calendar =
+ * Calendar.getInstance(); calendar.set(Calendar.DAY_OF_WEEK, dayNum);
+ * calendar.set(Calendar.HOUR_OF_DAY, hourFrom); calendar.set(Calendar.MINUTE,
+ * minFrom-30); calendar.set(Calendar.SECOND, 0); Intent myIntent =new
+ * Intent(this, Reciever.class);
+ */

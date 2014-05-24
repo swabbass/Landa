@@ -1,28 +1,14 @@
 package ward.landa.activities;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 import java.util.Locale;
-
-import org.apache.http.NameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.wallet.LineItem.Role;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
 import ward.landa.Course;
+import ward.landa.CourseNotification;
 import ward.landa.GCMUtils;
 import ward.landa.LoginFragment;
 import ward.landa.R;
@@ -34,10 +20,11 @@ import ward.landa.fragments.FragmentTeachers;
 import ward.landa.fragments.FragmentUpdates;
 import ward.landa.fragments.teacherFragment;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -69,9 +56,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+
 public class MainActivity extends FragmentActivity implements
 		FragmentCourses.OnCourseSelected, FragmentTeachers.callbackTeacher,
 		FragmentUpdates.updateCallback, OnBackStackChangedListener {
+
 	GoogleCloudMessaging gcm;
 	String localLang;
 	boolean isUpdateNotify;
@@ -94,6 +90,7 @@ public class MainActivity extends FragmentActivity implements
 	public static ImageLoader image_loader;
 	public static PauseOnScrollListener listener;
 	ConnectionDetector connection_detector;
+	Reciever alarm;
 
 	private ImageLoaderConfiguration initilizeImageLoader(
 			DisplayImageOptions options) {
@@ -162,14 +159,38 @@ public class MainActivity extends FragmentActivity implements
 				android.R.anim.fade_out);
 		initlizePager();
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		String msg="First time ?! You will have to connect to internet in order to use Landa application";
-		String notFirstTome="You have no internet connection ,connect to internet to get last updates and information!";
+		String msg = "First time ?! You will have to connect to internet in order to use Landa application";
+		String notFirstTome = "You have no internet connection ,connect to internet to get last updates and information!";
 		if (connection_detector.isConnectingToInternet())
 			initlizeGCM();
 		else {
-			Toast.makeText(getApplicationContext(), isReg?notFirstTome:msg, Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), isReg ? notFirstTome : msg,
+					Toast.LENGTH_LONG).show();
+			showDialogNoconnection();
 		}
 		super.onStart();
+	}
+
+	private void showDialogNoconnection() {
+		new AlertDialog.Builder(this)
+				.setTitle("Info")
+				.setMessage(
+						"Internet not available, Please check your internet connectivity and try again")
+
+				.setNeutralButton("Retry",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (connection_detector
+										.isConnectingToInternet()) {
+									initlizeGCM();
+
+								} else if (!isReg) {
+									showDialogNoconnection();
+								}
+
+							}
+						}).show();
 	}
 
 	@Override
@@ -193,8 +214,10 @@ public class MainActivity extends FragmentActivity implements
 	private void initlizeGCM() {
 		gcm = GoogleCloudMessaging.getInstance(this);
 		if (!isReg) {
-			task = new registerGcm();
-			task.execute();
+			if (connection_detector.isConnectingToInternet()) {
+				task = new registerGcm();
+				task.execute();
+			}
 		}
 
 	}
@@ -202,7 +225,13 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 122) {
-			mViewPager.setCurrentItem(resultCode);
+			mViewPager.setCurrentItem(Settings.COURSES);
+			CourseNotification c = (CourseNotification) data
+					.getSerializableExtra("notfiy");
+			if (c != null) {
+				Log.d("wordpress", c.getName());
+			setAlarms(c);
+			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -308,6 +337,7 @@ public class MainActivity extends FragmentActivity implements
 
 		setContentView(R.layout.activity_main);
 		jParser = new JSONParser();
+		alarm = new Reciever();
 
 	}
 
@@ -486,7 +516,7 @@ public class MainActivity extends FragmentActivity implements
 		extras.putSerializable("teacher", t);
 		Intent i = new Intent(this, TutorDetails.class);
 		i.putExtras(extras);
-		startActivityFromFragment(pages[1], i, 122);
+		startActivityFromFragment(pages[1], i, 133);
 
 	}
 
@@ -544,7 +574,7 @@ public class MainActivity extends FragmentActivity implements
 		extras.putString("content", u.getText());
 		Intent i = new Intent(this, UpdateDetailActivity.class);
 		i.putExtras(extras);
-		startActivityFromFragment(pages[2], i, 122);
+		startActivityFromFragment(pages[2], i, 144);
 
 	}
 
@@ -592,15 +622,19 @@ public class MainActivity extends FragmentActivity implements
 		protected String doInBackground(String... arg0) {
 			try {
 				st = gcm.register(GCMUtils.SENDER_ID);
+				if (st != null && !st.isEmpty()) {
+					isReg = true;
+					regKey = new String(st);
+					Log.d(GCMUtils.TAG, "regKey is : " + regKey);
+					GCMUtils.sendRegistrationIdToBackend(regKey);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				Log.e(GCMUtils.TAG, e.toString());
-			}
-			if (!st.isEmpty() || st != null) {
-				isReg = true;
-				regKey = new String(st);
-				Log.d(GCMUtils.TAG, "regKey is : " + regKey);
-				GCMUtils.sendRegistrationIdToBackend(regKey);
+				if (!connection_detector.isConnectingToInternet()) {
+					Log.e(GCMUtils.TAG, "faild no internet ");
+					cancel(true);
+				}
 			}
 
 			return "";
@@ -618,40 +652,47 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	/*
-	 * class loadDataFromBackend extends AsyncTask<String, String, String> {
-	 * List<NameValuePair> params = new ArrayList<NameValuePair>(); boolean
-	 * allOk = false;
 	 * 
-	 * @Override protected String doInBackground(String... arg0) { JSONObject
-	 * jsonUsers = jParser.makeHttpRequest( Settings.URL_teachers, "GET",
-	 * params); JSONObject jsonCourses = jParser.makeHttpRequest(
-	 * Settings.URL_COURSES, "GET", params); Log.d("ward",
-	 * jsonUsers.toString()); Log.d("ward", jsonCourses.toString());
 	 * 
-	 * try {
 	 * 
-	 * JSONArray teachers = jsonUsers.getJSONArray("users"); JSONArray courses =
-	 * jsonCourses.getJSONArray("courses");
 	 * 
-	 * for (int i = 0; i < teachers.length(); i++) { JSONObject c =
-	 * teachers.getJSONObject(i); Teacher t = new Teacher(c.getString("fname"),
-	 * c.getString("lname"), c.getString("email"), c.getString("id"), "T",
-	 * c.getString("faculty")); MainActivity.teachers.add(t);
-	 * db_mngr.insertTeacher(t); } for (int i = 0; i < courses.length(); i++) {
-	 * JSONObject c = courses.getJSONObject(i); Course tmp = new Course(i,
-	 * c.getString("subject_name"), c.getString("day"),
-	 * c.getString("time_from"), c.getString("time_to"), c.getString("place"),
-	 * c.getString("tutor_id")); MainActivity.courses.add(tmp);
-	 * db_mngr.insertCourse(tmp); }
 	 * 
-	 * allOk = true; } catch (JSONException e) { e.printStackTrace();
 	 * 
-	 * } return ""; }
 	 * 
-	 * @Override protected void onPostExecute(String result) { if (allOk)
-	 * saveLoadedDataFlag(true); super.onPostExecute(result); }
 	 * 
-	 * }
 	 */
+	private void setAlarms(CourseNotification notification) {
+		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+		for (Course c : notification.getCourse()) {
+			int dayNum = Utilities.dayWeekNumber(c.getDateTime());
+			if (dayNum == -1)
+				return;
+			int hourFrom = Integer.parseInt(c.getTimeFrom().split(":")[0]
+					.replaceAll("\\s", ""));
+			int minFrom = Integer.parseInt(c.getTimeFrom().split(":")[1]
+					.replaceAll("\\s", ""));
+			if (minFrom - 20 < 0) {
+				hourFrom--;
+				minFrom = 40;
+			}
+			minFrom -= 20;
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.DAY_OF_WEEK, dayNum);
+			calendar.set(Calendar.HOUR_OF_DAY, hourFrom);
+			calendar.set(Calendar.MINUTE, minFrom);
+			calendar.set(Calendar.SECOND, 0);
+			Intent myIntent = new Intent(this, Reciever.class);
+			myIntent.setAction(Settings.WARD_LANDA_ALARM);
+			myIntent.putExtra("course", c);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+					c.getCourseID(), myIntent,
+					PendingIntent.FLAG_CANCEL_CURRENT);
+
+			alarmManager.set(AlarmManager.RTC_WAKEUP,
+					calendar.getTimeInMillis(), pendingIntent);
+			db_mngr.UpdateCourse(c, 1);
+		}
+	}
 
 }

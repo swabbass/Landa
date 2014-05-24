@@ -1,5 +1,6 @@
 package ward.landa.fragments;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import ward.landa.R.layout;
 import ward.landa.R.menu;
 import ward.landa.activities.Settings;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -257,12 +259,29 @@ public class FragmentCourses extends Fragment {
 	class loadDataFromBackend extends AsyncTask<String, String, String> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		boolean allOk = false;
-
+		List<Course> toSave=new ArrayList<Course>();
+		
+		private ProgressDialog pDialog;
+		@Override
+		protected void onPreExecute() {
+			
+			super.onPreExecute();
+			pDialog=new ProgressDialog(getActivity());
+			pDialog.setMessage("Loading...");
+			pDialog.show();
+		}
 		@Override
 		protected String doInBackground(String... arg0) {
 
 			JSONObject jsonCourses = jParser.makeHttpRequest(
 					Settings.URL_COURSES, "GET", params);
+			if(jsonCourses==null)
+			{
+				if(cancel(true))
+				{
+					Log.e(GCMUtils.TAG,"loading courses from internet canceled");
+				}
+			}
 			Log.d("ward", jsonCourses.toString());
 
 			try {
@@ -278,13 +297,18 @@ public class FragmentCourses extends Fragment {
 					tmp.setImgID(R.drawable.ic_error);
 					if (!courses.contains(tmp))
 						courses.add(tmp);
-
-					db_mngr.insertCourse(tmp);
+					toSave.add(tmp);				
 				}
 
 				allOk = true;
 			} catch (JSONException e) {
 				e.printStackTrace();
+				Log.e(GCMUtils.TAG, e.toString());
+				if(!connectionDetector.isConnectingToInternet())
+				{
+					Log.e(GCMUtils.TAG, "faild no internet ");
+					cancel(true);
+				}
 
 			}
 			return "";
@@ -294,6 +318,7 @@ public class FragmentCourses extends Fragment {
 		protected void onPostExecute(String result) {
 			if (allOk) {
 				saveLoadedCoursesState(true);
+				pDialog.dismiss();
 				uAdapter = new coursesAdapter(courses, getActivity(),
 						getResources(), 0);
 
@@ -301,6 +326,11 @@ public class FragmentCourses extends Fragment {
 						uAdapter);
 				sb.setAbsListView(g);
 				g.setAdapter(sb);
+				for(Course c: toSave)
+				{
+					c.setCourse_db_id(db_mngr.insertCourse(c));
+				}
+				toSave=null;
 			}
 			super.onPostExecute(result);
 		}

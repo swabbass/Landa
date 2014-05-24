@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBManager {
 	public static final String DB_NAME = "db_LANDA";// הניתונים מסד שם
-	public static final int DB_VER = 8;// הנתונים מס של הגרסה
+	public static final int DB_VER = 9;// הנתונים מס של הגרסה
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -102,9 +102,21 @@ public class DBManager {
 		values.put(dbCourse.COURSE_DAY, course.getDateTime());
 		values.put(dbCourse.COURSE_TIME_FROM, course.getTimeFrom());
 		values.put(dbCourse.COURSE_TIME_TO, course.getTimeTo());
+		values.put(dbCourse.NOTIFIED, 0);
 		long id = db.insert(dbCourse.COURSE_TABLE, null, values);
 		db.close();
 		return id;
+	}
+
+	public boolean UpdateCourse(Course course, int notify) {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(dbCourse.NOTIFIED, notify);
+		boolean res = db.update(dbCourse.COURSE_TABLE, values,
+				dbCourse.COURSE_ID+" = "+course.getCourseID(),
+				null) > 0;
+		db.close();
+		return res;
 	}
 
 	public boolean updateTeacher(Teacher teacher) {
@@ -133,8 +145,9 @@ public class DBManager {
 		values.put(dbUpdate.UPDATE_CONTENT, update.getText());
 		values.put(dbUpdate.UPDATE_DATE, update.getDateTime());
 		values.put(dbUpdate.UPDATE_URL, update.getUrl());
-		boolean res = database.update(DB_NAME, values, dbTeacher.ID_NUMBER
-				+ " = " + getSQLText(update.getUpdate_id()), null) > 0;
+		boolean res = database.update(dbUpdate.UPDATES_TABLE, values,
+				dbUpdate.UPDATE_ID + " = " + getSQLText(update.getUpdate_id()),
+				null) > 0;
 		database.close();
 		return res;
 	}
@@ -161,7 +174,30 @@ public class DBManager {
 		Character ch = Character.valueOf(c);
 		return ch.toString() + text + ch.toString();
 	}
-
+	public List<Course> getAllNotifiedCourses()
+	{
+		Cursor cursor;
+		
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		cursor=database.query(dbCourse.COURSE_TABLE,new String[] {
+				dbCourse.COURSE_NAME,
+				dbCourse.COURSE_DAY,
+				dbCourse.COURSE_TIME_FROM,
+				dbCourse.COURSE_TIME_TO,
+				dbCourse.COURSE_PLACE,
+				
+		},dbCourse.NOTIFIED+" = "+"1",null,null,null,null);
+		List<Course> result=new ArrayList<Course>(cursor.getCount());
+		while(cursor.moveToNext()) {
+			Course c=new Course(cursor.getString(0), cursor.getString(1),
+					cursor.getString(2), 
+					cursor.getString(3),
+					cursor.getString(4));
+			c.setNotify(1);
+			result.add(c );
+		}
+		return result;
+	}
 	public List<Teacher> getCursorAllTeachers() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -194,28 +230,37 @@ public class DBManager {
 
 	}
 
-	public Cursor getCursorAllUpdates() {
+	public List<Update> getCursorAllUpdates() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(dbUpdate.UPDATES_TABLE, new String[] {
 				dbUpdate.UPDATE_ID, dbUpdate.UPDATE_SUBJECT,
 				dbUpdate.UPDATE_CONTENT, dbUpdate.UPDATE_DATE,
 				dbUpdate.UPDATE_URL }, null, null, null, null, null);
-		return cursor;
+		List<Update> updates = new ArrayList<Update>();
+		while (cursor.moveToNext()) {
+			Update u = new Update(cursor.getString(0), cursor.getString(1),
+					cursor.getString(3), cursor.getString(2));
+			u.setUrl(cursor.getString(4));
+			updates.add(u);
+		}
+
+		return updates;
 	}
 
 	public List<Course> getCursorAllWithCourses() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
-		cursor = database.query(false,dbCourse.COURSE_TABLE, new String[] {
+		cursor = database.query(false, dbCourse.COURSE_TABLE, new String[] {
 				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.TEACHER_ID,
 				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
 				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO }, null,
-				null, dbCourse.COURSE_NAME, null, null,null);
-		List<Course> courses=new ArrayList<Course>();
-		while(cursor.moveToNext()) {
-			
-			Course c=new Course(0, cursor.getString(1), "", cursor.getString(2), R.drawable.ic_error, 0);
+				null, dbCourse.COURSE_NAME, null, null, null);
+		List<Course> courses = new ArrayList<Course>();
+		while (cursor.moveToNext()) {
+
+			Course c = new Course(0, cursor.getString(1), "",
+					cursor.getString(2), R.drawable.ic_error, 0);
 			courses.add(c);
 		}
 		return courses;
@@ -228,7 +273,7 @@ public class DBManager {
 		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
 				dbCourse.TEACHER_ID, dbCourse.COURSE_PLACE,
 				dbCourse.COURSE_DAY, dbCourse.COURSE_TIME_FROM,
-				dbCourse.COURSE_TIME_TO }, dbCourse.COURSE_NAME + " = "
+				dbCourse.COURSE_TIME_TO,dbCourse.NOTIFIED,dbCourse.COURSE_ID }, dbCourse.COURSE_NAME + " = "
 				+ getSQLText(name), null, null, null, null);
 		cursor.moveToNext();
 		do {
@@ -238,12 +283,12 @@ public class DBManager {
 				teachers.add(t);
 			}
 			t = teachers.get(teachers.indexOf(t));
-			String timeInfo = cursor.getString(1) + " " + cursor.getString(2)
-					+ " " + cursor.getString(3) + " - " + cursor.getString(4);
+			String timeInfo = cursor.getString(1) + " - " + cursor.getString(2)
+					+ " - " + cursor.getString(3) + " - " + cursor.getString(4)+" - "+cursor.getString(5)+" - "+cursor.getString(6);
 			t.addTimeToCourse(name, timeInfo);
 			teachers.remove(t);
 			teachers.add(t);
-		}while(cursor.moveToNext());
+		} while (cursor.moveToNext());
 		return teachers;
 	}
 
@@ -270,11 +315,10 @@ public class DBManager {
 				null, null, null);
 		return cursor;
 	}
-	public static String removeQoutes(String s)
-	{
+
+	public static String removeQoutes(String s) {
 		return s.replace("\"", "");
 	}
-	
 
 }
 
@@ -310,6 +354,7 @@ class dbCourse {
 	public static final String TEACHER_ID = "id_number";
 	public static final String COURSE_NAME = "course_name";
 	public static final String COURSE_DAY = "course_day";
+	public static final String NOTIFIED = "notified";
 	public static final String COURSE_PLACE = "course_place";
 	public static final String COURSE_DESCRIPTION = "course_description";
 	public static final String COURSE_TIME_FROM = "course_time_from";
@@ -319,7 +364,8 @@ class dbCourse {
 			+ " text not null, " + COURSE_ID + " text not null, " + COURSE_NAME
 			+ " text not null, " + COURSE_DAY + " text not null, "
 			+ COURSE_PLACE + " text not null, " + COURSE_TIME_FROM
-			+ " text not null, " + COURSE_TIME_TO + " text not null " + " );";
+			+ " text not null, " + COURSE_TIME_TO + " text not null, "
+			+ NOTIFIED + " NUMERIC not null " + " );";
 }
 
 class dbUpdate {

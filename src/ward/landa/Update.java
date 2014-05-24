@@ -1,13 +1,21 @@
 package ward.landa;
 
-public class Update {
+import java.io.Serializable;
+
+import android.text.Html;
+
+public class Update implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4704709704844438730L;
 	private String text;
 	private String update_id;
 	private boolean active;
 	private String subject;
 	private String dateTime;
 	private String url;
-
+	private String urlToJason;
 	public Update(String subject, String dateTime, String text) {
 		setSubject(subject);
 		setDateTime(dateTime);
@@ -15,6 +23,10 @@ public class Update {
 
 	}
 
+	public Update(String id,String urlToJSon) {
+		this.update_id=id;
+		this.setUrlToJason(urlToJSon);
+	}
 	public Update(String id, String subject, String dateTime, String text) {
 		setUpdate_id(id);
 		setSubject(subject);
@@ -23,6 +35,16 @@ public class Update {
 
 	}
 
+	@Override
+	public boolean equals(Object o) {
+	
+		if (o instanceof Update)
+		{
+			Update t=(Update)o;
+			return t.update_id.equals(update_id);
+		}
+		return false;
+	}
 	public String getText() {
 		return text;
 	}
@@ -42,7 +64,7 @@ public class Update {
 	}
 
 	public void setText(String text) {
-		this.text = text;
+		this.text = Html.fromHtml(text).toString();
 	}
 
 	public boolean isActive() {
@@ -58,7 +80,7 @@ public class Update {
 	}
 
 	public void setSubject(String subject) {
-		this.subject = subject;
+		this.subject =Html.fromHtml(subject).toString();
 	}
 
 	public String getDateTime() {
@@ -83,6 +105,14 @@ public class Update {
 
 	public void setUpdate_id(String update_id) {
 		this.update_id = update_id;
+	}
+
+	public String getUrlToJason() {
+		return urlToJason;
+	}
+
+	public void setUrlToJason(String urlToJason) {
+		this.urlToJason = urlToJason;
 	}
 
 }

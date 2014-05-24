@@ -3,6 +3,7 @@ package ward.landa.fragments;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import utilites.DBManager;
 import ward.landa.Course;
@@ -26,6 +27,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -50,7 +53,10 @@ public class CourseFragment extends Fragment {
 	ImageView courseImg;
 	ImageView feedbackImg;
 	DBManager db_mngr;
-	
+	AlarmCallBack alarmCheckListner;
+	public interface AlarmCallBack{
+		public void onTimeChecked(String time,boolean isChecked);
+	}
 
 	@Override
 	public void onStart() {
@@ -87,6 +93,13 @@ public class CourseFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		try {
+			alarmCheckListner=(AlarmCallBack)activity;
+			
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement callbackTeacher");
+		}
 		setHasOptionsMenu(true);
 	}
 
@@ -100,25 +113,7 @@ public class CourseFragment extends Fragment {
 	}
 
 	private void initlizeTeachers() {
-		/*
-		 * teachers = new ArrayList<Teacher>(); Teacher t1 = new Teacher(0000,
-		 * R.drawable.ward, "Ward Abbass", "mail@ward.com", "0555", "חברתי",
-		 * "CS"); Teacher t2 = new Teacher(111, R.drawable.mohammed,
-		 * "Mohammed Abd Elraziq", "mail@mohammed.com", "015", "", "ה.חומרים");
-		 * Teacher t3 = new Teacher(111, R.drawable.hamed, "Hammed Abbass",
-		 * "mail@hamed.com", "0555", "", "ת.נ"); Teacher t4 = new Teacher(333,
-		 * R.drawable.stlzbale, "חסן ח'לאילה", "mail@stlzbale.com", "0555", "",
-		 * "חשמל");
-		 * 
-		 * teachers.add(t1); teachers.add(t2); teachers.add(t3);
-		 * teachers.add(t4);
-		 * 
-		 * Course c = new Course(7, courseName, "WednesDay", "17:30", "19:30",
-		 * "Ulman 603", "204112130"); HashMap<String, Course> stamTest = new
-		 * HashMap<String, Course>(); stamTest.put(courseName, c);
-		 * t1.setCourses(stamTest); t2.setCourses(stamTest);
-		 * t3.setCourses(stamTest); t4.setCourses(stamTest);
-		 */
+	
 	}
 
 	private void fetchArguments() {
@@ -179,7 +174,7 @@ public class CourseFragment extends Fragment {
 		///adapter ad = new adapter(getActivity(), teachers, getResources(),
 		//		courseName);
 		
-		ExpandableListAdapter ad=new ExpandableListAdapter(getActivity(), teachers, timesForEachTeacher);
+		ExpandableListAdapter ad=new ExpandableListAdapter(getActivity(), teachers, timesForEachTeacher,alarmCheckListner);
 		//SwingRightInAnimationAdapter sRin = new SwingRightInAnimationAdapter(ad);
 		//sRin.setAbsListView(l);
 		//l.setAdapter(sRin);
@@ -270,14 +265,16 @@ public class CourseFragment extends Fragment {
 		private List<Teacher> _teachers;
 		private HashMap<String, List<String>> _listTimes;
 		private LayoutInflater inflater;
+		private AlarmCallBack listner;
 		public ExpandableListAdapter(Context context, List<Teacher> teachers,
-				HashMap<String, List<String>> listTimes) {
+				HashMap<String, List<String>> listTimes,AlarmCallBack lister) {
 			this._context=context;
 			this._teachers=teachers;
 			this._listTimes=listTimes;
+			this.listner=lister;
 			this.inflater=(LayoutInflater)this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
-
+		
 		@Override
 		public Object getChild(int groupPos, int ChildPos) {
 			//return the list of theacher time for this course (String List) by id number given and get the spiceifec child (String )from strings list
@@ -302,7 +299,33 @@ public class CourseFragment extends Fragment {
 				
 			}
 			CheckBox chkBox=(CheckBox)v.getTag(R.id.day_time_workshop);
-			chkBox.setText(dateTime);
+			String[] info = dateTime.split(Pattern.quote(" - "));
+			int lastIndex = info.length - 3;
+			String day = info[lastIndex - 2];
+			String timeFrom = info[lastIndex - 1];
+			String tumeTo = info[lastIndex];
+			String place = info[lastIndex - 3];
+			String notify=info[lastIndex+1];
+			String id=info[lastIndex+2];
+			for (int i = lastIndex - 4; i >= 0; --i) {
+				place += " " + info[i];
+			}
+			chkBox.setText(place+" "+day+" "+timeFrom+"-"+tumeTo);
+			if(notify.equals("1"))
+			{
+				chkBox.setChecked(true);
+			}
+			else
+			{
+				chkBox.setChecked(false);
+			}
+			chkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					listner.onTimeChecked(dateTime, isChecked);
+				}
+			});
 			return v;
 		}
 
@@ -318,14 +341,12 @@ public class CourseFragment extends Fragment {
 		}
 
 		@Override
-		public int getGroupCount() {
-			
+		public int getGroupCount() {			
 			return this._teachers.size();
 		}
 
 		@Override
 		public long getGroupId(int arg0) {
-			// TODO Auto-generated method stub
 			return arg0;
 		}
 

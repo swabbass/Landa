@@ -2,12 +2,10 @@ package ward.landa.fragments;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
@@ -19,6 +17,7 @@ import ward.landa.activities.MainActivity;
 import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -41,12 +40,13 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 public class FragmentTeachers extends Fragment {
 
@@ -148,8 +148,7 @@ public class FragmentTeachers extends Fragment {
 
 			gridView = (GridView) root.findViewById(R.id.gridview);
 			tutors = new ArrayList<Teacher>();
-			gAdapter = new gridAdabter(root.getContext(), tutors,
-					getResources(), 0);
+		
 			boolean isConnected=connectionDetector.isConnectingToInternet();
 			if (!toFetchDataFromDB && isConnected) {
 				// fetch from internet
@@ -164,7 +163,7 @@ public class FragmentTeachers extends Fragment {
 						gAdapter);
 				sb.setAbsListView(gridView);
 				gridView.setAdapter(sb);
-				gAdapter.notifyDataSetChanged();
+				sb.notifyDataSetChanged();
 			}
 
 			gridView.setOnItemClickListener(new OnItemClickListener() {
@@ -188,6 +187,7 @@ public class FragmentTeachers extends Fragment {
 		List<Teacher> l;
 		Resources res;
 		BitmapUtils bmpUtils;
+		
 		int searched = 0;
 
 		public void setL(List<Teacher> l, int search) {
@@ -236,7 +236,7 @@ public class FragmentTeachers extends Fragment {
 			}
 			picture = (ImageView) v.getTag(R.id.picture);
 			name = (TextView) v.getTag(R.id.text);
-
+			ImageAware image=new ImageViewAware(picture, false);
 			final Teacher teacher = (Teacher) getItem(pos);
 
 			List<Bitmap> cached = MemoryCacheUtil.findCachedBitmapsForImageUri(
@@ -245,9 +245,10 @@ public class FragmentTeachers extends Fragment {
 			Log.d("eee", "cached image : " + cached.size());
 			if (cached.size() > 0) {
 				if (teacher.isDownloadedImage()) {
+					
 					picture.setImageBitmap(cached.get(0));
 				} else {
-					picture.setImageResource(R.drawable.ic_error);
+				//	picture.setImageResource(R.drawable.ic_error);
 				}
 			} else {
 				if (!teacher.isDownloadedImage()) {
@@ -264,7 +265,7 @@ public class FragmentTeachers extends Fragment {
 						public void onLoadingFailed(String imageUri, View view,
 								FailReason failReason) {
 							teacher.setDownloadedImage(false);
-							picture.setImageResource(R.drawable.ic_error);
+						//	picture.setImageResource(R.drawable.ic_error);
 							Log.d("test", failReason.toString());
 							super.onLoadingFailed(imageUri, view, failReason);
 						}
@@ -272,7 +273,9 @@ public class FragmentTeachers extends Fragment {
 						@Override
 						public void onLoadingComplete(String imageUri,
 								View view, Bitmap loadedImage) {
-							picture.setImageBitmap(loadedImage);
+							ImageView img=(ImageView)view;
+							img.setImageBitmap(loadedImage);
+							//picture.setImageBitmap(loadedImage);
 							Utilities.saveImageToSD(teacher, loadedImage);
 
 							teacher.setDownloadedImage(true);
@@ -281,7 +284,7 @@ public class FragmentTeachers extends Fragment {
 						}
 					};
 					MainActivity.image_loader.displayImage(
-							teacher.getImageUrl(), picture, s);
+							teacher.getImageUrl(), image, s);
 					// MainActivity.image_loader.loadImage(teacher.getImageUrl(),
 
 				} else {
@@ -303,14 +306,16 @@ public class FragmentTeachers extends Fragment {
 						@Override
 						public void onLoadingComplete(String imageUri,
 								View view, Bitmap loadedImage) {
-							picture.setImageBitmap(loadedImage);
+							ImageView img=(ImageView)view;
+							img.setImageBitmap(loadedImage);
+							//picture.setImageBitmap(loadedImage);
 							Log.d("sd", "loading from sd is successfull ");
 							super.onLoadingComplete(imageUri, view, loadedImage);
 						}
 					};
 					// MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(),
 					MainActivity.image_loader.displayImage(
-							"file://" + teacher.getImageLocalPath(), picture,
+							"file://" + teacher.getImageLocalPath(), image,
 							s2);
 
 				}
@@ -324,42 +329,48 @@ public class FragmentTeachers extends Fragment {
 	class loadDataFromBackend extends AsyncTask<String, String, String> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		boolean allOk = false;
-
+		private ProgressDialog pDialog;
+		@Override
+		protected void onPreExecute() {
+			
+			super.onPreExecute();
+			pDialog=new ProgressDialog(getActivity());
+			pDialog.setMessage("Loading...");
+			pDialog.show();
+		}
 		@Override
 		protected String doInBackground(String... arg0) {
 			JSONObject jsonUsers = jParser.makeHttpRequest(
 					Settings.URL_teachers, "GET", params);
-			/*
-			 * JSONObject jsonCourses = jParser.makeHttpRequest(
-			 * Settings.URL_COURSES, "GET", params);
-			 */
+			if(jsonUsers==null)
+			{
+				if(cancel(true))
+					{
+						Log.e(GCMUtils.TAG,"loading teachers from internet canceled");
+					}
+			}
 			Log.d("ward", jsonUsers.toString());
-			// Log.d("ward", jsonCourses.toString());
-
 			try {
 
 				JSONArray teachers = jsonUsers.getJSONArray("users");
-				// JSONArray courses = jsonCourses.getJSONArray("courses");
-
 				for (int i = 0; i < teachers.length(); i++) {
 					JSONObject c = teachers.getJSONObject(i);
 					Teacher t = new Teacher(c.getString("fname"),
 							c.getString("lname"), c.getString("email"),
 							c.getString("id"), "T", c.getString("faculty"));
+					t.setDownloadedImage(false);
 					tutors.add(t);
-					db_mngr.insertTeacher(t);
-				}
-				/*
-				 * for (int i = 0; i < courses.length(); i++) { JSONObject c =
-				 * courses.getJSONObject(i); Course tmp = new Course(i,
-				 * c.getString("subject_name"), c.getString("day"),
-				 * c.getString("time_from"), c.getString("time_to"),
-				 * c.getString("place"), c.getString("tutor_id"));
-				 * MainActivity.courses.add(tmp); db_mngr.insertCourse(tmp); }
-				 */
+					
+				}			
 				allOk = true;
 			} catch (JSONException e) {
 				e.printStackTrace();
+				Log.e(GCMUtils.TAG, e.toString());
+				if(!connectionDetector.isConnectingToInternet())
+				{
+					Log.e(GCMUtils.TAG, "faild no internet ");
+					cancel(true);
+				}
 
 			}
 			return "";
@@ -369,10 +380,18 @@ public class FragmentTeachers extends Fragment {
 		protected void onPostExecute(String result) {
 			if (allOk) {
 				saveLoadedTeachersState(true);
+				for(Teacher t :tutors)
+				{
+					db_mngr.insertTeacher(t);
+				}
+				pDialog.dismiss();
+				gAdapter = new gridAdabter(getActivity(), tutors,
+						getResources(), 0);
 				SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
 						gAdapter);
 				sb.setAbsListView(gridView);
 				gridView.setAdapter(sb);
+				sb.notifyDataSetChanged(true);
 			}
 			super.onPostExecute(result);
 		}

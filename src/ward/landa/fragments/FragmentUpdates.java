@@ -1,18 +1,30 @@
 package ward.landa.fragments;
 
+import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.apache.http.NameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import utilites.ConnectionDetector;
+import utilites.DBManager;
+import utilites.JSONParser;
 import ward.landa.ExpandableTextView;
+import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Update;
 import ward.landa.activities.Settings;
 import ward.landa.activities.SettingsActivity;
+import ward.landa.activities.Utilities;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -39,12 +51,17 @@ public class FragmentUpdates extends Fragment {
 	boolean isReg;
 	String regKey;
 	ListView l;
-	List<Update> ups;
+	List<Update> updates;
 	boolean isExpanded = false;
 	updateCallback callBack;
 	boolean showAll;
 	updatesAdapter uAdapter;
 	updateReciever uR;
+	JSONParser jParser;
+	ConnectionDetector connectionDetector;
+	DBManager db_mngr;
+	private boolean toFetchDataFromDB;
+	private int lastChangedIndex = -1;
 
 	public interface updateCallback {
 		public void onUpdateClick(Update u);
@@ -55,8 +72,10 @@ public class FragmentUpdates extends Fragment {
 		Log.d("Fragment", "on resume updates");
 
 		uR = new updateReciever();
-		getActivity().registerReceiver(uR,
-				new IntentFilter(Settings.DISPLAY_MESSAGE_ACTION));
+		IntentFilter intentFilter = new IntentFilter(
+				"com.google.android.c2dm.intent.RECEIVE");
+		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+		getActivity().registerReceiver(uR, intentFilter);
 
 		super.onResume();
 	}
@@ -64,19 +83,18 @@ public class FragmentUpdates extends Fragment {
 	@Override
 	public void onStop() {
 		Log.d("Fragment", "on stop updates");
+		try {
+			saveUpdatesChanges();
+		} catch (SQLDataException e) {
+
+			e.printStackTrace();
+		}
 		super.onStop();
 	}
 
 	@Override
 	public void onStart() {
 
-		uAdapter = new updatesAdapter(ups, ups, getActivity(), callBack);
-		uAdapter.setShowall(false);
-		ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
-		sc.setAbsListView(l);
-		l.setAdapter(sc);
-
-		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		Log.d("Fragment", "on start updates");
 		super.onStart();
 	}
@@ -134,18 +152,38 @@ public class FragmentUpdates extends Fragment {
 		Log.d("Fragment", "on create updates");
 		View root = inflater.inflate(R.layout.updates_frag_list, container,
 				false);
-
+		db_mngr = new DBManager(getActivity());
+		lastChangedIndex = -1;
+		connectionDetector = new ConnectionDetector(getActivity());
+		jParser = new JSONParser();
 		l = (ListView) root.findViewById(R.id.updates_listView);
-		// l = (SwipeListView) root.findViewById(R.id.updates_listView);
 		showAll = false;
-		ups = new ArrayList<Update>();
+		updates = new ArrayList<Update>();
 
+		SharedPreferences sh = getActivity().getSharedPreferences(
+				GCMUtils.DATA, Activity.MODE_PRIVATE);
+		toFetchDataFromDB = sh.getBoolean(GCMUtils.LOAD_UPDATES, false);
+		boolean isConnected = connectionDetector.isConnectingToInternet();
+		if (!toFetchDataFromDB && isConnected) {
+			new downloadRecentUpdates().execute();
+		} else {
+			updates = null;
+			updates = db_mngr.getCursorAllUpdates();
+			uAdapter = new updatesAdapter(updates, updates, getActivity(),
+					callBack);
+			uAdapter.setShowall(false);
+			ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
+			sc.setAbsListView(l);
+			l.setAdapter(sc);
+		}
+
+		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		l.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				callBack.onUpdateClick(ups.get(arg2));
+				callBack.onUpdateClick(updates.get(arg2));
 			}
 
 		});
@@ -187,7 +225,7 @@ public class FragmentUpdates extends Fragment {
 					int position, long id, boolean checked) {
 
 				if (checked) {
-					if (count <= ups.size())
+					if (count <= updates.size())
 						count++;
 					mode.setTitle(count + " "
 							+ getResources().getString(R.string.selected));
@@ -291,8 +329,6 @@ public class FragmentUpdates extends Fragment {
 						v.findViewById(R.id.contentTextBox));
 				v.setTag(R.id.update_timeLable,
 						v.findViewById(R.id.update_timeLable));
-				// v.setTag(R.id.imgattention,
-				// v.findViewById(R.id.imgattention));
 			}
 			subject = (ExpandableTextView) v.getTag(R.id.contentTextBox);
 			title = (TextView) v.getTag(R.id.title_updateLable);
@@ -300,14 +336,6 @@ public class FragmentUpdates extends Fragment {
 			subject.setText(updates.get(position).getText());
 			time = (TextView) v.getTag(R.id.update_timeLable);
 			time.setText(updates.get(position).getDateTime());
-			/*
-			 * final ImageButton btn = (ImageButton)
-			 * v.getTag(R.id.imgattention); if
-			 * (updates.get(position).isActive()) {
-			 * btn.setImageResource(R.drawable.update_icon_new); } else {
-			 * btn.setImageResource(R.drawable.megaphone_after); }
-			 */
-
 			return v;
 		}
 
@@ -318,18 +346,152 @@ public class FragmentUpdates extends Fragment {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			if (arg1.getAction().toString()
-					.compareTo(Settings.DISPLAY_MESSAGE_ACTION) == 0) {
-				Bundle extras = arg1.getExtras();
-				String title = extras.getString(Settings.EXTRA_TITLE);
-				String msg = extras.getString(Settings.EXTRA_MESSAGE);
-				String date = extras.getString(Settings.EXTRA_Date);
-				Update u = new Update(title, date, msg);
-				ups.add(u);
-				uAdapter.notifyDataSetChanged();
+					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
+				abortBroadcast();
+				Update u = Utilities.generateUpdateFromExtras(arg1.getExtras(),arg0);
+				if (u != null&& u.getUrlToJason()==null) {
+					updates.add(u);
+					if (lastChangedIndex == -1) {
+						lastChangedIndex = updates.size() - 1;
+					}
+					uAdapter.notifyDataSetChanged();
+					Utilities.showNotification(getActivity(), u.getSubject(), u.getText());
+				}
+				else if(u.getUrlToJason()!=null)
+				{
+					Utilities.PostListener  listner =new Utilities.PostListener() {
+						
+						@Override
+						public void onPostUpdateDownloaded(Update u) {
+							
+							boolean toSaveAdded=addUpdate(u);
+							if (lastChangedIndex == -1 && toSaveAdded ) {
+								lastChangedIndex = updates.size() - 1;
+							}
+							Utilities.showNotification(getActivity(), u.getSubject(), u.getText());
+							uAdapter.notifyDataSetChanged();
+							
+						}
+					};
+					Utilities.fetchUpdateFromBackEndTask task=new Utilities.fetchUpdateFromBackEndTask(getActivity(), listner);
+					task.execute(u.getUpdate_id());
+				}
 			}
 
 		}
 
 	}
+	private boolean addUpdate(Update u)
+	{
+		for(Update tmp:updates)
+		{
+			if(tmp.equals(u))
+			{
+				tmp.setSubject(u.getSubject());
+				tmp.setText(u.getText());
+				tmp.setDateTime(u.getDateTime());
+				tmp.setUrl(u.getUrl());
+				db_mngr.updateUpdate(u);
+				return false;
+			}
+		}
+		updates.add(u);
+		return true;
+	}
 
+	class downloadRecentUpdates extends AsyncTask<String, String, String> {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		private ProgressDialog pDialog;
+		boolean downloadOk = false;
+
+		@Override
+		protected void onPreExecute() {
+
+			super.onPreExecute();
+			pDialog = new ProgressDialog(getActivity());
+			pDialog.setMessage("Loading...");
+			pDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			JSONObject jObject = jParser.makeHttpRequest(Settings.URL_UPDATES,
+					"GET", this.params);
+			if (jObject == null) {
+				if (cancel(true)) {
+					Log.e(GCMUtils.TAG,
+							"loading Updates from internet canceled");
+				}
+			}
+			else {
+			Log.d("ward", jObject.toString());
+
+			try {
+				JSONArray updatesArray = jObject.getJSONArray("posts");
+				for (int i = 0; i < updatesArray.length(); ++i) {
+					JSONObject update = updatesArray.getJSONObject(i);
+					Update u = new Update(update.getString("id"),
+							update.getString("title"),
+							update.getString("date"),
+							update.getString("content"));
+					u.setUrl(update.getString("url"));
+					updates.add(u);
+				}
+				downloadOk = true;
+			} catch (JSONException e) {
+
+				e.printStackTrace();
+				Log.e(GCMUtils.TAG, e.toString());
+				if (!connectionDetector.isConnectingToInternet()) {
+					Log.e(GCMUtils.TAG, "faild no internet ");
+					cancel(true);
+				}
+
+			}
+			}
+			return "";
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			if (downloadOk) {
+				saveDownloadOnceStatus(true);
+				for (Update u : updates) {
+					db_mngr.insertUpdate(u);
+				}
+				pDialog.dismiss();
+				uAdapter = new updatesAdapter(updates, updates, getActivity(),
+						callBack);
+				uAdapter.setShowall(false);
+				ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(
+						uAdapter);
+				sc.setAbsListView(l);
+				l.setAdapter(sc);
+			}
+			super.onPostExecute(result);
+		}
+
+	}
+
+	public void saveDownloadOnceStatus(boolean b) {
+		SharedPreferences sh = getActivity().getSharedPreferences(
+				GCMUtils.DATA, Activity.MODE_PRIVATE);
+		SharedPreferences.Editor ed = sh.edit();
+		ed.putBoolean(GCMUtils.LOAD_UPDATES, b);
+		ed.commit();
+
+	}
+
+	private void saveUpdatesChanges() throws SQLDataException {
+		int size = updates.size();// o(n)
+		if (lastChangedIndex != -1) {
+			// each itration is o(1)
+			for (int i = lastChangedIndex; i < size; ++i) {
+				if (db_mngr.insertUpdate(updates.get(i)) < 0) {
+					throw new SQLDataException(
+							"Damn Rome You Have some Issues with Saving Updates ");
+				}
+			}
+		}
+	}
 }

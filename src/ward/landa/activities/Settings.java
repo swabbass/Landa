@@ -24,6 +24,8 @@ public class Settings {
 	public static final String HEBREW = "he";
 	public static final String ENGLISH = "en";
 	public static final String ARABIC = "ar";
+	public static final String URL_UPDATES="http://wabbass.byethost9.com/wordpress/?json=get_recent_posts";
+	
 	public static final String URL_teachers = "http://nlanda.technion.ac.il/LandaSystem/tutors.aspx";
 	public static final String URL_COURSES = "http://nlanda.technion.ac.il/LandaSystem/courses.aspx";
 	public final static String picsPathDir = "Landa" + File.separator
@@ -37,7 +39,7 @@ public class Settings {
 	private static String localLang;
 	private static boolean toNotifyUpdates;
 	private static boolean toNotifyCourse;
-
+	public static final String WARD_LANDA_ALARM = "ward.landa.ALARM";
 	public static final String DISPLAY_MESSAGE_ACTION = "ward.landa.DISPLAY_MESSAGE";
 	// public static final String ADD_CONVERSATION_ACTION =
 	// "ward.landa.ADD_CONVERSATION";

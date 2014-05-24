@@ -44,6 +44,7 @@ public class Teacher implements Serializable {
 	public Teacher(String fname, String lname, String email, String id_number,
 			String pos, String faculty) {
 
+		this.id_number=id_number;
 		setId_number(id_number);
 		setName(fname);
 		setLast_name(lname);
@@ -67,14 +68,6 @@ public class Teacher implements Serializable {
 		return false;
 	}
 
-	/*
-	 * public HashMap<String, String> getCourseDetailsToShow(String courseName)
-	 * { Course c=getCourses().get(courseName); if(c!=null){ HashMap< String,
-	 * String> details=new HashMap<String, String>(4); details.put("day",
-	 * c.getDateTime()); details.put("from",c.getTimeFrom()); details.put("to",
-	 * c.getTimeTo()); details.put("place", c.getPlace()); return details; }
-	 * else { throw new NullPointerException("Null Course"); } }
-	 */
 	public void addCourse(String course_name, List<String> times) {
 
 		timesForEachCourse.put(course_name, times);
