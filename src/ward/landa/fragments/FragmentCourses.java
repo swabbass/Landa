@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import utilites.ConnectionDetector;
 import utilites.DBManager;
@@ -23,7 +25,9 @@ import ward.landa.R.drawable;
 import ward.landa.R.id;
 import ward.landa.R.layout;
 import ward.landa.R.menu;
+import ward.landa.activities.MainActivity;
 import ward.landa.activities.Settings;
+import ward.landa.activities.Utilities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -77,7 +81,6 @@ public class FragmentCourses extends Fragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
 		getActivity().getMenuInflater().inflate(R.menu.course_menu, menu);
 		View v = (View) menu.findItem(R.id.course_menu_search).getActionView();
 
@@ -136,41 +139,41 @@ public class FragmentCourses extends Fragment {
 		root = inflater.inflate(R.layout.courses_frag_grid, container, false);
 		g = (GridView) root.findViewById(R.id.gridviewcourses);
 		connectionDetector = new ConnectionDetector(getActivity());
-			jParser = new JSONParser();
-			db_mngr = new DBManager(getActivity());
-			searced = new ArrayList<Course>();
-			courses = new ArrayList<Course>();
-			SharedPreferences sh = getActivity().getSharedPreferences(
-					GCMUtils.DATA, Activity.MODE_PRIVATE);
-			loadFromDb = sh.getBoolean(GCMUtils.LOAD_COURSES, false);
-			boolean isConnected=connectionDetector.isConnectingToInternet();
-			if (!loadFromDb && isConnected) {
-				new loadDataFromBackend().execute();
-			} else {
-				courses = null;
-				courses = db_mngr.getCursorAllWithCourses();
-				uAdapter = new coursesAdapter(courses, getActivity(),
-						getResources(), 0);
+		jParser = new JSONParser();
+		db_mngr = new DBManager(getActivity());
+		searced = new ArrayList<Course>();
+		courses = new ArrayList<Course>();
+		SharedPreferences sh = getActivity().getSharedPreferences(
+				GCMUtils.DATA, Activity.MODE_PRIVATE);
+		loadFromDb = sh.getBoolean(GCMUtils.LOAD_COURSES, false);
+		boolean isConnected = connectionDetector.isConnectingToInternet();
+		if (!loadFromDb && isConnected) {
+			new loadDataFromBackend().execute();
+		} else {
+			courses = null;
+			courses = db_mngr.getCursorAllWithCourses();
+			uAdapter = new coursesAdapter(courses, getActivity(),
+					getResources(), 0);
 
-				SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
-						uAdapter);
-				sb.setAbsListView(g);
-				g.setAdapter(sb);
+			SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+					uAdapter);
+			sb.setAbsListView(g);
+			g.setAdapter(sb);
 
+		}
+
+		g.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				callback.onCourseClick(uAdapter.searched == 0 ? courses
+						.get(arg2) : searced.get(arg2));
+				g.setItemChecked(arg2, true);
 			}
 
-			g.setOnItemClickListener(new OnItemClickListener() {
+		});
 
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					callback.onCourseClick(uAdapter.searched == 0 ? courses
-							.get(arg2) : searced.get(arg2));
-					g.setItemChecked(arg2, true);
-				}
-
-			});
-		
 		return root;
 	}
 
@@ -234,22 +237,28 @@ public class FragmentCourses extends Fragment {
 			View v = view;
 			ImageView picture;
 			TextView name;
-			RatingBar rb;
+			ImageView alarm;
 			Course c = (Course) getItem(position);
 			if (v == null) {
 				v = inflater.inflate(R.layout.course_item_grid, parent, false);
 				v.setTag(R.id.list_image, v.findViewById(R.id.list_image));
 				v.setTag(R.id.title, v.findViewById(R.id.title));
+				v.setTag(R.id.alarm_course_image_view,
+						v.findViewById(R.id.alarm_course_image_view));
 			}
 			picture = (ImageView) v.getTag(R.id.list_image);
+			ImageAware image = new ImageViewAware(picture, false);
 			name = (TextView) v.getTag(R.id.title);
-
-			// picture.setImageResource(c.getImgID());
-			bmpUtils.loadBitmap(c.getImgID(), picture);
-			/*
-			 * picture.setImageBitmap(Utilities.decodeSampledBitmapFromResource(
-			 * res, c.getImgID(), 100, 100));
-			 */
+			alarm = (ImageView) v.getTag(R.id.alarm_course_image_view);
+			if (c.getNotify() == 0) {
+				alarm.setVisibility(ImageView.INVISIBLE);
+			} else if (c.getNotify() == 1) {
+				alarm.setVisibility(ImageView.VISIBLE);
+			}
+			String imageUri = "drawable://"
+					+ Utilities.getImageForCourse(c.getName());
+			MainActivity.image_loader.displayImage(imageUri, image);
+			c.setImgID(Utilities.getImageForCourse(c.getName()));
 			name.setText(c.getName());
 			return v;
 		}
@@ -259,27 +268,28 @@ public class FragmentCourses extends Fragment {
 	class loadDataFromBackend extends AsyncTask<String, String, String> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		boolean allOk = false;
-		List<Course> toSave=new ArrayList<Course>();
-		
+		List<Course> toSave = new ArrayList<Course>();
+
 		private ProgressDialog pDialog;
+
 		@Override
 		protected void onPreExecute() {
-			
+
 			super.onPreExecute();
-			pDialog=new ProgressDialog(getActivity());
+			pDialog = new ProgressDialog(getActivity());
 			pDialog.setMessage("Loading...");
 			pDialog.show();
 		}
+
 		@Override
 		protected String doInBackground(String... arg0) {
 
 			JSONObject jsonCourses = jParser.makeHttpRequest(
 					Settings.URL_COURSES, "GET", params);
-			if(jsonCourses==null)
-			{
-				if(cancel(true))
-				{
-					Log.e(GCMUtils.TAG,"loading courses from internet canceled");
+			if (jsonCourses == null) {
+				if (cancel(true)) {
+					Log.e(GCMUtils.TAG,
+							"loading courses from internet canceled");
 				}
 			}
 			Log.d("ward", jsonCourses.toString());
@@ -297,15 +307,14 @@ public class FragmentCourses extends Fragment {
 					tmp.setImgID(R.drawable.ic_error);
 					if (!courses.contains(tmp))
 						courses.add(tmp);
-					toSave.add(tmp);				
+					toSave.add(tmp);
 				}
 
 				allOk = true;
 			} catch (JSONException e) {
 				e.printStackTrace();
 				Log.e(GCMUtils.TAG, e.toString());
-				if(!connectionDetector.isConnectingToInternet())
-				{
+				if (!connectionDetector.isConnectingToInternet()) {
 					Log.e(GCMUtils.TAG, "faild no internet ");
 					cancel(true);
 				}
@@ -326,11 +335,10 @@ public class FragmentCourses extends Fragment {
 						uAdapter);
 				sb.setAbsListView(g);
 				g.setAdapter(sb);
-				for(Course c: toSave)
-				{
+				for (Course c : toSave) {
 					c.setCourse_db_id(db_mngr.insertCourse(c));
 				}
-				toSave=null;
+				toSave = null;
 			}
 			super.onPostExecute(result);
 		}

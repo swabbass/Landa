@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/scrollView1"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff" >
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#fff" >
+        android:layout_height="match_parent"
+        android:background="@drawable/shadow"
+        android:orientation="vertical" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/updateDetailSubjectLable"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/shadow"
-            android:orientation="vertical" >
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#33b5e5" />
 
-            <TextView
-                android:id="@+id/updateDetailSubjectLable"
-                style="?android:attr/listSeparatorTextViewStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#33b5e5" />
+        <TextView
+            android:id="@+id/updateDetailDateTimeLable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Medium Text"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#4b4949" />
 
-            <TextView
-                android:id="@+id/updateDetailDateTimeLable"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="Medium Text"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#4b4949" />
+        <TextView
+            android:id="@+id/updateDetailContentLable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:gravity="right"
+            android:padding="5dp"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="vertical"
+            android:text="Large Text"
+            android:textSize="16sp" />
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/updateDetailContentLable"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:padding="5dp"
-                android:scrollbarStyle="outsideInset"
-                android:scrollbars="vertical"
-                android:text="Large Text"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-    </ScrollView>
-
+</ScrollView>

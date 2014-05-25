@@ -2,9 +2,7 @@
     android:id="@+id/updatesItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-  	android:background="?android:attr/activatedBackgroundIndicator"
-  	
-   >
+    android:background="?android:attr/activatedBackgroundIndicator" >
 
     <TextView
         android:id="@+id/title_updateLable"
@@ -36,12 +34,12 @@
         android:textColor="#BDBDBD" />
 
     <ImageView
-        android:contentDescription="Update Avatar"
         android:id="@+id/imgAttention"
         android:layout_width="89dp"
         android:layout_height="92dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:contentDescription="Update Avatar"
         android:padding="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/update_icon_new" />

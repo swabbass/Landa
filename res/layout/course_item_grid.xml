@@ -31,4 +31,13 @@
         android:textStyle="bold|normal"
         android:typeface="normal" />
 
+    <ImageView
+        android:id="@+id/alarm_course_image_view"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignRight="@+id/list_image"
+        android:layout_alignTop="@+id/list_image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/alarm_course" />
+
 </RelativeLayout>

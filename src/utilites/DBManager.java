@@ -113,8 +113,7 @@ public class DBManager {
 		ContentValues values = new ContentValues();
 		values.put(dbCourse.NOTIFIED, notify);
 		boolean res = db.update(dbCourse.COURSE_TABLE, values,
-				dbCourse.COURSE_ID+" = "+course.getCourseID(),
-				null) > 0;
+				dbCourse.COURSE_ID + " = " + course.getCourseID(), null) > 0;
 		db.close();
 		return res;
 	}
@@ -174,30 +173,30 @@ public class DBManager {
 		Character ch = Character.valueOf(c);
 		return ch.toString() + text + ch.toString();
 	}
-	public List<Course> getAllNotifiedCourses()
-	{
+
+	public List<Course> getAllNotifiedCourses() {
 		Cursor cursor;
-		
+
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
-		cursor=database.query(dbCourse.COURSE_TABLE,new String[] {
-				dbCourse.COURSE_NAME,
-				dbCourse.COURSE_DAY,
-				dbCourse.COURSE_TIME_FROM,
-				dbCourse.COURSE_TIME_TO,
-				dbCourse.COURSE_PLACE,
-				
-		},dbCourse.NOTIFIED+" = "+"1",null,null,null,null);
-		List<Course> result=new ArrayList<Course>(cursor.getCount());
-		while(cursor.moveToNext()) {
-			Course c=new Course(cursor.getString(0), cursor.getString(1),
-					cursor.getString(2), 
-					cursor.getString(3),
-					cursor.getString(4));
+		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
+				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.COURSE_DAY,
+				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
+				dbCourse.COURSE_PLACE
+
+		}, dbCourse.NOTIFIED + " = " + "1", null, null, null, null);
+		List<Course> result = new ArrayList<Course>(cursor.getCount());
+		while (cursor.moveToNext()) {
+			Course c = new Course(cursor.getString(1), cursor.getString(2),
+					cursor.getString(3), cursor.getString(4),
+					cursor.getString(5));
+			c.setCourseID(Integer.parseInt(cursor.getString(0)));
 			c.setNotify(1);
-			result.add(c );
+			result.add(c);
 		}
+		database.close();
 		return result;
 	}
+
 	public List<Teacher> getCursorAllTeachers() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -208,7 +207,6 @@ public class DBManager {
 				dbTeacher.DOWNLOADED_IMAGE }, null, null, null, null, null);
 
 		List<Teacher> res = new ArrayList<>(cursor.getCount());
-		// cursor.moveToFirst();
 		while (cursor.moveToNext()) {
 			String id_number = cursor.getString(0);
 			String first_name = cursor.getString(1);
@@ -236,7 +234,7 @@ public class DBManager {
 		cursor = database.query(dbUpdate.UPDATES_TABLE, new String[] {
 				dbUpdate.UPDATE_ID, dbUpdate.UPDATE_SUBJECT,
 				dbUpdate.UPDATE_CONTENT, dbUpdate.UPDATE_DATE,
-				dbUpdate.UPDATE_URL }, null, null, null, null, null);
+				dbUpdate.UPDATE_URL }, null, null, null, null,dbUpdate.UPDATE_DATE+" DESC");
 		List<Update> updates = new ArrayList<Update>();
 		while (cursor.moveToNext()) {
 			Update u = new Update(cursor.getString(0), cursor.getString(1),
@@ -249,6 +247,7 @@ public class DBManager {
 	}
 
 	public List<Course> getCursorAllWithCourses() {
+		List<Course> notified=getAllNotifiedCourses();
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(false, dbCourse.COURSE_TABLE, new String[] {
@@ -258,11 +257,19 @@ public class DBManager {
 				null, dbCourse.COURSE_NAME, null, null, null);
 		List<Course> courses = new ArrayList<Course>();
 		while (cursor.moveToNext()) {
-
-			Course c = new Course(0, cursor.getString(1), "",
+			
+			Course c = new Course(Integer.parseInt(cursor.getString(0)), cursor.getString(1), "",
 					cursor.getString(2), R.drawable.ic_error, 0);
+			if(notified.contains(c))
+			{
+				c.setNotify(1);
+			}
+			else {
+				c.setNotify(0);
+			}
 			courses.add(c);
 		}
+		database.close();
 		return courses;
 	}
 
@@ -270,11 +277,12 @@ public class DBManager {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		List<Teacher> teachers = new ArrayList<Teacher>();
-		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
-				dbCourse.TEACHER_ID, dbCourse.COURSE_PLACE,
-				dbCourse.COURSE_DAY, dbCourse.COURSE_TIME_FROM,
-				dbCourse.COURSE_TIME_TO,dbCourse.NOTIFIED,dbCourse.COURSE_ID }, dbCourse.COURSE_NAME + " = "
-				+ getSQLText(name), null, null, null, null);
+		cursor = database.query(dbCourse.COURSE_TABLE,
+				new String[] { dbCourse.TEACHER_ID, dbCourse.COURSE_PLACE,
+						dbCourse.COURSE_DAY, dbCourse.COURSE_TIME_FROM,
+						dbCourse.COURSE_TIME_TO, dbCourse.NOTIFIED,
+						dbCourse.COURSE_ID }, dbCourse.COURSE_NAME + " = "
+						+ getSQLText(name), null, null, null, null);
 		cursor.moveToNext();
 		do {
 			String tID = cursor.getString(0);
@@ -284,7 +292,8 @@ public class DBManager {
 			}
 			t = teachers.get(teachers.indexOf(t));
 			String timeInfo = cursor.getString(1) + " - " + cursor.getString(2)
-					+ " - " + cursor.getString(3) + " - " + cursor.getString(4)+" - "+cursor.getString(5)+" - "+cursor.getString(6);
+					+ " - " + cursor.getString(3) + " - " + cursor.getString(4)
+					+ " - " + cursor.getString(5) + " - " + cursor.getString(6);
 			t.addTimeToCourse(name, timeInfo);
 			teachers.remove(t);
 			teachers.add(t);

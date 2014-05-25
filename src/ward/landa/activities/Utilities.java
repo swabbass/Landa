@@ -138,7 +138,7 @@ public class Utilities {
 	public static String saveImageToSD(Teacher t, Bitmap bmp) {
 		FileOutputStream fos = null;
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+		bmp.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 
 		// check external state
 		String dirPath = Environment.getExternalStorageDirectory()
@@ -312,6 +312,24 @@ public class Utilities {
 	}
 
 
-
+public static int  getImageForCourse(String name)
+{
+	switch (name) {
+	case "מבוא למדעי המחשב":return R.drawable.advanced_c;
+	case "שפת C":return R.drawable.advanced_c;
+	case "פיזיקה 1מ":return R.drawable.emc2;
+	case "פיזיקה 1":return R.drawable.physyqs;
+	case "חדוא 1ת":return R.drawable.calculas2;
+	case "מכניקה הנדסית":return R.drawable.mechanics;
+	case "תורת החוזק":return R.drawable.enginerr;
+	case "כימיה אורגנית":return R.drawable.chemestry;
+	case "חדוא 1":return R.drawable.calculas1;
+	case "חדוא 1מ":return R.drawable.calculas3;
+	case "כימיה כללית":return R.drawable.chem;
+	case "יסודות כימיה":return R.drawable.atom;
+	case "פיזיקה 1פ":return R.drawable.physyqs;
+	}
+return R.drawable.ic_error;
+}
 
 }

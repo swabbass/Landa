@@ -3,10 +3,13 @@ package ward.landa.fragments;
 import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
@@ -52,6 +55,7 @@ public class FragmentUpdates extends Fragment {
 	String regKey;
 	ListView l;
 	List<Update> updates;
+	
 	boolean isExpanded = false;
 	updateCallback callBack;
 	boolean showAll;
@@ -146,12 +150,7 @@ public class FragmentUpdates extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		Log.d("Fragment", "on create updates");
-		View root = inflater.inflate(R.layout.updates_frag_list, container,
-				false);
+	private void initlizeFragment(View root) {
 		db_mngr = new DBManager(getActivity());
 		lastChangedIndex = -1;
 		connectionDetector = new ConnectionDetector(getActivity());
@@ -163,20 +162,10 @@ public class FragmentUpdates extends Fragment {
 		SharedPreferences sh = getActivity().getSharedPreferences(
 				GCMUtils.DATA, Activity.MODE_PRIVATE);
 		toFetchDataFromDB = sh.getBoolean(GCMUtils.LOAD_UPDATES, false);
-		boolean isConnected = connectionDetector.isConnectingToInternet();
-		if (!toFetchDataFromDB && isConnected) {
-			new downloadRecentUpdates().execute();
-		} else {
-			updates = null;
-			updates = db_mngr.getCursorAllUpdates();
-			uAdapter = new updatesAdapter(updates, updates, getActivity(),
-					callBack);
-			uAdapter.setShowall(false);
-			ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
-			sc.setAbsListView(l);
-			l.setAdapter(sc);
-		}
 
+	}
+
+	private void initlizeListners() {
 		l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		l.setOnItemClickListener(new OnItemClickListener() {
 
@@ -245,6 +234,33 @@ public class FragmentUpdates extends Fragment {
 
 		l.setItemsCanFocus(false);
 
+	}
+
+	private void initlizeDataForFragment() {
+		boolean isConnected = connectionDetector.isConnectingToInternet();
+		if (!toFetchDataFromDB && isConnected) {
+			new downloadRecentUpdates().execute();
+		} else {
+			updates = null;
+			updates = db_mngr.getCursorAllUpdates();
+			uAdapter = new updatesAdapter(updates, updates, getActivity(),
+					callBack);
+			uAdapter.setShowall(false);
+			ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
+			sc.setAbsListView(l);
+			l.setAdapter(sc);
+		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		Log.d("Fragment", "on create updates");
+		View root = inflater.inflate(R.layout.updates_frag_list, container,
+				false);
+		initlizeFragment(root);
+		initlizeDataForFragment();
+		initlizeListners();
 		return root;
 	}
 
@@ -348,32 +364,42 @@ public class FragmentUpdates extends Fragment {
 			if (arg1.getAction().toString()
 					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
 				abortBroadcast();
-				Update u = Utilities.generateUpdateFromExtras(arg1.getExtras(),arg0);
-				if (u != null&& u.getUrlToJason()==null) {
-					updates.add(u);
+				Update u = Utilities.generateUpdateFromExtras(arg1.getExtras(),
+						arg0);
+				if (u != null && u.getUrlToJason() == null) {
+					updates.add(0,u);
+
+
 					if (lastChangedIndex == -1) {
-						lastChangedIndex = updates.size() - 1;
+						lastChangedIndex = 0;
+					}
+					else {
+						lastChangedIndex++;
 					}
 					uAdapter.notifyDataSetChanged();
-					Utilities.showNotification(getActivity(), u.getSubject(), u.getText());
-				}
-				else if(u.getUrlToJason()!=null)
-				{
-					Utilities.PostListener  listner =new Utilities.PostListener() {
-						
+					Utilities.showNotification(getActivity(), u.getSubject(),
+							u.getText());
+				} else if (u.getUrlToJason() != null) {
+					Utilities.PostListener listner = new Utilities.PostListener() {
+
 						@Override
 						public void onPostUpdateDownloaded(Update u) {
-							
-							boolean toSaveAdded=addUpdate(u);
-							if (lastChangedIndex == -1 && toSaveAdded ) {
-								lastChangedIndex = updates.size() - 1;
+
+							boolean toSaveAdded = addUpdate(u);
+							if (lastChangedIndex == -1 && toSaveAdded) {
+								lastChangedIndex = 0;
 							}
-							Utilities.showNotification(getActivity(), u.getSubject(), u.getText());
+							else if(toSaveAdded){
+								lastChangedIndex++;
+							}
+							Utilities.showNotification(getActivity(),
+									u.getSubject(), u.getText());
 							uAdapter.notifyDataSetChanged();
-							
+
 						}
 					};
-					Utilities.fetchUpdateFromBackEndTask task=new Utilities.fetchUpdateFromBackEndTask(getActivity(), listner);
+					Utilities.fetchUpdateFromBackEndTask task = new Utilities.fetchUpdateFromBackEndTask(
+							getActivity(), listner);
 					task.execute(u.getUpdate_id());
 				}
 			}
@@ -381,12 +407,10 @@ public class FragmentUpdates extends Fragment {
 		}
 
 	}
-	private boolean addUpdate(Update u)
-	{
-		for(Update tmp:updates)
-		{
-			if(tmp.equals(u))
-			{
+
+	private boolean addUpdate(Update u) {
+		for (Update tmp : updates) {
+			if (tmp.equals(u)) {
 				tmp.setSubject(u.getSubject());
 				tmp.setText(u.getText());
 				tmp.setDateTime(u.getDateTime());
@@ -395,7 +419,7 @@ public class FragmentUpdates extends Fragment {
 				return false;
 			}
 		}
-		updates.add(u);
+		updates.add(0,u);
 		return true;
 	}
 
@@ -422,32 +446,31 @@ public class FragmentUpdates extends Fragment {
 					Log.e(GCMUtils.TAG,
 							"loading Updates from internet canceled");
 				}
-			}
-			else {
-			Log.d("ward", jObject.toString());
+			} else {
+				Log.d("ward", jObject.toString());
 
-			try {
-				JSONArray updatesArray = jObject.getJSONArray("posts");
-				for (int i = 0; i < updatesArray.length(); ++i) {
-					JSONObject update = updatesArray.getJSONObject(i);
-					Update u = new Update(update.getString("id"),
-							update.getString("title"),
-							update.getString("date"),
-							update.getString("content"));
-					u.setUrl(update.getString("url"));
-					updates.add(u);
+				try {
+					JSONArray updatesArray = jObject.getJSONArray("posts");
+					for (int i = 0; i < updatesArray.length(); ++i) {
+						JSONObject update = updatesArray.getJSONObject(i);
+						Update u = new Update(update.getString("id"),
+								update.getString("title"),
+								update.getString("date"),
+								update.getString("content"));
+						u.setUrl(update.getString("url"));
+						updates.add(u);
+					}
+					downloadOk = true;
+				} catch (JSONException e) {
+
+					e.printStackTrace();
+					Log.e(GCMUtils.TAG, e.toString());
+					if (!connectionDetector.isConnectingToInternet()) {
+						Log.e(GCMUtils.TAG, "faild no internet ");
+						cancel(true);
+					}
+
 				}
-				downloadOk = true;
-			} catch (JSONException e) {
-
-				e.printStackTrace();
-				Log.e(GCMUtils.TAG, e.toString());
-				if (!connectionDetector.isConnectingToInternet()) {
-					Log.e(GCMUtils.TAG, "faild no internet ");
-					cancel(true);
-				}
-
-			}
 			}
 			return "";
 		}
@@ -486,7 +509,7 @@ public class FragmentUpdates extends Fragment {
 		int size = updates.size();// o(n)
 		if (lastChangedIndex != -1) {
 			// each itration is o(1)
-			for (int i = lastChangedIndex; i < size; ++i) {
+			for (int i = 0; i <= lastChangedIndex; ++i) {
 				if (db_mngr.insertUpdate(updates.get(i)) < 0) {
 					throw new SQLDataException(
 							"Damn Rome You Have some Issues with Saving Updates ");

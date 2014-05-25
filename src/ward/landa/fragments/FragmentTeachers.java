@@ -257,7 +257,7 @@ public class FragmentTeachers extends Fragment {
 						public void onLoadingCancelled(String imageUri,
 								View view) {
 							teacher.setDownloadedImage(false);
-							picture.setImageResource(R.drawable.ic_error);
+							picture.setImageResource(R.drawable.person);
 							super.onLoadingCancelled(imageUri, view);
 						}
 

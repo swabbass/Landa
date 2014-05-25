@@ -111,9 +111,9 @@ public class MainActivity extends FragmentActivity implements
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.ic_stub)
 				// resource or drawable
-				.showImageForEmptyUri(R.drawable.ic_empty)
+				.showImageForEmptyUri(R.drawable.person)
 				// resource or drawable
-				.showImageOnFail(R.drawable.ic_error)
+				.showImageOnFail(R.drawable.person)
 				// resource or drawable
 				.resetViewBeforeLoading(false)
 				// default
@@ -230,7 +230,7 @@ public class MainActivity extends FragmentActivity implements
 					.getSerializableExtra("notfiy");
 			if (c != null) {
 				Log.d("wordpress", c.getName());
-			setAlarms(c);
+				setAlarms(c);
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -376,25 +376,10 @@ public class MainActivity extends FragmentActivity implements
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
-
-			CourseFragment c = (CourseFragment) activityRef
-					.getSupportFragmentManager().findFragmentByTag(
-							"CourseFragment");
-			teacherFragment t = (teacherFragment) activityRef
-					.getSupportFragmentManager().findFragmentByTag(
-							"TeacherFragment");
-
-			if ((c != null && c.isVisible()) || (t != null && t.isVisible())) {
-				Log.i("LANDA", "CourseFragment");
-
-			}
-			activityRef.getSupportFragmentManager().popBackStack();
 			if (arg2 < activityRef.drawertitles.length)
-				if (arg2 == activityRef.drawertitles.length - 1) {
-					activityRef.openLoginFragment();
-				} else {
-					activityRef.mViewPager.setCurrentItem(arg2);
-				}
+
+				activityRef.mViewPager.setCurrentItem(2-arg2);
+
 			activityRef.drawerLayout.closeDrawer(activityRef.draweList);
 		}
 
@@ -689,8 +674,17 @@ public class MainActivity extends FragmentActivity implements
 					c.getCourseID(), myIntent,
 					PendingIntent.FLAG_CANCEL_CURRENT);
 
-			alarmManager.set(AlarmManager.RTC_WAKEUP,
-					calendar.getTimeInMillis(), pendingIntent);
+			/*
+			 * alarmManager.set(AlarmManager.RTC_WAKEUP,
+			 * calendar.getTimeInMillis(), pendingIntent);
+			 */
+			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+					calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7,
+					pendingIntent);
+			calendar.set(Calendar.MINUTE, minFrom + 10);
+			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+					calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7,
+					pendingIntent);
 			db_mngr.UpdateCourse(c, 1);
 		}
 	}

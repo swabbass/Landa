@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter.CountDownFormatter;
 
+import utilites.DBManager;
 import ward.landa.Course;
 import ward.landa.CourseNotification;
 import ward.landa.R;
@@ -31,7 +32,7 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 	private int parentIndex = -1;
 	private List<String> checkedCourses;
 	private CourseNotification courseNotification;
-
+	DBManager dbManager;
 	private void fetchArguments() {
 		Bundle ex = getIntent().getExtras();
 		if (ex != null) {
@@ -48,6 +49,7 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_course_deatils);
 		fetchArguments();
+		dbManager=new DBManager(getApplicationContext());
 		courseNotification = new CourseNotification(courseName);
 		checkedCourses = new ArrayList<String>();
 		result = new Intent(getApplicationContext(), MainActivity.class);
@@ -57,7 +59,7 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 				android.R.anim.slide_out_right);
 		if (savedInstanceState == null) {
 			CourseFragment cf = new CourseFragment();
-
+			
 			Bundle extras = new Bundle();
 			extras.putString("name", getCourseName());
 			extras.putInt("ImageID", getImgId());
@@ -169,14 +171,15 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 			for (int i = lastIndex - 4; i >= 0; --i) {
 				place += " " + info[i];
 			}
-
+			
 			Course c = new Course(courseName, day, timeFrom, tumeTo, place);
 			c.setNotify(1);
 			c.setCourseID(Integer.parseInt(id));
 			list.add(c);
 
 		}
-
+		
+		
 		return list;
 	}
 

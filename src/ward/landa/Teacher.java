@@ -52,8 +52,8 @@ public class Teacher implements Serializable {
 		setPosition(pos);
 		setFaculty(faculty);
 		setImageUrl("http://nlanda.technion.ac.il/LandaSystem/pics/"
-				+ id_number + ".jpg");
-		String t = Settings.picFromAbsoulotePath + id_number + ".jpg";
+				+ id_number + ".png");
+		String t = Settings.picFromAbsoulotePath + id_number + ".png";
 		setImageLocalPath(t);
 		setDownloadedImage(false);
 		timesForEachCourse = new HashMap<String, List<String>>();
@@ -95,7 +95,6 @@ public class Teacher implements Serializable {
 	}
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName() + " " + getLast_name();
 	}
 
