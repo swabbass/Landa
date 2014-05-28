@@ -1,6 +1,8 @@
 package ward.landa;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import android.text.Html;
 
@@ -80,7 +82,13 @@ public class Update implements Serializable {
 	}
 
 	public void setSubject(String subject) {
-		this.subject =Html.fromHtml(subject).toString();
+		try {
+			this.subject =
+					URLDecoder.decode(Html.fromHtml(subject).toString(),"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public String getDateTime() {
