@@ -55,7 +55,7 @@ public class FragmentUpdates extends Fragment {
 	String regKey;
 	ListView l;
 	List<Update> updates;
-	
+
 	boolean isExpanded = false;
 	updateCallback callBack;
 	boolean showAll;
@@ -363,44 +363,43 @@ public class FragmentUpdates extends Fragment {
 		public void onReceive(Context arg0, Intent arg1) {
 			if (arg1.getAction().toString()
 					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
-				abortBroadcast();
-				Update u = Utilities.generateUpdateFromExtras(arg1.getExtras(),
-						arg0);
-				if (u != null && u.getUrlToJason() == null) {
-					updates.add(0,u);
+				if (arg1.getStringExtra("Type") == null) {
+					abortBroadcast();
+					Update u = Utilities.generateUpdateFromExtras(
+							arg1.getExtras(), arg0);
+					if (u != null && u.getUrlToJason() == null) {
+						updates.add(0, u);
 
-
-					if (lastChangedIndex == -1) {
-						lastChangedIndex = 0;
-					}
-					else {
-						lastChangedIndex++;
-					}
-					uAdapter.notifyDataSetChanged();
-					Utilities.showNotification(getActivity(), u.getSubject(),
-							u.getText());
-				} else if (u.getUrlToJason() != null) {
-					Utilities.PostListener listner = new Utilities.PostListener() {
-
-						@Override
-						public void onPostUpdateDownloaded(Update u) {
-
-							boolean toSaveAdded = addUpdate(u);
-							if (lastChangedIndex == -1 && toSaveAdded) {
-								lastChangedIndex = 0;
-							}
-							else if(toSaveAdded){
-								lastChangedIndex++;
-							}
-							Utilities.showNotification(getActivity(),
-									u.getSubject(), u.getText());
-							uAdapter.notifyDataSetChanged();
-
+						if (lastChangedIndex == -1) {
+							lastChangedIndex = 0;
+						} else {
+							lastChangedIndex++;
 						}
-					};
-					Utilities.fetchUpdateFromBackEndTask task = new Utilities.fetchUpdateFromBackEndTask(
-							getActivity(), listner);
-					task.execute(u.getUpdate_id());
+						uAdapter.notifyDataSetChanged();
+						Utilities.showNotification(getActivity(),
+								u.getSubject(), u.getText());
+					} else if (u.getUrlToJason() != null) {
+						Utilities.PostListener listner = new Utilities.PostListener() {
+
+							@Override
+							public void onPostUpdateDownloaded(Update u) {
+
+								boolean toSaveAdded = addUpdate(u);
+								if (lastChangedIndex == -1 && toSaveAdded) {
+									lastChangedIndex = 0;
+								} else if (toSaveAdded) {
+									lastChangedIndex++;
+								}
+								Utilities.showNotification(getActivity(),
+										u.getSubject(), u.getText());
+								uAdapter.notifyDataSetChanged();
+
+							}
+						};
+						Utilities.fetchUpdateFromBackEndTask task = new Utilities.fetchUpdateFromBackEndTask(
+								getActivity(), listner);
+						task.execute(u.getUpdate_id());
+					}
 				}
 			}
 
@@ -419,7 +418,7 @@ public class FragmentUpdates extends Fragment {
 				return false;
 			}
 		}
-		updates.add(0,u);
+		updates.add(0, u);
 		return true;
 	}
 

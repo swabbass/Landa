@@ -23,14 +23,17 @@ public class GCMUtils {
 	public static final String REG_KEY = "REGKEY";
 	public static final String URL = "http://wabbass.byethost9.com/wordpress/";
 	public static final String TAG = "wordpress";
-
+	public static final String NLANDA_GCM_REG="http://nlanda.technion.ac.il/LandaSystem/registerGcm.aspx";
 
 	public static  String sendRegistrationIdToBackend(String regKey) {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(URL + "/?regId=" + regKey);
+		HttpPost httppostNlanda = new HttpPost(NLANDA_GCM_REG + "?reg_id=" + regKey);
 		try {
 			HttpResponse response = httpclient.execute(httppost);
+			HttpResponse resNlanda=httpclient.execute(httppostNlanda);
 			Log.d(TAG, EntityUtils.toString(response.getEntity()));
+			Log.d(TAG, EntityUtils.toString(resNlanda.getEntity()));
 		return  "";
 
 		} catch (ClientProtocolException e) {

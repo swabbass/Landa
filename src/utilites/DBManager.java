@@ -15,8 +15,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBManager {
-	public static final String DB_NAME = "db_LANDA";// הניתונים מסד שם
-	public static final int DB_VER = 9;// הנתונים מס של הגרסה
+	public static final String DB_NAME = "db_LANDA";// ׳”׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳“
+													// ׳©׳�
+	public static final int DB_VER = 9;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -113,7 +114,7 @@ public class DBManager {
 		ContentValues values = new ContentValues();
 		values.put(dbCourse.NOTIFIED, notify);
 		boolean res = db.update(dbCourse.COURSE_TABLE, values,
-				dbCourse.COURSE_ID + " = " + course.getCourseID(), null) > 0;
+				dbCourse.COURSE_ID + " = " + getSQLText(Integer.toString(course.getCourseID())), null) > 0;
 		db.close();
 		return res;
 	}
@@ -234,7 +235,8 @@ public class DBManager {
 		cursor = database.query(dbUpdate.UPDATES_TABLE, new String[] {
 				dbUpdate.UPDATE_ID, dbUpdate.UPDATE_SUBJECT,
 				dbUpdate.UPDATE_CONTENT, dbUpdate.UPDATE_DATE,
-				dbUpdate.UPDATE_URL }, null, null, null, null,dbUpdate.UPDATE_DATE+" DESC");
+				dbUpdate.UPDATE_URL }, null, null, null, null,
+				dbUpdate.UPDATE_DATE + " DESC");
 		List<Update> updates = new ArrayList<Update>();
 		while (cursor.moveToNext()) {
 			Update u = new Update(cursor.getString(0), cursor.getString(1),
@@ -247,7 +249,7 @@ public class DBManager {
 	}
 
 	public List<Course> getCursorAllWithCourses() {
-		List<Course> notified=getAllNotifiedCourses();
+		List<Course> notified = getAllNotifiedCourses();
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(false, dbCourse.COURSE_TABLE, new String[] {
@@ -257,14 +259,13 @@ public class DBManager {
 				null, dbCourse.COURSE_NAME, null, null, null);
 		List<Course> courses = new ArrayList<Course>();
 		while (cursor.moveToNext()) {
-			
-			Course c = new Course(Integer.parseInt(cursor.getString(0)), cursor.getString(1), "",
-					cursor.getString(2), R.drawable.ic_error, 0);
-			if(notified.contains(c))
-			{
+
+			Course c = new Course(Integer.parseInt(cursor.getString(0)),
+					cursor.getString(1), "", cursor.getString(2),
+					R.drawable.ic_error, 0);
+			if (notified.contains(c)) {
 				c.setNotify(1);
-			}
-			else {
+			} else {
 				c.setNotify(0);
 			}
 			courses.add(c);
@@ -308,10 +309,38 @@ public class DBManager {
 				dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
 				dbTeacher.FACULTY }, dbTeacher.ID_NUMBER + " = "
 				+ getSQLText(idNum), null, null, null, null);
-		cursor.moveToNext();
-		Teacher t = new Teacher(cursor.getString(1), cursor.getString(2), "",
-				idNum, "T", cursor.getString(3));
-		return t;
+		if (cursor != null && cursor.getCount() != 0) {
+			cursor.moveToNext();
+			Teacher t = new Teacher(cursor.getString(1), cursor.getString(2),
+					"", idNum, "T", cursor.getString(3));
+			return t;
+		} else {
+			return null;
+		}
+
+	}
+
+	public Course getCourseById(String id) {
+		Cursor cursor;
+		SQLiteDatabase database = dbHelper.getReadableDatabase();
+		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
+				dbCourse.COURSE_ID, dbCourse.COURSE_NAME,
+				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
+				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
+				dbCourse.TEACHER_ID }, dbCourse.COURSE_ID + " = "
+				+ getSQLText(id), null, null, null, null);
+		if (cursor != null && cursor.getCount() != 0) {
+			cursor.moveToNext();
+			Course c = new Course(cursor.getString(1), cursor.getString(3),
+					cursor.getString(4), cursor.getString(5),
+					cursor.getString(2));
+			c.setCourseID(Integer.parseInt(cursor.getString(0)));
+			c.setTutor_id(cursor.getString(6));
+			return c;
+		} else {
+			return null;
+		}
+
 	}
 
 	public Cursor getTeachersForCourse(String teacher_id, String course_name) {
@@ -332,11 +361,11 @@ public class DBManager {
 }
 
 class dbTeacher {
-	public static final String TEACHERS_TABLE = "Teachers";// הטבלה שם
+	public static final String TEACHERS_TABLE = "Teachers";// ׳”׳˜׳‘׳�׳” ׳©׳�
 	public static final String UID = "id";
 	public static final String ID_NUMBER = "id_number";
 	public static final String FIRST_NAME = "first_name";//
-	public static final String LAST_NAME = "last_name";// הטלפון מספר
+	public static final String LAST_NAME = "last_name";// ׳”׳˜׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String EMAIL = "email";
 	public static final String FACULTY = "faculty";
 	public static final String IMAGE_URL = "image_url";
@@ -378,12 +407,13 @@ class dbCourse {
 }
 
 class dbUpdate {
-	public static final String UPDATES_TABLE = "updates";// הטבלה שם
+	public static final String UPDATES_TABLE = "updates";// ׳”׳˜׳‘׳�׳” ׳©׳�
 	public static final String UID = "id";
 	public static final String UPDATE_ID = "subject_id";
 	public static final String UPDATE_SUBJECT = "subject";
-	public static final String UPDATE_CONTENT = "content";// המשימה של הטקסט
-	public static final String UPDATE_DATE = "date";// הטלפון מספר
+	public static final String UPDATE_CONTENT = "content";// ׳”׳�׳©׳™׳�׳” ׳©׳�
+															// ׳”׳˜׳§׳¡׳˜
+	public static final String UPDATE_DATE = "date";// ׳”׳˜׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String UPDATE_URL = "url";
 	public final static String CREATE = "create table " + UPDATES_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + UPDATE_ID
