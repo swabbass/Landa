@@ -51,15 +51,15 @@ public class Utilities {
 	public static int dayWeekNumber(String hebrewDay) {
 		
 		switch (hebrewDay.replaceAll("\\s", "")) {
-		case "ראשון":
+		case "׳¨׳�׳©׳•׳�":
 			return Calendar.SUNDAY;
-		case "שני":
+		case "׳©׳ ׳™":
 			return Calendar.MONDAY;
-		case "שלישי":
+		case "׳©׳�׳™׳©׳™":
 			return Calendar.TUESDAY;
-		case "רבעי":
+		case "׳¨׳‘׳¢׳™":
 			return Calendar.WEDNESDAY;
-		case "חמישי":
+		case "׳—׳�׳™׳©׳™":
 			return Calendar.THURSDAY;
 
 		}
@@ -135,7 +135,7 @@ public class Utilities {
 	 * 
 	 * @return the path to the pic
 	 */
-	public static String saveImageToSD(Teacher t, Bitmap bmp) {
+	public static String saveImageToSD(String localPath, Bitmap bmp) {
 		FileOutputStream fos = null;
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		bmp.compress(Bitmap.CompressFormat.PNG, 100, bytes);
@@ -150,7 +150,7 @@ public class Utilities {
 			}
 		}
 
-		File file = new File(t.getImageLocalPath());
+		File file = new File(localPath);
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
@@ -168,8 +168,8 @@ public class Utilities {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Log.d("eee", "saved Image : " + t.getImageLocalPath());
-		return t.getImageLocalPath();
+		Log.d("eee", "saved Image : " + localPath);
+		return localPath;
 
 	}
 
@@ -315,19 +315,19 @@ public class Utilities {
 public static int  getImageForCourse(String name)
 {
 	switch (name) {
-	case "מבוא למדעי המחשב":return R.drawable.advanced_c;
-	case "שפת C":return R.drawable.advanced_c;
-	case "פיזיקה 1מ":return R.drawable.emc2;
-	case "פיזיקה 1":return R.drawable.physyqs;
-	case "חדוא 1ת":return R.drawable.calculas2;
-	case "מכניקה הנדסית":return R.drawable.mechanics;
-	case "תורת החוזק":return R.drawable.enginerr;
-	case "כימיה אורגנית":return R.drawable.chemestry;
-	case "חדוא 1":return R.drawable.calculas1;
-	case "חדוא 1מ":return R.drawable.calculas3;
-	case "כימיה כללית":return R.drawable.chem;
-	case "יסודות כימיה":return R.drawable.atom;
-	case "פיזיקה 1פ":return R.drawable.physyqs;
+	case "׳�׳‘׳•׳� ׳�׳�׳“׳¢׳™ ׳”׳�׳—׳©׳‘":return R.drawable.advanced_c;
+	case "׳©׳₪׳× C":return R.drawable.advanced_c;
+	case "׳₪׳™׳–׳™׳§׳” 1׳�":return R.drawable.emc2;
+	case "׳₪׳™׳–׳™׳§׳” 1":return R.drawable.physyqs;
+	case "׳—׳“׳•׳� 1׳×":return R.drawable.calculas2;
+	case "׳�׳›׳ ׳™׳§׳” ׳”׳ ׳“׳¡׳™׳×":return R.drawable.mechanics;
+	case "׳×׳•׳¨׳× ׳”׳—׳•׳–׳§":return R.drawable.enginerr;
+	case "׳›׳™׳�׳™׳” ׳�׳•׳¨׳’׳ ׳™׳×":return R.drawable.chemestry;
+	case "׳—׳“׳•׳� 1":return R.drawable.calculas1;
+	case "׳—׳“׳•׳� 1׳�":return R.drawable.calculas3;
+	case "׳›׳™׳�׳™׳” ׳›׳�׳�׳™׳×":return R.drawable.chem;
+	case "׳™׳¡׳•׳“׳•׳× ׳›׳™׳�׳™׳”":return R.drawable.atom;
+	case "׳₪׳™׳–׳™׳§׳” 1׳₪":return R.drawable.physyqs;
 	}
 return R.drawable.ic_error;
 }

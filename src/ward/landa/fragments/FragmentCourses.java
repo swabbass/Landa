@@ -10,6 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
@@ -30,9 +34,13 @@ import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -75,9 +83,29 @@ public class FragmentCourses extends Fragment {
 	coursesAdapter uAdapter;
 	List<Course> searced;
 	boolean loadFromDb;
-	DBManager db_mngr;
+	static DBManager db_mngr;
 	public JSONParser jParser;
+	reciever corseRsvr;
 	ConnectionDetector connectionDetector;
+
+	@Override
+	public void onStop() {
+		if (corseRsvr != null) {
+
+			getActivity().unregisterReceiver(corseRsvr);
+		}
+		super.onStop();
+	}
+
+	@Override
+	public void onResume() {
+		corseRsvr = new reciever();
+		IntentFilter intentFilter = new IntentFilter(
+				"com.google.android.c2dm.intent.RECEIVE");
+		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 2);
+		getActivity().registerReceiver(corseRsvr, intentFilter);
+		super.onResume();
+	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -235,10 +263,10 @@ public class FragmentCourses extends Fragment {
 		public View getView(int position, View view, ViewGroup parent) {
 
 			View v = view;
-			ImageView picture;
+			final ImageView picture;
 			TextView name;
 			ImageView alarm;
-			Course c = (Course) getItem(position);
+			final Course c = (Course) getItem(position);
 			if (v == null) {
 				v = inflater.inflate(R.layout.course_item_grid, parent, false);
 				v.setTag(R.id.list_image, v.findViewById(R.id.list_image));
@@ -255,10 +283,90 @@ public class FragmentCourses extends Fragment {
 			} else if (c.getNotify() == 1) {
 				alarm.setVisibility(ImageView.VISIBLE);
 			}
-			String imageUri = "drawable://"
-					+ Utilities.getImageForCourse(c.getName());
-			MainActivity.image_loader.displayImage(imageUri, image);
-			c.setImgID(Utilities.getImageForCourse(c.getName()));
+			String imageUri = c.getImageUrl();
+			List<Bitmap> cached = MemoryCacheUtil
+					.findCachedBitmapsForImageUri(c.getImageUrl(), ImageLoader
+							.getInstance().getMemoryCache());
+			Log.d("eee", "cached image : " + cached.size());
+			if (cached.size() > 0) {
+				if (c.isDownloadedImage()) {
+
+					picture.setImageBitmap(cached.get(0));
+				} else {
+					// picture.setImageResource(R.drawable.ic_error);
+				}
+			} else {
+				if (!c.isDownloadedImage()) {
+					SimpleImageLoadingListener s = new SimpleImageLoadingListener() {
+						@Override
+						public void onLoadingCancelled(String imageUri,
+								View view) {
+							c.setDownloadedImage(false);
+							picture.setImageResource(R.drawable.ic_launcher);
+							super.onLoadingCancelled(imageUri, view);
+						}
+
+						@Override
+						public void onLoadingFailed(String imageUri, View view,
+								FailReason failReason) {
+							c.setDownloadedImage(false);
+							// picture.setImageResource(R.drawable.ic_error);
+							Log.d("test", failReason.toString());
+							super.onLoadingFailed(imageUri, view, failReason);
+						}
+
+						@Override
+						public void onLoadingComplete(String imageUri,
+								View view, Bitmap loadedImage) {
+							ImageView img = (ImageView) view;
+							img.setImageBitmap(loadedImage);
+							// picture.setImageBitmap(loadedImage);
+							Utilities.saveImageToSD(c.getImagePath(),
+									loadedImage);
+
+							c.setDownloadedImage(true);
+							// TODO save isdownlaoded flag
+							db_mngr.UpdateCourse(c, c.getNotify());
+							super.onLoadingComplete(imageUri, view, loadedImage);
+						}
+					};
+					MainActivity.image_loader.displayImage(c.getImageUrl(),
+							image, s);
+					// MainActivity.image_loader.loadImage(teacher.getImageUrl(),
+
+				} else {
+					SimpleImageLoadingListener s2 = new SimpleImageLoadingListener() {
+						@Override
+						public void onLoadingStarted(String imageUri, View view) {
+							Log.e("sd", "loading from sd is started");
+							super.onLoadingStarted(imageUri, view);
+						}
+
+						@Override
+						public void onLoadingFailed(String imageUri, View view,
+								FailReason failReason) {
+							Log.e("sd", "loading from sd is failed cause : "
+									+ failReason.getCause().getMessage());
+							super.onLoadingFailed(imageUri, view, failReason);
+						}
+
+						@Override
+						public void onLoadingComplete(String imageUri,
+								View view, Bitmap loadedImage) {
+							ImageView img = (ImageView) view;
+							img.setImageBitmap(loadedImage);
+							// picture.setImageBitmap(loadedImage);
+							Log.d("sd", "loading from sd is successfull ");
+							super.onLoadingComplete(imageUri, view, loadedImage);
+						}
+					};
+					// MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(),
+					MainActivity.image_loader.displayImage(
+							"file://" + c.getImagePath(), image, s2);
+
+				}
+			}
+
 			name.setText(c.getName());
 			return v;
 		}
@@ -305,6 +413,10 @@ public class FragmentCourses extends Fragment {
 							c.getString("time_from"), c.getString("time_to"),
 							c.getString("place"), c.getString("tutor_id"));
 					tmp.setImgID(R.drawable.ic_error);
+					tmp.setSubject_id(c.getString("subject_id"));
+					tmp.setImageUrl(tmp.getSubject_id_string());
+					tmp.setImagePath(tmp.getSubject_id_string());
+					tmp.setDownloadedImage(false);
 					if (!courses.contains(tmp))
 						courses.add(tmp);
 					toSave.add(tmp);
@@ -341,6 +453,34 @@ public class FragmentCourses extends Fragment {
 				toSave = null;
 			}
 			super.onPostExecute(result);
+		}
+
+	}
+
+	class reciever extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().toString()
+					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
+				if (intent.getStringExtra("Type") != null) {
+					if (intent.getStringExtra("Type").contains("WORKSHOP")) {
+						GCMUtils.HandleWorkshop(intent.getStringExtra("Type"),
+								context, db_mngr, intent);
+						courses = null;
+						courses = db_mngr.getCursorAllWithCourses();
+						uAdapter = new coursesAdapter(courses, getActivity(),
+								getResources(), 0);
+
+						SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+								uAdapter);
+						sb.setAbsListView(g);
+						g.setAdapter(sb);
+						abortBroadcast();
+					}
+				}
+			}
+
 		}
 
 	}

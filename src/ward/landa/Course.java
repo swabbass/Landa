@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import ward.landa.activities.Settings;
+
 public class Course implements Serializable {
 	/**
 	 * 
@@ -16,12 +18,15 @@ public class Course implements Serializable {
 	private String place;
 	private String Teacher;
 	private int imgID;
+	private String ImageUrl;
+	private String ImagePath;
 	private int courseID;
 	private long course_db_id;
 	private float rating;
 	private String tutor_id;
 	private int notify;
-	
+	private int subject_id;
+	private boolean downloadedImage;
 	public Course(String name,String day,String timeFrom,String timeTo,String place)
 	{
 		this.name=name;
@@ -30,6 +35,7 @@ public class Course implements Serializable {
 		this.timeTo=timeTo;
 		this.place=place;
 		this.notify=1;
+		
 	}
 	//private List<Teacher> teachers;
 	private int toShow;
@@ -54,31 +60,9 @@ public class Course implements Serializable {
 		setImgID(0);
 		setRating(0);
 		setTutor_id(tutor_id);
-	//	teachers=new ArrayList<Teacher>();
 	
 	}
-	/*public void addTeacher(Teacher t)
-	{
-		if(t!=null)
-		{
-			for(Teacher tmp :teachers)
-			{
-				if(tmp.equals(t))
-				{
-					return ;
-				}
-			}
-			teachers.add(t);
-		}
-	}
-	public void removeTeacher(Teacher t)
-	{
 
-		if(teachers.contains(t))
-		{
-			teachers.remove(t);
-		}
-	}*/
 	@Override
 	public boolean equals(Object o) {
 		// TODO Auto-generated method stub
@@ -166,6 +150,37 @@ public class Course implements Serializable {
 	}
 	public void setCourse_db_id(long course_db_id) {
 		this.course_db_id = course_db_id;
+	}
+	public int getSubject_id() {
+		return subject_id;
+	}
+	public String getSubject_id_string() {
+		return Integer.toString(this.subject_id);
+	}
+	public void setSubject_id(int subject_id) {
+		this.subject_id = subject_id;
+	}
+	public void setSubject_id(String subject_id) {
+		this.subject_id = Integer.valueOf(subject_id);
+	}
+	public String getImageUrl() {
+		return ImageUrl;
+	}
+	public void setImageUrl(String subject_id) {
+		ImageUrl = "http://nlanda.technion.ac.il/LandaSystem/pics/"
+				+ subject_id + ".png";
+	}
+	public String getImagePath() {
+		return ImagePath;
+	}
+	public void setImagePath(String subject_id) {
+		ImagePath =  Settings.picFromAbsoulotePath + subject_id + ".png";
+	}
+	public boolean isDownloadedImage() {
+		return downloadedImage;
+	}
+	public void setDownloadedImage(boolean downloadedImage) {
+		this.downloadedImage = downloadedImage;
 	}
 	
 	

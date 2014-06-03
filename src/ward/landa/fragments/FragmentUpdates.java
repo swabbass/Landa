@@ -401,6 +401,9 @@ public class FragmentUpdates extends Fragment {
 						task.execute(u.getUpdate_id());
 					}
 				}
+				else{
+					
+				}
 			}
 
 		}

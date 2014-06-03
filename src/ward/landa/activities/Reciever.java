@@ -4,6 +4,7 @@ import java.util.Set;
 
 import utilites.DBManager;
 import ward.landa.Course;
+import ward.landa.GCMUtils;
 import ward.landa.Teacher;
 import ward.landa.Update;
 import ward.landa.activities.Utilities.PostListener;
@@ -32,39 +33,12 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 			dbmngr = new DBManager(context);
 			if (intent.getStringExtra("Type") != null) {
 				String t=intent.getStringExtra("Type");
-				if(t.equals("INSTRUCTOR"))
+				if(t.contains("INSTRUCTOR"))
 				{
-					Teacher tmp=new Teacher(intent.getStringExtra("fname"), intent.getStringExtra("lname"), 
-							intent.getStringExtra("email"), 
-							intent.getStringExtra("id"), "T", 
-							intent.getStringExtra("faculty"));
-				
-					if(dbmngr.getTeacherByIdNumber(tmp.getId_number())==null)
-					{
-						tmp.setDownloadedImage(false);
-						dbmngr.insertTeacher(tmp);
-						
-					}
-					else{
-						
-						dbmngr.updateTeacher(tmp);
-					}
+					GCMUtils.HandleInstructor(t,context, dbmngr, intent);
 				}
-				else if(t.equals("WORKSHOP")){
-					Course cTmp=new Course(intent.getStringExtra("subject_name")
-							, intent.getStringExtra("day"),
-							intent.getStringExtra("time_from"), 
-							intent.getStringExtra("time_to"),
-							intent.getStringExtra("place"));
-					cTmp.setCourseID(Integer.parseInt(intent.getStringExtra("id")));
-					cTmp.setTutor_id(intent.getStringExtra("tutor_id"));
-					if(dbmngr.getCourseById(Integer.toString(cTmp.getCourseID()))==null)
-					{
-						dbmngr.insertCourse(cTmp);
-					}
-					else{
-						dbmngr.UpdateCourse(cTmp, 0);
-					}
+				else if(t.contains("WORKSHOP")){
+				GCMUtils.HandleWorkshop(t, context, dbmngr, intent);
 				}
 			} else {
 				Update u = Utilities.generateUpdateFromExtras(

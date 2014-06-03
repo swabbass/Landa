@@ -17,7 +17,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBManager {
 	public static final String DB_NAME = "db_LANDA";// ׳”׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳“
 													// ׳©׳�
-	public static final int DB_VER = 9;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
+	public static final int DB_VER = 10;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -97,12 +97,14 @@ public class DBManager {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(dbCourse.COURSE_ID, course.getCourseID());
+		values.put(dbCourse.SUBJECT_ID, course.getSubject_id_string());
 		values.put(dbCourse.TEACHER_ID, course.getTutor_id());
 		values.put(dbCourse.COURSE_NAME, removeQoutes(course.getName()));
 		values.put(dbCourse.COURSE_PLACE, course.getPlace());
 		values.put(dbCourse.COURSE_DAY, course.getDateTime());
 		values.put(dbCourse.COURSE_TIME_FROM, course.getTimeFrom());
 		values.put(dbCourse.COURSE_TIME_TO, course.getTimeTo());
+		values.put(dbCourse.DOWNLOADED_IMAGE, Boolean.toString(false));
 		values.put(dbCourse.NOTIFIED, 0);
 		long id = db.insert(dbCourse.COURSE_TABLE, null, values);
 		db.close();
@@ -112,9 +114,29 @@ public class DBManager {
 	public boolean UpdateCourse(Course course, int notify) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
+		values.put(dbCourse.COURSE_ID, course.getCourseID());
+		values.put(dbCourse.SUBJECT_ID, course.getSubject_id_string());
+		values.put(dbCourse.TEACHER_ID, course.getTutor_id());
+		values.put(dbCourse.COURSE_NAME, removeQoutes(course.getName()));
+		values.put(dbCourse.COURSE_PLACE, course.getPlace());
+		values.put(dbCourse.COURSE_DAY, course.getDateTime());
+		values.put(dbCourse.COURSE_TIME_FROM, course.getTimeFrom());
+		values.put(dbCourse.COURSE_TIME_TO, course.getTimeTo());
+		values.put(dbCourse.DOWNLOADED_IMAGE, Boolean.toString(course.isDownloadedImage()));
 		values.put(dbCourse.NOTIFIED, notify);
-		boolean res = db.update(dbCourse.COURSE_TABLE, values,
-				dbCourse.COURSE_ID + " = " + getSQLText(Integer.toString(course.getCourseID())), null) > 0;
+		boolean res = db.update(
+				dbCourse.COURSE_TABLE,
+				values,
+				dbCourse.COURSE_ID + " = "
+						+ getSQLText(Integer.toString(course.getCourseID())),
+				null) > 0;
+				//TODO add isdownload image and save the image and when update course update for all subjects 
+		boolean res2 = db.update(
+				dbCourse.COURSE_TABLE,
+				values,
+				dbCourse.COURSE_ID + " = "
+						+ getSQLText(Integer.toString(course.getCourseID())),
+				null) > 0;
 		db.close();
 		return res;
 	}
@@ -155,7 +177,16 @@ public class DBManager {
 	public boolean deleteTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		boolean b = database.delete(dbTeacher.TEACHERS_TABLE,
-				dbTeacher.ID_NUMBER + "=" + getSQLText(teacher.getId_number()),
+				dbTeacher.ID_NUMBER + " = "
+						+ getSQLText(teacher.getId_number()), null) > 0;
+		database.close();
+		return b;
+	}
+
+	public boolean deleteCourse(Course course) {
+		SQLiteDatabase database = dbHelper.getWritableDatabase();
+		boolean b = database.delete(dbCourse.COURSE_TABLE, dbCourse.COURSE_ID
+				+ " = " + getSQLText(Integer.toString(course.getCourseID())),
 				null) > 0;
 		database.close();
 		return b;
@@ -182,7 +213,7 @@ public class DBManager {
 		cursor = database.query(dbCourse.COURSE_TABLE, new String[] {
 				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.COURSE_DAY,
 				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
-				dbCourse.COURSE_PLACE
+				dbCourse.COURSE_PLACE, dbCourse.SUBJECT_ID
 
 		}, dbCourse.NOTIFIED + " = " + "1", null, null, null, null);
 		List<Course> result = new ArrayList<Course>(cursor.getCount());
@@ -192,6 +223,7 @@ public class DBManager {
 					cursor.getString(5));
 			c.setCourseID(Integer.parseInt(cursor.getString(0)));
 			c.setNotify(1);
+			c.setSubject_id(cursor.getString(6));
 			result.add(c);
 		}
 		database.close();
@@ -255,14 +287,17 @@ public class DBManager {
 		cursor = database.query(false, dbCourse.COURSE_TABLE, new String[] {
 				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.TEACHER_ID,
 				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
-				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO }, null,
-				null, dbCourse.COURSE_NAME, null, null, null);
+				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
+				dbCourse.SUBJECT_ID,dbCourse.DOWNLOADED_IMAGE }, null, null, dbCourse.SUBJECT_ID, null,
+				null, null);
 		List<Course> courses = new ArrayList<Course>();
 		while (cursor.moveToNext()) {
 
 			Course c = new Course(Integer.parseInt(cursor.getString(0)),
 					cursor.getString(1), "", cursor.getString(2),
 					R.drawable.ic_error, 0);
+			c.setSubject_id(cursor.getString(7));
+			c.setDownloadedImage(Boolean.valueOf(cursor.getString(8)));
 			if (notified.contains(c)) {
 				c.setNotify(1);
 			} else {
@@ -327,8 +362,8 @@ public class DBManager {
 				dbCourse.COURSE_ID, dbCourse.COURSE_NAME,
 				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
 				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
-				dbCourse.TEACHER_ID }, dbCourse.COURSE_ID + " = "
-				+ getSQLText(id), null, null, null, null);
+				dbCourse.TEACHER_ID, dbCourse.SUBJECT_ID,dbCourse.DOWNLOADED_IMAGE }, dbCourse.COURSE_ID
+				+ " = " + getSQLText(id), null, null, null, null);
 		if (cursor != null && cursor.getCount() != 0) {
 			cursor.moveToNext();
 			Course c = new Course(cursor.getString(1), cursor.getString(3),
@@ -336,6 +371,8 @@ public class DBManager {
 					cursor.getString(2));
 			c.setCourseID(Integer.parseInt(cursor.getString(0)));
 			c.setTutor_id(cursor.getString(6));
+			c.setSubject_id(cursor.getString(7));
+			c.setDownloadedImage(Boolean.valueOf(cursor.getString(8)));
 			return c;
 		} else {
 			return null;
@@ -389,6 +426,7 @@ class dbCourse {
 	public static final String COURSE_TABLE = "Courses";
 	public static final String UID = "id";
 	public static final String COURSE_ID = "course_id";
+	public static final String SUBJECT_ID = "subject_id";
 	public static final String TEACHER_ID = "id_number";
 	public static final String COURSE_NAME = "course_name";
 	public static final String COURSE_DAY = "course_day";
@@ -397,13 +435,16 @@ class dbCourse {
 	public static final String COURSE_DESCRIPTION = "course_description";
 	public static final String COURSE_TIME_FROM = "course_time_from";
 	public static final String COURSE_TIME_TO = "course_time_to";
+	public static final String DOWNLOADED_IMAGE = "cached_img";
 	public static final String CREATE = "create table " + COURSE_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TEACHER_ID
-			+ " text not null, " + COURSE_ID + " text not null, " + COURSE_NAME
-			+ " text not null, " + COURSE_DAY + " text not null, "
-			+ COURSE_PLACE + " text not null, " + COURSE_TIME_FROM
-			+ " text not null, " + COURSE_TIME_TO + " text not null, "
-			+ NOTIFIED + " NUMERIC not null " + " );";
+			+ " text not null, " + COURSE_ID + " text not null, " + SUBJECT_ID
+			+ " text not null, " + COURSE_NAME + " text not null, "
+			+ COURSE_DAY + " text not null, " + COURSE_PLACE
+			+ " text not null, " + COURSE_TIME_FROM + " text not null, "
+			+ COURSE_TIME_TO + " text not null, " 
+			+ DOWNLOADED_IMAGE+ " text not null, "
+			+ NOTIFIED+ " NUMERIC not null " + " );";
 }
 
 class dbUpdate {
