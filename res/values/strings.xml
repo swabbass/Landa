@@ -12,7 +12,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-  -->
+-->
 
 <resources>
 
@@ -26,12 +26,36 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
+
+    <string name="navigateTo">נווט ל</string>
+    <string name="Navigation">ניווט</string>
+    <string name="General">כללי</string>
     <string name="settings">הגדרות</string>
-  <string name="app_name">לנדא</string>
+    <string name="app_name">לנדא</string>
     <string name="courses">סדנאות</string>
     <string name="drawer_close">סגור רשימה</string>
     <string name="drawer_open">פתח רשימה</string>
     <string name="selected">"נבחר "</string>
     <string name="teachers">מסדנתים</string>
     <string name="updates">עדכונים</string>
+    <string name="about">אודות</string>
+    <string name="tutor">חונך אקדמי</string>
+    <string name="AC">רכז פרויקט</string>
+    <string name="SC">רכז/ת חברתי</string>
+    <string name="noConntectionMsgFirsttime">נא להתחבר לאינטרנט להרצת האפלקציה בפעם הראשונה</string>
+    <string name="noConntection">אין חיבור,לקבלת מידע עדכני נא להתחבר לאינטרנט</string>
+
+    <string-array name="filter_teacher">
+        <item>הכל</item>
+        <item>רכזים</item>
+        <item>חונכים</item>
+    </string-array>
+    <string-array name="drawer_array">
+        <item>עדכונים</item>
+        <item>מסדנתים</item>
+        <item>סדנאות</item>
+        <item>הגדרות</item>
+        <item>אודות</item>
+    </string-array>
+
 </resources>

@@ -1,8 +1,12 @@
 package ward.landa.fragments;
 
+import org.jsoup.examples.HtmlToPlainText;
+
 import ward.landa.R;
+import ward.landa.Update;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +31,10 @@ public class updateDetailsFragment extends Fragment {
 		subject = (TextView) root.findViewById(R.id.updateDetailSubjectLable);
 		dateTime = (TextView) root.findViewById(R.id.updateDetailDateTimeLable);
 		content = (TextView) root.findViewById(R.id.updateDetailContentLable);
-
-		subject.setText(getArguments().getString("subject"));
-		dateTime.setText(getArguments().getString("dateTime"));
-		content.setText(getArguments().getString("content"));
+		Update u =(Update)getArguments().getSerializable("Update");
+		String Cont=getArguments().getString("content");
+		subject.setText(u.getSubject());
+		dateTime.setText(u.getDateTime());
+		content.setText(Html.fromHtml(u.getText()).toString());
 	}
 }

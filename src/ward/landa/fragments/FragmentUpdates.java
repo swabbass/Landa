@@ -20,16 +20,20 @@ import ward.landa.Update;
 import ward.landa.activities.Settings;
 import ward.landa.activities.SettingsActivity;
 import ward.landa.activities.Utilities;
+import ward.landa.fragments.FragmentCourses.loadDataFromBackend;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -55,7 +59,7 @@ public class FragmentUpdates extends Fragment {
 	String regKey;
 	ListView l;
 	List<Update> updates;
-
+	boolean rtlSupport;
 	boolean isExpanded = false;
 	updateCallback callBack;
 	boolean showAll;
@@ -119,6 +123,7 @@ public class FragmentUpdates extends Fragment {
 		try {
 			callBack = (updateCallback) activity;
 			setHasOptionsMenu(true);
+
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
 					+ " must implement callbackTeacher");
@@ -147,12 +152,15 @@ public class FragmentUpdates extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 		getActivity().getMenuInflater().inflate(R.menu.listmenu, menu);
+		if (!getArguments().getBoolean("rtl"))
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	private void initlizeFragment(View root) {
 		db_mngr = new DBManager(getActivity());
 		lastChangedIndex = -1;
+
 		connectionDetector = new ConnectionDetector(getActivity());
 		jParser = new JSONParser();
 		l = (ListView) root.findViewById(R.id.updates_listView);
@@ -241,15 +249,19 @@ public class FragmentUpdates extends Fragment {
 		if (!toFetchDataFromDB && isConnected) {
 			new downloadRecentUpdates().execute();
 		} else {
-			updates = null;
-			updates = db_mngr.getCursorAllUpdates();
-			uAdapter = new updatesAdapter(updates, updates, getActivity(),
-					callBack);
-			uAdapter.setShowall(false);
-			ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
-			sc.setAbsListView(l);
-			l.setAdapter(sc);
+			loadFromDataBase();
 		}
+	}
+
+	private void loadFromDataBase() {
+		updates = null;
+		updates = db_mngr.getCursorAllUpdates();
+		uAdapter = new updatesAdapter(updates, updates, getActivity(), callBack);
+		uAdapter.setShowall(false);
+		ScaleInAnimationAdapter sc = new ScaleInAnimationAdapter(uAdapter);
+		sc.setAbsListView(l);
+		l.setAdapter(sc);
+
 	}
 
 	@Override
@@ -349,7 +361,9 @@ public class FragmentUpdates extends Fragment {
 			subject = (ExpandableTextView) v.getTag(R.id.contentTextBox);
 			title = (TextView) v.getTag(R.id.title_updateLable);
 			title.setText(updates.get(position).getSubject());
-			subject.setText(updates.get(position).getText());
+			String tmp = Html.fromHtml(updates.get(position).getText())
+					.toString();
+			subject.setText(tmp);
 			time = (TextView) v.getTag(R.id.update_timeLable);
 			time.setText(updates.get(position).getDateTime());
 			return v;
@@ -400,9 +414,8 @@ public class FragmentUpdates extends Fragment {
 								getActivity(), listner);
 						task.execute(u.getUpdate_id());
 					}
-				}
-				else{
-					
+				} else {
+
 				}
 			}
 
@@ -436,6 +449,7 @@ public class FragmentUpdates extends Fragment {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
 			pDialog.setMessage("Loading...");
+			pDialog.setCanceledOnTouchOutside(false);
 			pDialog.show();
 		}
 
@@ -462,16 +476,16 @@ public class FragmentUpdates extends Fragment {
 						u.setUrl(update.getString("url"));
 						updates.add(u);
 					}
-					downloadOk = true;
+					if (connectionDetector.isConnectingToInternet())
+						downloadOk = true;
 				} catch (JSONException e) {
-
-					e.printStackTrace();
 					Log.e(GCMUtils.TAG, e.toString());
 					if (!connectionDetector.isConnectingToInternet()) {
 						Log.e(GCMUtils.TAG, "faild no internet ");
-						cancel(true);
-					}
 
+					}
+					db_mngr.clearDb();
+					return "";
 				}
 			}
 			return "";
@@ -479,12 +493,13 @@ public class FragmentUpdates extends Fragment {
 
 		@Override
 		protected void onPostExecute(String result) {
+			pDialog.dismiss();
 			if (downloadOk) {
 				saveDownloadOnceStatus(true);
 				for (Update u : updates) {
 					db_mngr.insertUpdate(u);
 				}
-				pDialog.dismiss();
+
 				uAdapter = new updatesAdapter(updates, updates, getActivity(),
 						callBack);
 				uAdapter.setShowall(false);
@@ -492,10 +507,39 @@ public class FragmentUpdates extends Fragment {
 						uAdapter);
 				sc.setAbsListView(l);
 				l.setAdapter(sc);
+			} else {
+				showDialogNoconnection(!toFetchDataFromDB);
 			}
 			super.onPostExecute(result);
 		}
 
+	}
+
+	private void showDialogNoconnection(boolean isfirst) {
+		new AlertDialog.Builder(getActivity())
+				.setCancelable(false)
+				.setTitle("Info")
+				.setMessage(
+						isfirst ? getResources().getString(
+								R.string.noConntectionMsgFirsttime)
+								: getResources().getString(
+										R.string.noConntection))
+
+				.setNeutralButton("Retry",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (connectionDetector.isConnectingToInternet()) {
+									new downloadRecentUpdates().execute();
+
+								} else if (!toFetchDataFromDB) {
+									getActivity().finish();
+								} else if (toFetchDataFromDB) {
+									loadFromDataBase();
+								}
+
+							}
+						}).show();
 	}
 
 	public void saveDownloadOnceStatus(boolean b) {

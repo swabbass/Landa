@@ -15,12 +15,15 @@ import ward.landa.Course;
 import ward.landa.CourseNotification;
 import ward.landa.R;
 import ward.landa.fragments.CourseFragment;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class CourseDeatilsActivity extends FragmentActivity implements
 		CourseFragment.AlarmCallBack {
@@ -43,12 +46,22 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 		}
 
 	}
-
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+	private void forceRTLIfSupported() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			getWindow().getDecorView().setLayoutDirection(
+					View.LAYOUT_DIRECTION_RTL);
+		
+		} else {
+		}
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		forceRTLIfSupported();
 		setContentView(R.layout.activity_course_deatils);
 		fetchArguments();
+	
 		dbManager=new DBManager(getApplicationContext());
 		courseNotification = new CourseNotification(courseName);
 		checkedCourses = new ArrayList<String>();
@@ -65,6 +78,7 @@ public class CourseDeatilsActivity extends FragmentActivity implements
 			extras.putInt("ImageID", getImgId());
 			extras.putInt("courseID", getCourseID());
 			cf.setArguments(extras);
+			extras.putSerializable("course", getIntent().getExtras().getSerializable("course"));
 			FragmentTransaction tr = getSupportFragmentManager()
 					.beginTransaction();
 			tr.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);

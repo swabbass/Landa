@@ -1,6 +1,8 @@
 package ward.landa.fragments;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
@@ -13,19 +15,26 @@ import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.ImageUtilities.BitmapUtils;
+import ward.landa.ImageUtilities.UILTools;
 import ward.landa.activities.MainActivity;
 import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
 import ward.landa.fragments.FragmentCourses.reciever;
+import ward.landa.fragments.FragmentUpdates.downloadRecentUpdates;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerResultsIntent;
@@ -36,17 +45,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.internal.fb;
+import com.google.android.gms.wallet.LineItem.Role;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -54,6 +69,9 @@ import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+import com.squareup.picasso.Picasso.LoadedFrom;
 
 public class FragmentTeachers extends Fragment {
 
@@ -69,6 +87,10 @@ public class FragmentTeachers extends Fragment {
 	TeacherReciever tRsvr;
 	SwingBottomInAnimationAdapter sb;
 	View root;
+	EditText search;
+	Spinner spinner;
+	private static ImageLoader imageLoader;
+
 	@Override
 	public void onStop() {
 		if (tRsvr != null) {
@@ -94,7 +116,7 @@ public class FragmentTeachers extends Fragment {
 
 	private void initlizeSearchEngine(View v) {
 
-		EditText search = (EditText) v.findViewById(R.id.teacher_txt_search);
+		search = (EditText) v.findViewById(R.id.teacher_txt_search);
 		search.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -144,7 +166,42 @@ public class FragmentTeachers extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		getActivity().getMenuInflater().inflate(R.menu.teacher_menu, menu);
 		View v = (View) menu.findItem(R.id.teacher_menu_search).getActionView();
+		spinner=(Spinner)menu.findItem(R.id.teacher_menu_filter).getActionView();
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				onNavigationItemSelected(position, id);
+				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				onNavigationItemSelected(0, 0);
+				
+			}
+			
+		});
+		if (!getArguments().getBoolean("rtl"))
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		initlizeSearchEngine(v);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.teacher_menu_filter:
+				
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onOptionsMenuClosed(Menu menu) {
+		super.onOptionsMenuClosed(menu);
 	}
 
 	@Override
@@ -162,10 +219,14 @@ public class FragmentTeachers extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		 root = inflater.inflate(R.layout.teacher_custom_grid, container,
-				false);
+		root = inflater.inflate(R.layout.teacher_custom_grid, container, false);
 		connectionDetector = new ConnectionDetector(getActivity());
-
+		imageLoader = UILTools.initlizeImageLoad(UILTools.initilizeImageLoader(
+				UILTools.initlizeImageDisplay(R.drawable.person,
+						R.drawable.person, R.drawable.person), getActivity()),
+				getActivity());
+		
+		
 		db_mngr = new DBManager(getActivity());
 		SharedPreferences sh = getActivity().getSharedPreferences(
 				GCMUtils.DATA, Activity.MODE_PRIVATE);
@@ -182,16 +243,8 @@ public class FragmentTeachers extends Fragment {
 			// fetch from internet
 			new loadDataFromBackend().execute();
 		} else {
-			// fetch from database
-			tutors = null;
-			tutors = db_mngr.getCursorAllTeachers();
-			gAdapter = new gridAdabter(root.getContext(), tutors,
-					getResources(), 0);
-			sb = new SwingBottomInAnimationAdapter(
-					gAdapter);
-			sb.setAbsListView(gridView);
-			gridView.setAdapter(sb);
-			sb.notifyDataSetChanged();
+			loadFromDataBase();
+
 		}
 
 		gridView.setOnItemClickListener(new OnItemClickListener() {
@@ -208,13 +261,24 @@ public class FragmentTeachers extends Fragment {
 		return root;
 	}
 
+	private void loadFromDataBase() {
+		tutors = null;
+		tutors = db_mngr.getCursorAllTeachers();
+		gAdapter = new gridAdabter(root.getContext(), tutors, getResources(), 0);
+		sb = new SwingBottomInAnimationAdapter(gAdapter);
+		sb.setAbsListView(gridView);
+		gridView.setAdapter(sb);
+		sb.notifyDataSetChanged();
+
+	}
+
 	static class gridAdabter extends BaseAdapter {
 
 		LayoutInflater inflater;
 		List<Teacher> l;
 		Resources res;
 		BitmapUtils bmpUtils;
-
+		Context cxt;
 		int searched = 0;
 
 		public void setL(List<Teacher> l, int search) {
@@ -224,6 +288,7 @@ public class FragmentTeachers extends Fragment {
 
 		public gridAdabter(Context context, List<Teacher> l, Resources res,
 				int search) {
+			this.cxt = context;
 			this.inflater = LayoutInflater.from(context);
 			this.l = l;
 			this.res = res;
@@ -265,86 +330,42 @@ public class FragmentTeachers extends Fragment {
 			name = (TextView) v.getTag(R.id.text);
 			ImageAware image = new ImageViewAware(picture, false);
 			final Teacher teacher = (Teacher) getItem(pos);
-
-			List<Bitmap> cached = MemoryCacheUtil.findCachedBitmapsForImageUri(
-					teacher.getImageUrl(), ImageLoader.getInstance()
-							.getMemoryCache());
-			Log.d("eee", "cached image : " + cached.size());
-			if (cached.size() > 0) {
-				if (teacher.isDownloadedImage()) {
-
-					picture.setImageBitmap(cached.get(0));
-				} else {
-					// picture.setImageResource(R.drawable.ic_error);
+			Target target = new Target() {
+				@Override
+				public void onBitmapFailed(Drawable arg0) {
+					// TODO Auto-generated method stub
+					teacher.setDownloadedImage(false);
 				}
+
+				@Override
+				public void onBitmapLoaded(final Bitmap arg0, LoadedFrom arg1) {
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							Utilities.saveImageToSD(
+									teacher.getImageLocalPath(), arg0);
+
+						}
+					}).start();
+					teacher.setDownloadedImage(true);
+					db_mngr.UpdateTeacherImageDownloaded(teacher, true);
+				}
+
+				@Override
+				public void onPrepareLoad(Drawable arg0) {
+					// TODO Auto-generated method stub
+
+				}
+
+			};
+			if (!teacher.isDownloadedImage()) {
+				Picasso.with(cxt).load(teacher.getImageUrl())
+						.error(R.drawable.ic_launcher).into(picture);
+				Picasso.with(cxt).load(teacher.getImageUrl()).into(target);
 			} else {
-				if (!teacher.isDownloadedImage()) {
-					SimpleImageLoadingListener s = new SimpleImageLoadingListener() {
-						@Override
-						public void onLoadingCancelled(String imageUri,
-								View view) {
-							teacher.setDownloadedImage(false);
-							picture.setImageResource(R.drawable.person);
-							super.onLoadingCancelled(imageUri, view);
-						}
-
-						@Override
-						public void onLoadingFailed(String imageUri, View view,
-								FailReason failReason) {
-							teacher.setDownloadedImage(false);
-							// picture.setImageResource(R.drawable.ic_error);
-							Log.d("test", failReason.toString());
-							super.onLoadingFailed(imageUri, view, failReason);
-						}
-
-						@Override
-						public void onLoadingComplete(String imageUri,
-								View view, Bitmap loadedImage) {
-							ImageView img = (ImageView) view;
-							img.setImageBitmap(loadedImage);
-							// picture.setImageBitmap(loadedImage);
-							Utilities.saveImageToSD(teacher.getImageLocalPath(), loadedImage);
-
-							teacher.setDownloadedImage(true);
-							db_mngr.updateTeacher(teacher);
-							super.onLoadingComplete(imageUri, view, loadedImage);
-						}
-					};
-					MainActivity.image_loader.displayImage(
-							teacher.getImageUrl(), image, s);
-					// MainActivity.image_loader.loadImage(teacher.getImageUrl(),
-
-				} else {
-					SimpleImageLoadingListener s2 = new SimpleImageLoadingListener() {
-						@Override
-						public void onLoadingStarted(String imageUri, View view) {
-							Log.e("sd", "loading from sd is started");
-							super.onLoadingStarted(imageUri, view);
-						}
-
-						@Override
-						public void onLoadingFailed(String imageUri, View view,
-								FailReason failReason) {
-							Log.e("sd", "loading from sd is failed cause : "
-									+ failReason.getCause().getMessage());
-							super.onLoadingFailed(imageUri, view, failReason);
-						}
-
-						@Override
-						public void onLoadingComplete(String imageUri,
-								View view, Bitmap loadedImage) {
-							ImageView img = (ImageView) view;
-							img.setImageBitmap(loadedImage);
-							// picture.setImageBitmap(loadedImage);
-							Log.d("sd", "loading from sd is successfull ");
-							super.onLoadingComplete(imageUri, view, loadedImage);
-						}
-					};
-					// MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(),
-					MainActivity.image_loader.displayImage(
-							"file://" + teacher.getImageLocalPath(), image, s2);
-
-				}
+				Picasso.with(cxt).load(new File(teacher.getImageLocalPath()))
+						.error(R.drawable.ic_launcher).into(picture);
 			}
 			name.setText(teacher.toString());
 
@@ -367,8 +388,7 @@ public class FragmentTeachers extends Fragment {
 						tutors = db_mngr.getCursorAllTeachers();
 						gAdapter = new gridAdabter(root.getContext(), tutors,
 								getResources(), 0);
-						sb = new SwingBottomInAnimationAdapter(
-								gAdapter);
+						sb = new SwingBottomInAnimationAdapter(gAdapter);
 						sb.setAbsListView(gridView);
 						gridView.setAdapter(sb);
 						sb.notifyDataSetChanged();
@@ -392,6 +412,7 @@ public class FragmentTeachers extends Fragment {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
 			pDialog.setMessage("Loading...");
+			pDialog.setCanceledOnTouchOutside(false);
 			pDialog.show();
 		}
 
@@ -413,43 +434,85 @@ public class FragmentTeachers extends Fragment {
 					JSONObject c = teachers.getJSONObject(i);
 					Teacher t = new Teacher(c.getString("fname"),
 							c.getString("lname"), c.getString("email"),
-							c.getString("id"), "T", c.getString("faculty"));
+							c.getString("id"), utilites.Role.getRole(
+									Integer.valueOf(c.getString("position")))
+									.name(), c.getString("faculty"));
 					t.setDownloadedImage(false);
 					tutors.add(t);
 
 				}
-				allOk = true;
+				if (connectionDetector.isConnectingToInternet())
+					allOk = true;
 			} catch (JSONException e) {
-				e.printStackTrace();
 				Log.e(GCMUtils.TAG, e.toString());
 				if (!connectionDetector.isConnectingToInternet()) {
 					Log.e(GCMUtils.TAG, "faild no internet ");
-					cancel(true);
-				}
 
+				}
+				db_mngr.clearDb();
+				return "";
 			}
 			return "";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			pDialog.dismiss();
 			if (allOk) {
 				saveLoadedTeachersState(true);
 				for (Teacher t : tutors) {
 					db_mngr.insertTeacher(t);
 				}
-				pDialog.dismiss();
-				gAdapter = new gridAdabter(getActivity(), tutors,
-						getResources(), 0);
-				SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
-						gAdapter);
-				sb.setAbsListView(gridView);
-				gridView.setAdapter(sb);
-				sb.notifyDataSetChanged(true);
+
+				getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						gAdapter = new gridAdabter(getActivity(), tutors,
+								getResources(), 0);
+						SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+								gAdapter);
+						sb.setAbsListView(gridView);
+						gridView.setAdapter(sb);
+						gAdapter.notifyDataSetChanged();
+						sb.notifyDataSetChanged(true);
+
+					}
+				});
+
+			} else {
+				showDialogNoconnection(!toFetchDataFromDB);
 			}
 			super.onPostExecute(result);
 		}
 
+	}
+
+	private void showDialogNoconnection(boolean isfirst) {
+		new AlertDialog.Builder(getActivity())
+				.setCancelable(false)
+				.setTitle("Info")
+				.setMessage(
+						isfirst ? getResources().getString(
+								R.string.noConntectionMsgFirsttime)
+								: getResources().getString(
+										R.string.noConntection))
+
+				.setNeutralButton("Close",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (connectionDetector.isConnectingToInternet()) {
+									new loadDataFromBackend().execute();
+
+								} else if (!toFetchDataFromDB) {
+									getActivity().finish();
+								} else if (toFetchDataFromDB) {
+									loadFromDataBase();
+								}
+
+							}
+						}).show();
 	}
 
 	private void saveLoadedTeachersState(boolean flag) {
@@ -460,4 +523,44 @@ public class FragmentTeachers extends Fragment {
 		ed.commit();
 	}
 
+	private List<Teacher> filterCords() {
+		List<Teacher> cords = new ArrayList<Teacher>();
+		for (Teacher t : tutors) {
+
+			if (!t.getPosition().equals(utilites.Role.TUTOR.name())) {
+				cords.add(t);
+			}
+		}
+		return cords;
+	}
+
+	private List<Teacher> filterTutors() {
+		List<Teacher> tutor = new ArrayList<Teacher>();
+		for (Teacher t : tutors) {
+
+			if (t.getPosition().equals(utilites.Role.TUTOR.name())) {
+				tutor.add(t);
+			}
+		}
+		return tutor;
+	}
+
+
+	private boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		switch (itemPosition) {
+		case 0:
+			gAdapter.setL(tutors, 0);
+			gAdapter.notifyDataSetChanged();
+			break;
+		case 1:
+			gAdapter.setL(filterCords(), 1);
+			gAdapter.notifyDataSetChanged();
+			break;
+		case 2:
+			gAdapter.setL(filterTutors(), 1);
+			gAdapter.notifyDataSetChanged();
+			break;
+		}
+		return true;
+	}
 }

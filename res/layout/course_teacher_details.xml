@@ -15,7 +15,7 @@
         android:layout_toRightOf="@+id/alaramMe"
         android:gravity="center"
         android:text="TextView"
-        android:textColor="#4b4949" />
+        android:textColor="#E0E0E0" />
 
     <ImageView
         android:id="@+id/tutorSmallAvatar"
@@ -26,7 +26,7 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_error" />
+        android:src="@drawable/person" />
 
     <TextView
         android:id="@+id/teacherFacultyLable"
@@ -36,11 +36,10 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/tutorSmallAvatar"
         android:layout_marginRight="5dp"
-        android:background="#33b5e5"
         android:gravity="center"
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#fff"
+        android:textColor="#e0e0e0"
         android:textSize="10sp" />
 
     <ImageView

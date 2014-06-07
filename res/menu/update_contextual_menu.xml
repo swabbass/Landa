@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
    <item
-        android:id="@+id/showall"
+        android:id="@+id/deleteUpdate"
         android:showAsAction="always"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="show/hide"/>
+        android:title="Delete"/>
    
 </menu>

@@ -24,7 +24,7 @@ public class Settings {
 	public static final String HEBREW = "he";
 	public static final String ENGLISH = "en";
 	public static final String ARABIC = "ar";
-	public static final String URL_UPDATES="http://wabbass.byethost9.com/wordpress/?json=get_recent_posts";
+	public static final String URL_UPDATES="http://wabbass.byethost9.com/wordpress/?json=get_posts&count=-1";
 	
 	public static final String URL_teachers = "http://nlanda.technion.ac.il/LandaSystem/tutors.aspx";
 	public static final String URL_COURSES = "http://nlanda.technion.ac.il/LandaSystem/courses.aspx";

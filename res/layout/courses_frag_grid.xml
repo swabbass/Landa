@@ -3,7 +3,7 @@
     android:id="@+id/replace_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-      android:background="#fff"
+      android:background="#404040"
     android:orientation="vertical" >
 
   
@@ -12,9 +12,9 @@
         android:id="@+id/gridviewcourses"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:horizontalSpacing="5dp"
+        
         android:numColumns="2"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="5dp" />
+       />
 
 </LinearLayout>

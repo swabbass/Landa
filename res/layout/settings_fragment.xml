@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#404040"
     android:orientation="vertical" >
 
     <TextView
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="כללי"
-        android:textColor="#33b5e5"
+        android:textColor="#0082f7"
         android:textSize="18sp" />
 
     <CheckBox
@@ -21,6 +22,7 @@
         android:gravity="right"
         android:padding="5dp"
         android:text="התראות סדנה"
+        android:textColor="#e0e0e0"
         android:textSize="18sp" />
 
     <CheckBox
@@ -31,6 +33,7 @@
         android:gravity="right"
         android:padding="5dp"
         android:text="התראות עדכונים"
+        android:textColor="#e0e0e0"
         android:textSize="18sp" />
 
     <TextView
@@ -41,7 +44,7 @@
         android:gravity="right"
         android:text="שפה"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#33b5e5"
+        android:textColor="#0082f7"
         android:textSize="18sp" />
 
     <RadioGroup
@@ -58,21 +61,24 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="He" />
+            android:text="He"
+            android:textColor="#e0e0e0" />
 
         <RadioButton
             android:id="@+id/radioAr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ar" />
+            android:text="Ar"
+            android:textColor="#e0e0e0" />
 
         <RadioButton
             android:id="@+id/radioEn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="En" />
+            android:text="En"
+            android:textColor="#e0e0e0" />
 
     </RadioGroup>
 

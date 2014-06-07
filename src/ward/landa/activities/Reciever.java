@@ -13,6 +13,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.Html;
 import android.util.Log;
 
 public class Reciever extends BroadcastReceiver implements PostListener {
@@ -46,7 +47,7 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 				if (u != null && u.getUrlToJason() == null) {
 					dbmngr.insertUpdate(u);
 					Utilities.showNotification(context, u.getSubject(),
-							u.getText());
+							Html.fromHtml(u.getText()).toString());
 				} else {
 					Utilities.fetchUpdateFromBackEndTask task = new Utilities.fetchUpdateFromBackEndTask(
 							context, this);
@@ -67,7 +68,7 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 	public void onPostUpdateDownloaded(Update u) {
 		if (u != null && cxt != null) {
 			dbmngr.updateUpdate(u);
-			Utilities.showNotification(cxt, u.getSubject(), u.getText());
+			Utilities.showNotification(cxt, u.getSubject(), Html.fromHtml(u.getText()).toString());
 		}
 
 	}

@@ -2,9 +2,10 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    android:background="@drawable/shadow" >
+    android:padding="5dp"
+     >
 
-    <ward.landa.squareImage
+    <ImageView
         android:id="@+id/list_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -12,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/title"
@@ -21,12 +22,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:background="#4c8bff"
         android:fontFamily="davidNew.tff"
         android:gravity="center_vertical|center"
         android:text="course name"
         android:textAlignment="center"
-        android:textColor="#ffffff"
+        android:textColor="#e0e0e0"
         android:textSize="15sp"
         android:textStyle="bold|normal"
         android:typeface="normal" />

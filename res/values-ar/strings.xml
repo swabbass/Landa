@@ -1,5 +1,6 @@
 <resources>
-
+<string name="Navigation">الانتقال</string>
+    <string name="General">عام</string>
     <string name="app_name">مشروع لنده</string>
     <string name="courses">ورشات</string>
     <string name="drawer_close">اغلق القائمه</string>
@@ -7,5 +8,8 @@
     <string name="selected">"اختيار   "</string>
     <string name="teachers">مدرسون</string>
     <string name="updates">مستجدات</string>
-
+  <string name="settings">اعدادات</string>
+	<string name="about">حول البرنامج</string>
+	    <string name="noConntectionMsgFirsttime">الرجاء الاتصال بالانترنت لتشغيل البرنامج للمره الاولى</string>
+     <string name="noConntection">لا يوجد اتصاب,لتلقي معلومات محتلنه الرجاء الاتصال بالانترنت</string>
 </resources>

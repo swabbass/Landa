@@ -1,13 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
 
-    <CheckBox
-        android:id="@+id/day_time_workshop"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Place Day Time From-To" />
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/imageView2"
+        android:layout_marginRight="5dp"
+        android:src="@drawable/ic_action_place" />
 
-</LinearLayout>
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:fontFamily="davidNew.tff"
+        android:textColor="#e0e0e0"
+        android:textStyle="normal" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/imageView1"
+        android:src="@drawable/ic_action_time" />
+
+    <TextView
+        android:id="@+id/dTLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toRightOf="@+id/switch1"
+        android:fontFamily="davidNew.tff"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#e0e0e0"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/placeLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageView1"
+        android:layout_alignLeft="@+id/switch1"
+        android:layout_alignRight="@+id/dTLable"
+        android:fontFamily="davidNew.tff"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#e0e0e0"
+        android:textSize="18sp" />
+
+</RelativeLayout>

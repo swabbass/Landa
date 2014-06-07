@@ -3,7 +3,7 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:background="#404040"
     android:clickable="true"
     android:orientation="horizontal"
     android:weightSum="1" >
@@ -12,137 +12,132 @@
         android:id="@+id/teacher_picture"
         android:layout_width="125dp"
         android:layout_height="125dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/person" />
+
+    <TextView
+        android:id="@+id/emailTeacherLable"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/border"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_error" />
+        android:layout_alignRight="@+id/emailTeacher"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="דואר אלקטרוני"
+        android:textColor="#0082f7"
+        android:textSize="18sp" />
 
-    <LinearLayout
-        android:id="@+id/LinearLayout1"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/emailTeacher"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/emailTeacherLable"
+        android:layout_toLeftOf="@+id/teacher_picture"
+        android:layout_toRightOf="@+id/sendEmail"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:text="Email"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#e0e0e0"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/facultyTeacherLable"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/emailTeacher"
+        android:layout_below="@+id/emailTeacher"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="פקולטה"
+        android:textColor="#0082f7"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/positionteacher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/positionteacherLable"
+        android:layout_below="@+id/positionteacherLable"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:text="position"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#e0e0e0"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/nameteacher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/positionteacher"
+        android:layout_alignLeft="@+id/teacher_picture"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/teacher_picture"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/teacher_picture"
-        android:dividerPadding="2dp"
-        android:orientation="vertical"
-        android:showDividers="middle"
-        android:weightSum="8" >
+        android:layout_alignTop="@+id/positionteacherLable"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:text="שם"
+        android:textColor="#e0e0e0"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/nameteacherLable"
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:text="שם"
-            android:textColor="#33b5e5"
-            android:textSize="18sp" />
+    <TextView
+        android:id="@+id/facultyTeacher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/facultyTeacherLable"
+        android:layout_below="@+id/facultyTeacherLable"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:text="Faculty"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#e0e0e0"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/nameteacher"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="20dp"
-            android:paddingTop="5dp"
-            android:text="שם"
-            android:textColor="#4b4949"
-            android:textSize="16sp" />
+    <TextView
+        android:id="@+id/positionteacherLable"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/facultyTeacher"
+        android:layout_below="@+id/teacher_picture"
+        android:fontFamily="davidNew.tff"
+        android:gravity="right"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="תפקיד"
+        android:textColor="#0082f7"
+        android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/positionteacherLable"
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:text="תפקיד"
-            android:textColor="#33b5e5"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/positionteacher"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="20dp"
-            android:paddingTop="5dp"
-            android:text="position"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#4b4949"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/emailTeacherLable"
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:text="דואר אלקטרוני"
-            android:textColor="#33b5e5"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/emailTeacher"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="20dp"
-            android:paddingTop="5dp"
-            android:text="Email"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#4b4949"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/facultyTeacherLable"
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:text="פקולטה"
-            android:textColor="#33b5e5"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/facultyTeacher"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fontFamily="david.tff"
-            android:gravity="right"
-            android:paddingRight="20dp"
-            android:paddingTop="5dp"
-            android:text="Faculty"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#4b4949"
-            android:textSize="16sp" />
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/sendEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/facultyTeacherLable"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/emailTeacher"
+        android:clickable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_action_new_email" />
 
 </RelativeLayout>

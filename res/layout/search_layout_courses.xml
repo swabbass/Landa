@@ -4,11 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
     
-    <EditText 
+    <EditText
         android:id="@+id/course_txt_search"
-        android:inputType="text"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"        
-        />
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:textColor="#0082f7" />
     
 </LinearLayout>

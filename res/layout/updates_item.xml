@@ -15,7 +15,7 @@
         android:gravity="right"
         android:padding="3dp"
         android:text="עדכון"
-        android:textColor="#33b5e5"
+        android:textColor="#0082f7"
         android:textSize="17sp" />
 
     <ward.landa.ExpandableTextView
@@ -31,7 +31,7 @@
         android:paddingLeft="3dp"
         android:text="news news news!!"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#BDBDBD" />
+        android:textColor="#fff" />
 
     <ImageView
         android:id="@+id/imgAttention"

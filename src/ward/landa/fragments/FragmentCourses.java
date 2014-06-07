@@ -1,6 +1,6 @@
 package ward.landa.fragments;
 
-import java.lang.ref.WeakReference;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,52 +9,39 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
-import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
-
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
 import ward.landa.Course;
 import ward.landa.GCMUtils;
 import ward.landa.R;
-import ward.landa.Teacher;
 import ward.landa.ImageUtilities.BitmapUtils;
-import ward.landa.R.drawable;
-import ward.landa.R.id;
-import ward.landa.R.layout;
-import ward.landa.R.menu;
-import ward.landa.activities.MainActivity;
+import ward.landa.ImageUtilities.UILTools;
 import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -62,9 +49,18 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
+
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Picasso.LoadedFrom;
+import com.squareup.picasso.Target;
 
 public class FragmentCourses extends Fragment {
 
@@ -87,14 +83,21 @@ public class FragmentCourses extends Fragment {
 	public JSONParser jParser;
 	reciever corseRsvr;
 	ConnectionDetector connectionDetector;
+	private static ImageLoader imageLoader;
 
 	@Override
 	public void onStop() {
+
+		super.onStop();
+	}
+
+	@Override
+	public void onPause() {
 		if (corseRsvr != null) {
 
 			getActivity().unregisterReceiver(corseRsvr);
 		}
-		super.onStop();
+		super.onPause();
 	}
 
 	@Override
@@ -111,6 +114,8 @@ public class FragmentCourses extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		getActivity().getMenuInflater().inflate(R.menu.course_menu, menu);
 		View v = (View) menu.findItem(R.id.course_menu_search).getActionView();
+		if (!getArguments().getBoolean("rtl"))
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 
 		EditText search = (EditText) v.findViewById(R.id.course_txt_search);
 		search.addTextChangedListener(new TextWatcher() {
@@ -160,12 +165,56 @@ public class FragmentCourses extends Fragment {
 		super.onAttach(activity);
 	}
 
+	private void showDialogNoconnection(boolean isfirst) {
+		new AlertDialog.Builder(getActivity())
+				.setCancelable(false)
+				.setTitle("Info")
+				.setMessage(
+						isfirst ? getResources().getString(
+								R.string.noConntectionMsgFirsttime)
+								: getResources().getString(
+										R.string.noConntection))
+
+				.setNeutralButton("Retry",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (connectionDetector.isConnectingToInternet()) {
+									new loadDataFromBackend().execute();
+
+								} else if (!loadFromDb) {
+									getActivity().finish();
+								} else if (loadFromDb) {
+									loadFromDataBase();
+								}
+
+							}
+						}).show();
+	}
+
+	private void loadFromDataBase() {
+		courses = null;
+		courses = db_mngr.getCursorAllWithCourses();
+		uAdapter = new coursesAdapter(courses, getActivity(), getResources(), 0);
+
+		SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
+				uAdapter);
+		sb.setAbsListView(g);
+		g.setAdapter(sb);
+
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
 		root = inflater.inflate(R.layout.courses_frag_grid, container, false);
 		g = (GridView) root.findViewById(R.id.gridviewcourses);
+		imageLoader = UILTools.initlizeImageLoad(UILTools.initilizeImageLoader(
+				UILTools.initlizeImageDisplay(R.drawable.ic_launcher,
+						R.drawable.ic_launcher, R.drawable.ic_launcher),
+				getActivity()), getActivity());
+
 		connectionDetector = new ConnectionDetector(getActivity());
 		jParser = new JSONParser();
 		db_mngr = new DBManager(getActivity());
@@ -177,18 +226,10 @@ public class FragmentCourses extends Fragment {
 		boolean isConnected = connectionDetector.isConnectingToInternet();
 		if (!loadFromDb && isConnected) {
 			new loadDataFromBackend().execute();
-		} else {
-			courses = null;
-			courses = db_mngr.getCursorAllWithCourses();
-			uAdapter = new coursesAdapter(courses, getActivity(),
-					getResources(), 0);
+		} else if(loadFromDb) {
+			loadFromDataBase();
 
-			SwingBottomInAnimationAdapter sb = new SwingBottomInAnimationAdapter(
-					uAdapter);
-			sb.setAbsListView(g);
-			g.setAdapter(sb);
-
-		}
+		} 
 
 		g.setOnItemClickListener(new OnItemClickListener() {
 
@@ -283,88 +324,41 @@ public class FragmentCourses extends Fragment {
 			} else if (c.getNotify() == 1) {
 				alarm.setVisibility(ImageView.VISIBLE);
 			}
-			String imageUri = c.getImageUrl();
-			List<Bitmap> cached = MemoryCacheUtil
-					.findCachedBitmapsForImageUri(c.getImageUrl(), ImageLoader
-							.getInstance().getMemoryCache());
-			Log.d("eee", "cached image : " + cached.size());
-			if (cached.size() > 0) {
-				if (c.isDownloadedImage()) {
-
-					picture.setImageBitmap(cached.get(0));
-				} else {
-					// picture.setImageResource(R.drawable.ic_error);
+			Target target = new Target() {
+				@Override
+				public void onBitmapFailed(Drawable arg0) {
+					// TODO Auto-generated method stub
+					c.setDownloadedImage(false);
 				}
+
+				@Override
+				public void onBitmapLoaded(final Bitmap arg0, LoadedFrom arg1) {
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							Utilities.saveImageToSD(c.getImagePath(), arg0);
+
+						}
+					}).start();
+					c.setDownloadedImage(true);
+					db_mngr.UpdateCourseImageDownloaded(c, true);
+				}
+
+				@Override
+				public void onPrepareLoad(Drawable arg0) {
+					// TODO Auto-generated method stub
+
+				}
+
+			};
+			if (!c.isDownloadedImage()) {
+				Picasso.with(cxt).load(c.getImageUrl())
+						.error(R.drawable.ic_launcher).into(picture);
+				Picasso.with(cxt).load(c.getImageUrl()).into(target);
 			} else {
-				if (!c.isDownloadedImage()) {
-					SimpleImageLoadingListener s = new SimpleImageLoadingListener() {
-						@Override
-						public void onLoadingCancelled(String imageUri,
-								View view) {
-							c.setDownloadedImage(false);
-							picture.setImageResource(R.drawable.ic_launcher);
-							super.onLoadingCancelled(imageUri, view);
-						}
-
-						@Override
-						public void onLoadingFailed(String imageUri, View view,
-								FailReason failReason) {
-							c.setDownloadedImage(false);
-							// picture.setImageResource(R.drawable.ic_error);
-							Log.d("test", failReason.toString());
-							super.onLoadingFailed(imageUri, view, failReason);
-						}
-
-						@Override
-						public void onLoadingComplete(String imageUri,
-								View view, Bitmap loadedImage) {
-							ImageView img = (ImageView) view;
-							img.setImageBitmap(loadedImage);
-							// picture.setImageBitmap(loadedImage);
-							Utilities.saveImageToSD(c.getImagePath(),
-									loadedImage);
-
-							c.setDownloadedImage(true);
-							// TODO save isdownlaoded flag
-							db_mngr.UpdateCourse(c, c.getNotify());
-							super.onLoadingComplete(imageUri, view, loadedImage);
-						}
-					};
-					MainActivity.image_loader.displayImage(c.getImageUrl(),
-							image, s);
-					// MainActivity.image_loader.loadImage(teacher.getImageUrl(),
-
-				} else {
-					SimpleImageLoadingListener s2 = new SimpleImageLoadingListener() {
-						@Override
-						public void onLoadingStarted(String imageUri, View view) {
-							Log.e("sd", "loading from sd is started");
-							super.onLoadingStarted(imageUri, view);
-						}
-
-						@Override
-						public void onLoadingFailed(String imageUri, View view,
-								FailReason failReason) {
-							Log.e("sd", "loading from sd is failed cause : "
-									+ failReason.getCause().getMessage());
-							super.onLoadingFailed(imageUri, view, failReason);
-						}
-
-						@Override
-						public void onLoadingComplete(String imageUri,
-								View view, Bitmap loadedImage) {
-							ImageView img = (ImageView) view;
-							img.setImageBitmap(loadedImage);
-							// picture.setImageBitmap(loadedImage);
-							Log.d("sd", "loading from sd is successfull ");
-							super.onLoadingComplete(imageUri, view, loadedImage);
-						}
-					};
-					// MainActivity.image_loader.loadImage("file://"+teacher.getImageLocalPath(),
-					MainActivity.image_loader.displayImage(
-							"file://" + c.getImagePath(), image, s2);
-
-				}
+				Picasso.with(cxt).load(new File(c.getImagePath()))
+						.error(R.drawable.ic_launcher).into(picture);
 			}
 
 			name.setText(c.getName());
@@ -386,6 +380,7 @@ public class FragmentCourses extends Fragment {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
 			pDialog.setMessage("Loading...");
+			pDialog.setCanceledOnTouchOutside(false);
 			pDialog.show();
 		}
 
@@ -412,7 +407,7 @@ public class FragmentCourses extends Fragment {
 							.getString("subject_name")), c.getString("day"),
 							c.getString("time_from"), c.getString("time_to"),
 							c.getString("place"), c.getString("tutor_id"));
-					tmp.setImgID(R.drawable.ic_error);
+					tmp.setImgID(R.drawable.ic_launcher);
 					tmp.setSubject_id(c.getString("subject_id"));
 					tmp.setImageUrl(tmp.getSubject_id_string());
 					tmp.setImagePath(tmp.getSubject_id_string());
@@ -421,25 +416,31 @@ public class FragmentCourses extends Fragment {
 						courses.add(tmp);
 					toSave.add(tmp);
 				}
-
+				if (connectionDetector.isConnectingToInternet())
 				allOk = true;
 			} catch (JSONException e) {
-				e.printStackTrace();
 				Log.e(GCMUtils.TAG, e.toString());
 				if (!connectionDetector.isConnectingToInternet()) {
 					Log.e(GCMUtils.TAG, "faild no internet ");
-					cancel(true);
+				
 				}
 
+				return "";
 			}
 			return "";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			pDialog.dismiss();
 			if (allOk) {
 				saveLoadedCoursesState(true);
-				pDialog.dismiss();
+
+				for (Course c : toSave) {
+					db_mngr.insertCourse(c);
+				}
+				toSave = null;
+				courses = db_mngr.getCursorAllWithCourses();
 				uAdapter = new coursesAdapter(courses, getActivity(),
 						getResources(), 0);
 
@@ -447,10 +448,10 @@ public class FragmentCourses extends Fragment {
 						uAdapter);
 				sb.setAbsListView(g);
 				g.setAdapter(sb);
-				for (Course c : toSave) {
-					c.setCourse_db_id(db_mngr.insertCourse(c));
-				}
-				toSave = null;
+
+			} else {
+				db_mngr.clearDb();
+				showDialogNoconnection(!loadFromDb);
 			}
 			super.onPostExecute(result);
 		}
@@ -465,6 +466,7 @@ public class FragmentCourses extends Fragment {
 					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
 				if (intent.getStringExtra("Type") != null) {
 					if (intent.getStringExtra("Type").contains("WORKSHOP")) {
+						abortBroadcast();
 						GCMUtils.HandleWorkshop(intent.getStringExtra("Type"),
 								context, db_mngr, intent);
 						courses = null;
@@ -476,7 +478,7 @@ public class FragmentCourses extends Fragment {
 								uAdapter);
 						sb.setAbsListView(g);
 						g.setAdapter(sb);
-						abortBroadcast();
+
 					}
 				}
 			}

@@ -141,17 +141,9 @@ public class Teacher implements Serializable {
 	}
 
 	public void setPosition(String position) {
-		this.position = position.replaceAll("\\s", "");
+		this.position = position;
 	}
-	public String getRole()
-	{
-		switch(this.position)
-		{
-		case "T":return "חונך אקדמי";
-		case "C":return "רכז";
-		}
-		return null;
-	}
+	
 
 	public String getFaculty() {
 		return faculty;

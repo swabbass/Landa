@@ -1,13 +1,16 @@
 package ward.landa.fragments;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import utilites.DBManager;
 import ward.landa.Course;
 import ward.landa.R;
+import ward.landa.R.string;
 import ward.landa.Teacher;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -34,6 +37,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingRightInAnimationAdapter;
@@ -45,6 +49,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+import com.squareup.picasso.Picasso;
 
 public class CourseFragment extends Fragment {
 
@@ -55,98 +60,18 @@ public class CourseFragment extends Fragment {
 	ExpandableListAdapter exAdapter;
 	int courseID;
 	int imgId;
-	float rating;
-	static String courseName;
+
+	String courseName;
 	String courseDesription;
-	private static TextView courseDesriptionLable;
 	TextView courseNameLable;
 	ImageView courseImg;
 	ImageView feedbackImg;
-	ImageLoaderConfiguration config;
-	private static ImageLoader image_loader;
-	PauseOnScrollListener listener;
 	DBManager db_mngr;
 	AlarmCallBack alarmCheckListner;
-
-	private ImageLoaderConfiguration initilizeImageLoader(
-			DisplayImageOptions options) {
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				getActivity()).memoryCacheExtraOptions(120, 120)
-				.denyCacheImageMultipleSizesInMemory()
-				.threadPriority(Thread.MAX_PRIORITY)
-				.memoryCache(new LruMemoryCache(2 * 1024 * 1024))
-				.memoryCacheSize(2 * 1024 * 1024).threadPoolSize(5)
-				.defaultDisplayImageOptions(options)
-				.discCacheSize(50 * 1024 * 1024).discCacheFileCount(100)
-				.writeDebugLogs().build();
-		return config;
-
-	}
-
-	private DisplayImageOptions initlizeImageDisplay() {
-		DisplayImageOptions options = new DisplayImageOptions.Builder()
-				.showImageOnLoading(R.drawable.ic_stub)
-				// resource or drawable
-				.showImageForEmptyUri(R.drawable.person)
-				// resource or drawable
-				.showImageOnFail(R.drawable.person)
-				// resource or drawable
-				.resetViewBeforeLoading(false)
-				// default
-				.delayBeforeLoading(200).cacheInMemory(true).cacheOnDisc(true)
-				.considerExifParams(false) // default
-				.imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
-				.bitmapConfig(Bitmap.Config.RGB_565) // default
-				.handler(new Handler()) // default
-				.build();
-		return options;
-	}
-
-	private void initlizeImageLoad() {
-		config = initilizeImageLoader(initlizeImageDisplay());
-		image_loader = ImageLoader.getInstance();
-		image_loader.init(config);
-		boolean pauseOnScroll = false; // or true
-		boolean pauseOnFling = true; // or false
-		listener = new PauseOnScrollListener(image_loader, pauseOnScroll,
-				pauseOnFling);
-
-	}
+	Course c;
 
 	public interface AlarmCallBack {
 		public void onTimeChecked(String time, boolean isChecked);
-	}
-
-	@Override
-	public void onStart() {
-
-		// list already viewed
-		Log.e("Fragment", "fragment course is started");
-		super.onStart();
-	}
-
-	@Override
-	public void onPause() {
-		Log.e("Fragment", "fragment course is paused");
-		super.onPause();
-	}
-
-	@Override
-	public void onStop() {
-		Log.e("Fragment", "fragment course is stopped");
-		super.onStop();
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.e("Fragment", "fragment course is destroyed");
-		super.onDestroy();
-	}
-
-	@Override
-	public void onDetach() {
-		Log.e("Fragment", "fragment course is deattached");
-		super.onDetach();
 	}
 
 	@Override
@@ -171,33 +96,28 @@ public class CourseFragment extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
-	private void initlizeTeachers() {
-
-	}
-
 	private void fetchArguments() {
 		Bundle ex = getArguments();
 		if (ex != null) {
 			courseName = ex.getString("name");
 			this.imgId = ex.getInt("ImageID");
 			this.courseID = ex.getInt("courseID");
+			this.c = (Course) ex.getSerializable("course");
 		}
-
-		this.rating = -1;
 	}
 
 	private void initlizeUI(View root) {
 		courseNameLable = (TextView) root.findViewById(R.id.courseLable);
-		courseDesriptionLable = (TextView) root
-				.findViewById(R.id.courseDescription);
 		courseImg = (ImageView) root.findViewById(R.id.courseAvatar);
 		feedbackImg = (ImageView) root.findViewById(R.id.feedbackImg);
 
 		courseNameLable.setText(courseName);
-		courseDesriptionLable
-				.setText(courseDesription == null ? "No Description"
-						: courseDesription);
-		courseImg.setImageResource(imgId);
+		if (c != null) {
+			Picasso.with(getActivity()).load(new File(c.getImagePath()))
+					.into(courseImg);
+		} else
+			courseImg.setImageResource(imgId);
+
 		addListnerOnFeedClick();
 		// l = (ListView) root.findViewById(R.id.courseTeachers);
 		exList = (ExpandableListView) root.findViewById(R.id.courseTeachers);
@@ -224,14 +144,29 @@ public class CourseFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_course, null);
 		db_mngr = new DBManager(getActivity());
-		initlizeImageLoad();
 		fetchArguments();
 		initlizeUI(root);
-		initlizeTeachers();
 		ExpandableListAdapter ad = new ExpandableListAdapter(getActivity(),
 				teachers, timesForEachTeacher, alarmCheckListner);
 		exList.setAdapter(ad);
+		expandNotifiedDateTimes();
+
 		return root;
+	}
+
+	private void expandNotifiedDateTimes() {
+		HashMap<String, String> params = null;
+		for (Teacher teacher : teachers) {
+			List<String> dates = timesForEachTeacher
+					.get(teacher.getId_number());
+			for (String dateTime : dates) {
+				params = getParamsForCourse(dateTime);
+				if (params.get("notify").equals("1")) {
+					exList.expandGroup(teachers.indexOf(teacher), true);
+				}
+			}
+		}
+
 	}
 
 	static class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -274,37 +209,34 @@ public class CourseFragment extends Fragment {
 			View v = convertView;
 			if (v == null) {
 				v = inflater.inflate(R.layout.teacher_course_times, null);
-				v.setTag(R.id.day_time_workshop,
-						v.findViewById(R.id.day_time_workshop));
+				v.setTag(R.id.switch1, v.findViewById(R.id.switch1));
+				v.setTag(R.id.dTLable, v.findViewById(R.id.dTLable));
+				v.setTag(R.id.placeLable, v.findViewById(R.id.placeLable));
 
 			}
-			CheckBox chkBox = (CheckBox) v.getTag(R.id.day_time_workshop);
-			String[] info = dateTime.split(Pattern.quote(" - "));
-			int lastIndex = info.length - 3;
-			String day = info[lastIndex - 2];
-			String timeFrom = info[lastIndex - 1];
-			String tumeTo = info[lastIndex];
-			String place = info[lastIndex - 3];
-			String notify = info[lastIndex + 1];
-			String id = info[lastIndex + 2];
-			for (int i = lastIndex - 4; i >= 0; --i) {
-				place += " " + info[i];
-			}
-			chkBox.setText(place + " " + day + " " + timeFrom + "-" + tumeTo);
-			if (notify.equals("1")) {
-				chkBox.setChecked(true);
+			Switch switchToggle = (Switch) v.getTag(R.id.switch1);
+			HashMap<String, String> params = getParamsForCourse(dateTime);
+			TextView place = (TextView) v.getTag(R.id.placeLable);
+			TextView time = (TextView) v.getTag(R.id.dTLable);
+			place.setText(params.get("place"));
+			time.setText(params.get("day") + " " + params.get("timeFrom") + "-"
+					+ params.get("timeTo"));
+			if (params.get("notify").equals("1")) {
+				switchToggle.setChecked(true);
+
 			} else {
-				chkBox.setChecked(false);
+				switchToggle.setChecked(false);
 			}
-			chkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			switchToggle
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView,
-						boolean isChecked) {
-					courseDesriptionLable.append(dateTime);
-					listner.onTimeChecked(dateTime, isChecked);
-				}
-			});
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView,
+								boolean isChecked) {
+
+							listner.onTimeChecked(dateTime, isChecked);
+						}
+					});
 			return v;
 		}
 
@@ -331,31 +263,36 @@ public class CourseFragment extends Fragment {
 		}
 
 		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
-				ViewGroup parent) {
-		
-			View v=convertView;
-			if(v==null) {
-			v = inflater.inflate(R.layout.course_teacher_details, parent,
-					false);
-			v.setTag(R.id.tutorSmallAvatar,
-					v.findViewById(R.id.tutorSmallAvatar));
-			v.setTag(R.id.alaramMe, v.findViewById(R.id.alaramMe));
-			v.setTag(R.id.teacherFacultyLable,
-					v.findViewById(R.id.teacherFacultyLable));
-			v.setTag(R.id.teacherCourseName,
-					v.findViewById(R.id.teacherCourseName));
-		
+		public View getGroupView(int groupPosition, boolean isExpanded,
+				View convertView, ViewGroup parent) {
+
+			View v = convertView;
+			if (v == null) {
+				v = inflater.inflate(R.layout.course_teacher_details, parent,
+						false);
+				v.setTag(R.id.tutorSmallAvatar,
+						v.findViewById(R.id.tutorSmallAvatar));
+				v.setTag(R.id.alaramMe, v.findViewById(R.id.alaramMe));
+				v.setTag(R.id.teacherFacultyLable,
+						v.findViewById(R.id.teacherFacultyLable));
+				v.setTag(R.id.teacherCourseName,
+						v.findViewById(R.id.teacherCourseName));
+
 			}
 			ImageView teacherAvatar = (ImageView) v
 					.getTag(R.id.tutorSmallAvatar);
-			ImageAware image = new ImageViewAware(teacherAvatar, false);
 			ImageView alarmMe = (ImageView) v.getTag(R.id.alaramMe);
+			if (isExpanded) {
+				alarmMe.setImageResource(R.drawable.alarm_close);
+			} else {
+				alarmMe.setImageResource(R.drawable.alarm_open);
+			}
 			TextView faculty = (TextView) v.getTag(R.id.teacherFacultyLable);
 			TextView name = (TextView) v.getTag(R.id.teacherCourseName);
-			Teacher t = (Teacher)_teachers.get(groupPosition);
-			image_loader.displayImage("file://" + t.getImageLocalPath(), image);
-			name.setText(t.getName()+" "+t.getLast_name());
+			Teacher t = (Teacher) _teachers.get(groupPosition);
+			Picasso.with(_context).load(new File(t.getImageLocalPath()))
+					.into(teacherAvatar);
+			name.setText(t.getName() + " " + t.getLast_name());
 			faculty.setText(t.getFaculty());
 
 			return v;
@@ -373,6 +310,34 @@ public class CourseFragment extends Fragment {
 			return true;
 		}
 
+	}
+
+	/**
+	 * 
+	 * @param dateTime
+	 *            a day -timefrom-timeto-place-toNotify pattern to
+	 * @return hashmap with the values seperated
+	 */
+	private static HashMap<String, String> getParamsForCourse(String dateTime) {
+		String[] info = dateTime.split(Pattern.quote(" - "));
+		int lastIndex = info.length - 3;
+		String day = info[lastIndex - 2];
+		String timeFrom = info[lastIndex - 1];
+		String tumeTo = info[lastIndex];
+		String place = info[lastIndex - 3];
+		String notify = info[lastIndex + 1];
+		String id = info[lastIndex + 2];
+		for (int i = lastIndex - 4; i >= 0; --i) {
+			place += " " + info[i];
+		}
+		HashMap<String, String> res = new HashMap<String, String>(5);
+		res.put("day", day);
+		res.put("timeFrom", timeFrom);
+		res.put("timeTo", tumeTo);
+		res.put("place", place);
+		res.put("notify", notify);
+		res.put("id", id);
+		return res;
 	}
 
 }

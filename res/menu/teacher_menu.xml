@@ -7,11 +7,12 @@
         android:icon="@drawable/action_search"
         android:showAsAction="ifRoom|collapseActionView"
         android:title="Search"/>
-     <item
-        android:id="@+id/teacher_menu_filter"      
-        android:icon="@drawable/filter_action_white"
+    <item
+        android:id="@+id/teacher_menu_filter"
+        android:actionLayout="@layout/filter_spinner"
+        android:icon="@drawable/filter"
         android:showAsAction="ifRoom|collapseActionView"
-        android:title="Filter"/>
-    
+        android:title="Filter">
+    </item>
 
 </menu>

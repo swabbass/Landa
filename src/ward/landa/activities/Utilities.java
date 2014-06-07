@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -30,6 +31,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,29 +45,63 @@ public class Utilities {
 	public static final String NEW_UPDATE = "new_Update";
 	private static final int notfyId = 12;
 
+	
+	
+	
+	
+	
+	
 	public static InputMethodManager getInputMethodManager(Activity activity) {
 		return (InputMethodManager) activity
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 	}
 
+	public static String replacer(StringBuffer outBuffer) {
+
+		String data = outBuffer.toString();
+		try {
+			StringBuffer tempBuffer = new StringBuffer();
+			int incrementor = 0;
+			int dataLength = data.length();
+			while (incrementor < dataLength) {
+				char charecterAt = data.charAt(incrementor);
+				if (charecterAt == '%') {
+					tempBuffer.append("<percentage>");
+				} else if (charecterAt == '+') {
+					tempBuffer.append("<plus>");
+				} else {
+					tempBuffer.append(charecterAt);
+				}
+				incrementor++;
+			}
+			data = tempBuffer.toString();
+			data = URLDecoder.decode(data, "UTF-8");
+			data = data.replaceAll("<percentage>", "%");
+			data = data.replaceAll("<plus>", "+");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+
 	public static int dayWeekNumber(String hebrewDay) {
-		
+
 		switch (hebrewDay.replaceAll("\\s", "")) {
-		case "׳¨׳�׳©׳•׳�":
+		case "ראשון":
 			return Calendar.SUNDAY;
-		case "׳©׳ ׳™":
+		case "שני":
 			return Calendar.MONDAY;
-		case "׳©׳�׳™׳©׳™":
+		case "שלישי":
 			return Calendar.TUESDAY;
-		case "׳¨׳‘׳¢׳™":
+		case "רבעי":
 			return Calendar.WEDNESDAY;
-		case "׳—׳�׳™׳©׳™":
+		case "חמישי":
 			return Calendar.THURSDAY;
 
 		}
 		return -1;
 	}
-	
+
 	public static int calculateInSampleSize(BitmapFactory.Options options,
 			int reqWidth, int reqHeight) {
 		// Raw height and width of image
@@ -181,6 +217,7 @@ public class Utilities {
 	 */
 	public static Update generateUpdateFromExtras(Bundle extras, Context cxt) {
 		String msg = extras.getString(Settings.EXTRA_MESSAGE);
+		String subject = extras.getString("title");
 		Update u = null;
 		String[] data = msg.split("\n");
 		String post = data[0];
@@ -189,7 +226,7 @@ public class Utilities {
 			try {
 				JSONObject jObj = new JSONObject(msg);
 				String id = jObj.getString("ID");
-				String title = jObj.getString("post_name");
+				String title = subject;
 				String content = jObj.getString("post_content");
 				String date = jObj.getString("post_date");
 				String url = jObj.getString("guid");
@@ -215,6 +252,7 @@ public class Utilities {
 
 	public static interface PostListener {
 		public void onPostUpdateDownloaded(Update u);
+		
 	}
 
 	public static class fetchUpdateFromBackEndTask extends
@@ -285,14 +323,15 @@ public class Utilities {
 
 	}
 
+	public static void showNotification(Context context, String title,
+			String text) {
 
-	public static void showNotification(Context context, String title, String text) {
-		
 		// Notification notification=new Notification(R.drawable.success,
 		// tickerText, when)
 		NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(
 				context).setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(title).setContentText(text).setAutoCancel(true)
+				.setAutoCancel(true).setContentTitle(title)
+				.setContentText(text).setAutoCancel(true)
 				.setDefaults(Notification.DEFAULT_ALL)
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 		// PendingMsgs.add(msg);
@@ -310,26 +349,5 @@ public class Utilities {
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify(notfyId, nBuilder.build());
 	}
-
-
-public static int  getImageForCourse(String name)
-{
-	switch (name) {
-	case "׳�׳‘׳•׳� ׳�׳�׳“׳¢׳™ ׳”׳�׳—׳©׳‘":return R.drawable.advanced_c;
-	case "׳©׳₪׳× C":return R.drawable.advanced_c;
-	case "׳₪׳™׳–׳™׳§׳” 1׳�":return R.drawable.emc2;
-	case "׳₪׳™׳–׳™׳§׳” 1":return R.drawable.physyqs;
-	case "׳—׳“׳•׳� 1׳×":return R.drawable.calculas2;
-	case "׳�׳›׳ ׳™׳§׳” ׳”׳ ׳“׳¡׳™׳×":return R.drawable.mechanics;
-	case "׳×׳•׳¨׳× ׳”׳—׳•׳–׳§":return R.drawable.enginerr;
-	case "׳›׳™׳�׳™׳” ׳�׳•׳¨׳’׳ ׳™׳×":return R.drawable.chemestry;
-	case "׳—׳“׳•׳� 1":return R.drawable.calculas1;
-	case "׳—׳“׳•׳� 1׳�":return R.drawable.calculas3;
-	case "׳›׳™׳�׳™׳” ׳›׳�׳�׳™׳×":return R.drawable.chem;
-	case "׳™׳¡׳•׳“׳•׳× ׳›׳™׳�׳™׳”":return R.drawable.atom;
-	case "׳₪׳™׳–׳™׳§׳” 1׳₪":return R.drawable.physyqs;
-	}
-return R.drawable.ic_error;
-}
 
 }

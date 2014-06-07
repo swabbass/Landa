@@ -3,6 +3,14 @@ package ward.landa;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.entity.StringEntity;
+import org.jsoup.Jsoup;
+import org.jsoup.parser.Parser;
+
+import ward.landa.activities.Utilities;
 
 import android.text.Html;
 
@@ -18,6 +26,7 @@ public class Update implements Serializable {
 	private String dateTime;
 	private String url;
 	private String urlToJason;
+
 	public Update(String subject, String dateTime, String text) {
 		setSubject(subject);
 		setDateTime(dateTime);
@@ -25,10 +34,11 @@ public class Update implements Serializable {
 
 	}
 
-	public Update(String id,String urlToJSon) {
-		this.update_id=id;
+	public Update(String id, String urlToJSon) {
+		this.update_id = id;
 		this.setUrlToJason(urlToJSon);
 	}
+
 	public Update(String id, String subject, String dateTime, String text) {
 		setUpdate_id(id);
 		setSubject(subject);
@@ -39,14 +49,14 @@ public class Update implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-	
-		if (o instanceof Update)
-		{
-			Update t=(Update)o;
+
+		if (o instanceof Update) {
+			Update t = (Update) o;
 			return t.update_id.equals(update_id);
 		}
 		return false;
 	}
+
 	public String getText() {
 		return text;
 	}
@@ -66,7 +76,9 @@ public class Update implements Serializable {
 	}
 
 	public void setText(String text) {
-		this.text = Html.fromHtml(text).toString();
+		this.text = text;
+
+		// Html.fromHtml(text).toString();
 	}
 
 	public boolean isActive() {
@@ -82,13 +94,15 @@ public class Update implements Serializable {
 	}
 
 	public void setSubject(String subject) {
-		try {
-			this.subject =
-					URLDecoder.decode(Html.fromHtml(subject).toString(),"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		String mamn = Jsoup.parse(subject).text();
+		/*
+		 * mamn = URLEncoder.encode(mamn, "UTF-8");
+		 * mamn=StringEscapeUtils.escapeJava(mamn); mamn=URLDecoder.decode(mamn,
+		 * "UTF-8");
+		 */
+		this.subject = Utilities.replacer(new StringBuffer(mamn));
+
 	}
 
 	public String getDateTime() {

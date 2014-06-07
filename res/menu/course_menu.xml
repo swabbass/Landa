@@ -8,7 +8,7 @@
         android:title="Search"/>
      <item
         android:id="@+id/course_menu_filter"      
-        android:icon="@drawable/filter_action_white"
+        android:icon="@drawable/filter"
         android:showAsAction="ifRoom|collapseActionView"
         android:title="Filter"/>
 

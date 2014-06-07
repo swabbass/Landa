@@ -3,12 +3,12 @@
     android:id="@+id/scrollView1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#fff" >
+    android:background="#404040" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/shadow"
+       
         android:orientation="vertical" >
 
         <TextView
@@ -20,7 +20,7 @@
             android:gravity="center"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#33b5e5" />
+            android:textColor="#0082f7" />
 
         <TextView
             android:id="@+id/updateDetailDateTimeLable"
@@ -29,7 +29,7 @@
             android:padding="5dp"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#4b4949" />
+            android:textColor="#e0e0e0" />
 
         <TextView
             android:id="@+id/updateDetailContentLable"
@@ -41,7 +41,9 @@
             android:scrollbarStyle="outsideInset"
             android:scrollbars="vertical"
             android:text="Large Text"
+            android:textColor="#e0e0e0"
             android:textSize="16sp" />
+
     </LinearLayout>
 
 </ScrollView>
