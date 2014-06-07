@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
+import ward.landa.AboutActivity;
 import ward.landa.ExpandableTextView;
 import ward.landa.GCMUtils;
 import ward.landa.R;
@@ -141,7 +142,10 @@ public class FragmentUpdates extends Fragment {
 			startActivity(i);
 
 			break;
-
+		case R.id.about:
+			Intent s = new Intent(getActivity(), AboutActivity.class);
+			startActivity(s);
+			break;
 		default:
 			break;
 		}

@@ -8,6 +8,7 @@ import java.util.Locale;
 import utilites.ConnectionDetector;
 import utilites.DBManager;
 import utilites.JSONParser;
+import ward.landa.AboutActivity;
 import ward.landa.Course;
 import ward.landa.CourseNotification;
 import ward.landa.GCMUtils;
@@ -411,11 +412,8 @@ public class MainActivity extends FragmentActivity implements
 			startActivity(i);
 			break;
 		case 4:
-			// launch about activity
-			/*
-			 * Intent i = new Intent(getActivity(), SettingsActivity.class);
-			 * startActivity(i);
-			 */
+			 Intent s = new Intent(this, AboutActivity.class);
+			  startActivity(s);	 
 			break;
 		}
 		return true;
@@ -736,6 +734,8 @@ public class MainActivity extends FragmentActivity implements
 					activityRef.startActivity(i);
 					break;
 				case ABOUT:
+					Intent s = new Intent(activityRef, AboutActivity.class);
+					activityRef.startActivity(s);
 					break;
 				default:
 					break;

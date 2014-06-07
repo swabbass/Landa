@@ -166,23 +166,7 @@ public class FragmentTeachers extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		getActivity().getMenuInflater().inflate(R.menu.teacher_menu, menu);
 		View v = (View) menu.findItem(R.id.teacher_menu_search).getActionView();
-		spinner=(Spinner)menu.findItem(R.id.teacher_menu_filter).getActionView();
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				onNavigationItemSelected(position, id);
-				
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				onNavigationItemSelected(0, 0);
-				
-			}
-			
-		});
+		
 		if (!getArguments().getBoolean("rtl"))
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		initlizeSearchEngine(v);
@@ -191,11 +175,7 @@ public class FragmentTeachers extends Fragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		switch (item.getItemId()) {
-		case R.id.teacher_menu_filter:
-				
-			break;
-		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
