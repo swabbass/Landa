@@ -45,7 +45,6 @@ public class CourseFragment extends Fragment {
 	String courseDesription;
 	TextView courseNameLable;
 	ImageView courseImg;
-	ImageView feedbackImg;
 	DBManager db_mngr;
 	AlarmCallBack alarmCheckListner;
 	Course c;
@@ -89,7 +88,6 @@ public class CourseFragment extends Fragment {
 	private void initlizeUI(View root) {
 		courseNameLable = (TextView) root.findViewById(R.id.courseLable);
 		courseImg = (ImageView) root.findViewById(R.id.courseAvatar);
-		feedbackImg = (ImageView) root.findViewById(R.id.feedbackImg);
 
 		courseNameLable.setText(courseName);
 		if (c != null) {
@@ -98,7 +96,6 @@ public class CourseFragment extends Fragment {
 		} else
 			courseImg.setImageResource(imgId);
 
-		addListnerOnFeedClick();
 		// l = (ListView) root.findViewById(R.id.courseTeachers);
 		exList = (ExpandableListView) root.findViewById(R.id.courseTeachers);
 		teachers = db_mngr.getTeachersForCourse(courseName);
@@ -107,16 +104,6 @@ public class CourseFragment extends Fragment {
 			timesForEachTeacher.put(t.getId_number(),
 					t.getTimePlaceForCourse(courseName));
 		}
-	}
-
-	private void addListnerOnFeedClick() {
-		feedbackImg.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-
-			}
-		});
 	}
 
 	@Override
@@ -155,7 +142,7 @@ public class CourseFragment extends Fragment {
 		private HashMap<String, List<String>> _listTimes;
 		private LayoutInflater inflater;
 		private AlarmCallBack listner;
-		
+
 		public ExpandableListAdapter(Context context, List<Teacher> teachers,
 				HashMap<String, List<String>> listTimes, AlarmCallBack lister) {
 			this._context = context;
