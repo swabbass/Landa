@@ -4,13 +4,13 @@ import java.io.File;
 
 import com.squareup.picasso.Picasso;
 
-import utilites.Role;
+import utils.Role;
+import utils.Utilities;
 import ward.landa.R;
 import ward.landa.R.id;
 import ward.landa.R.layout;
 import ward.landa.Teacher;
 import ward.landa.ImageUtilities.CircleImageView;
-import ward.landa.activities.Utilities;
 import android.content.Intent;
 import android.graphics.Picture;
 import android.net.Uri;

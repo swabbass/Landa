@@ -7,14 +7,15 @@ import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import utilites.ConnectionDetector;
-import utilites.DBManager;
-import utilites.JSONParser;
-import ward.landa.GCMUtils;
+
+import utils.ConnectionDetector;
+import utils.DBManager;
+import utils.GCMUtils;
+import utils.JSONParser;
+import utils.Utilities;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.activities.Settings;
-import ward.landa.activities.Utilities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -113,7 +114,7 @@ public class FragmentTeachers extends Fragment {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				Log.d("text", "text now changed");
+		
 				if (s.length() != 0) {
 					gAdapter.setL(search(s.toString()), 1);
 					gAdapter.notifyDataSetChanged();
@@ -139,13 +140,13 @@ public class FragmentTeachers extends Fragment {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				Log.d("text", "before text now changed");
+			
 
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				Log.d("text", "after text now changed");
+			
 
 			}
 		});
@@ -289,17 +290,16 @@ public class FragmentTeachers extends Fragment {
 		@Override
 		public View getView(int pos, View view, ViewGroup viewGroup) {
 			View v = view;
-			final ImageView picture;
-			TextView name;
 
 			if (v == null) {
+				TeacherViewHolder viewHolder = new TeacherViewHolder();
 				v = inflater.inflate(R.layout.grid_textimg_item, viewGroup,
 						false);
-				v.setTag(R.id.picture, v.findViewById(R.id.picture));
-				v.setTag(R.id.text, v.findViewById(R.id.text));
+				viewHolder.name = (TextView) v.findViewById(R.id.text);
+				viewHolder.picture = (ImageView) v.findViewById(R.id.picture);
+				v.setTag(viewHolder);
 			}
-			picture = (ImageView) v.getTag(R.id.picture);
-			name = (TextView) v.getTag(R.id.text);
+			TeacherViewHolder viewHolder = (TeacherViewHolder) v.getTag();
 			final Teacher teacher = (Teacher) getItem(pos);
 			Target target = new Target() {
 				@Override
@@ -332,16 +332,21 @@ public class FragmentTeachers extends Fragment {
 			};
 			if (!teacher.isDownloadedImage()) {
 				Picasso.with(cxt).load(teacher.getImageUrl())
-						.error(R.drawable.ic_launcher).into(picture);
+						.error(R.drawable.ic_launcher).into(viewHolder.picture);
 				Picasso.with(cxt).load(teacher.getImageUrl()).into(target);
 			} else {
 				Picasso.with(cxt).load(new File(teacher.getImageLocalPath()))
-						.error(R.drawable.ic_launcher).into(picture);
+						.error(R.drawable.ic_launcher).into(viewHolder.picture);
 			}
-			name.setText(teacher.toString());
+			viewHolder.name.setText(teacher.toString());
 
 			return v;
 		}
+	}
+
+	static class TeacherViewHolder {
+		ImageView picture;
+		TextView name;
 	}
 
 	/**
@@ -419,7 +424,7 @@ public class FragmentTeachers extends Fragment {
 					JSONObject c = teachers.getJSONObject(i);
 					Teacher t = new Teacher(c.getString("fname"),
 							c.getString("lname"), c.getString("email"),
-							c.getString("id"), utilites.Role.getRole(
+							c.getString("id"), utils.Role.getRole(
 									Integer.valueOf(c.getString("position")))
 									.name(), c.getString("faculty"));
 					t.setDownloadedImage(false);

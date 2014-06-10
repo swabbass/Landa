@@ -5,17 +5,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import utilites.ConnectionDetector;
-import utilites.DBManager;
-import utilites.JSONParser;
+import utils.ConnectionDetector;
+import utils.DBManager;
+import utils.GCMUtils;
+import utils.JSONParser;
+import utils.Utilities;
 import ward.landa.AboutActivity;
 import ward.landa.Course;
 import ward.landa.CourseNotification;
-import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
-import ward.landa.ImageUtilities.UILTools;
 import ward.landa.fragments.FragmentCourses;
 import ward.landa.fragments.FragmentTeachers;
 import ward.landa.fragments.FragmentUpdates;
@@ -58,7 +58,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -86,7 +85,7 @@ public class MainActivity extends FragmentActivity implements
 	boolean isTutuors;
 	boolean isCourses;
 	String regKey;
-	utilites.DBManager db_mngr;
+	utils.DBManager db_mngr;
 	JSONParser jParser;
 	private registerGcm task;
 	ImageLoaderConfiguration config;
@@ -114,8 +113,6 @@ public class MainActivity extends FragmentActivity implements
 	protected void onStart() {
 		Log.e("Fragment", "Main Activity started");
 		connection_detector = new ConnectionDetector(getApplicationContext());
-
-		initlizeImageLoad();
 		initlizeDataBase();
 
 		loadRegsetrationData();
@@ -248,13 +245,6 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	// ------------------------------Initlizations --------------------\\
-	private void initlizeImageLoad() {
-		config = UILTools.initilizeImageLoader(UILTools.initlizeImageDisplay(
-				R.drawable.person, R.drawable.person, R.drawable.person),
-				getApplicationContext());
-		image_loader = UILTools.initlizeImageLoad(config,
-				getApplicationContext());
-	}
 
 	private void initlizeGCM() {
 		gcm = GoogleCloudMessaging.getInstance(this);
@@ -262,7 +252,7 @@ public class MainActivity extends FragmentActivity implements
 			if (connection_detector.isConnectingToInternet()) {
 				task = new registerGcm();
 				task.execute();
-				
+
 			}
 		}
 
@@ -686,7 +676,8 @@ public class MainActivity extends FragmentActivity implements
 		protected void onPostExecute(String result) {
 			if (isReg) {
 				saveRegstrationData(true, st);
-				Settings.saveSettings(getApplicationContext(), localLang, true, true);
+				Settings.saveSettings(getApplicationContext(), localLang, true,
+						true);
 			}
 			super.onPostExecute(result);
 		}

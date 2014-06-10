@@ -1,4 +1,4 @@
-package utilites;
+package utils;
 
 public enum Role {
 

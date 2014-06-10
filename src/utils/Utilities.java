@@ -1,4 +1,4 @@
-package ward.landa.activities;
+package utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,12 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
-import utilites.ConnectionDetector;
-import utilites.JSONParser;
-import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
+import ward.landa.activities.MainActivity;
+import ward.landa.activities.Settings;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -52,12 +51,22 @@ public class Utilities {
 	public static final String NEW_UPDATE = "new_Update";
 	private static final int notfyId = 12;
 
-	public static void saveDownloadOnceStatus(boolean b, final String key,
+	/**
+	 * Saving the download data once per key in the Shared Perfrences
+	 * 
+	 * @param value
+	 *            the vlaue
+	 * @param key
+	 *            the key GCMutils key
+	 * @param cxt
+	 *            Context
+	 */
+	public static void saveDownloadOnceStatus(boolean value, final String key,
 			Context cxt) {
 		SharedPreferences sh = cxt.getSharedPreferences(GCMUtils.DATA,
 				Activity.MODE_PRIVATE);
 		SharedPreferences.Editor ed = sh.edit();
-		ed.putBoolean(key, b);
+		ed.putBoolean(key, value);
 		ed.commit();
 
 	}
@@ -95,61 +104,67 @@ public class Utilities {
 		return outp;
 	}
 
-	public static String FetchTableTagHtml(String html) {
-		boolean intag = false;
-		String outp = null;
-		//List<Table> tables = getTableTags(html);
-		/*for(Table t : tables)
-		{
-			String remove=html.substring(t.firstTrStartIndex, t.firstTrEndIndex);
-			html=html.replace(remove, "");
-			tables=getTableTags(html);
-		}*/
-		int firstTrTag = html.indexOf("<tr");
-		int lastTrTag = html.indexOf("</tr>") + "</tr>".length();
-		String firstTr = null;
-		if (firstTrTag != -1 && lastTrTag != -1)
-			firstTr = html.substring(firstTrTag, lastTrTag);
-		if (firstTr != null)
-			outp = html.replace(firstTr, "");
+	/**
+	 * Removing first row in the table tag (names of columns)
+	 * 
+	 * @param html
+	 *            html to parse
+	 * @return html text without table if they were existed ,else the same text
+	 */
+	public static String removeTableFirstTrHtml(String html) {
+		String tmp = html;
+		List<Table> tables = getTableTags(tmp);
+		for (int i = 0; i < tables.size(); ++i) {
 
-		return outp;
-	}
-
-	private static List<Table> getTableTags(String html) {
-		List<Table> tabels = new ArrayList<Table>();
-		for (int i = 0; i < html.length(); ++i) {
-			char c = html.charAt(i);
-			if (c == '<') {
-				if (Table.TABLE_OPENER.length() + i - 1 < html.length()) {
-					int x = -1;
-					if (html.charAt(i + 1) == 't' && html.charAt(i + 2) == 'a'
-							&& html.charAt(i + 3) == 'b'
-							&& html.charAt(i + 4) == 'l'){
-						if ((x = html.indexOf(Table.TABLE_OPENER, i)) != -1) {
-							Table t = new Table();
-							t.startIndex = x;
-							t.endIndex = html.indexOf(Table.TABLE_CLOSER, i);
-							t.firstTrEndIndex = html
-									.indexOf(Table.TR_OPENER, i);
-							t.firstTrStartIndex = html.indexOf(Table.TR_CLOSER,
-									i);
-							tabels.add(t);
-						} else {
-							continue;
-						}
-				} else {
-					continue;
+			Table t = tables.get(i);
+			int firstTrTag = html.indexOf("<tr", t.startIndex);
+			int lastTrTag = html.indexOf("</tr>", t.startIndex)
+					+ "</tr>".length();
+			String firstTr = null;
+			if (firstTrTag != -1 && lastTrTag != -1)
+				firstTr = html.substring(firstTrTag, lastTrTag);
+			if (firstTr != null) {
+				String empty = "";
+				for (int j = 0; j < firstTr.length(); j++) {
+					empty += " ";
 				}
-				}
-				else{
-					break;
-				}
-			} else {
-				continue;
+				html = html.replace(firstTr, empty);
 			}
 		}
-		return tabels;
+		return html;
+	}
+
+	/**
+	 * getting list of tables in html text with Table objects
+	 * 
+	 * @param html
+	 *            html text to fetch data from
+	 * @return list of tables in the html
+	 */
+	private static List<Table> getTableTags(String html) {
+		int tableIndex = -1;
+		int count = 0;
+		List<Table> tables = new ArrayList<Utilities.Table>();
+		while ((tableIndex = html.indexOf(Table.TABLE_OPENER)) != -1) {
+			int tableCloserIndex = html.indexOf(Table.TABLE_CLOSER)
+					+ Table.TABLE_CLOSER.length();
+			if (tableCloserIndex != -1) {
+				count++;
+				Table t = new Table();
+				t.startIndex = tableIndex;
+				t.endIndex = tableCloserIndex;
+				String empty = "";
+				for (int i = 0; i < tableCloserIndex - tableIndex; i++) {
+					empty += " ";
+				}
+				t.firstTrStartIndex = html.indexOf(Table.TR_OPENER, tableIndex);
+				t.firstTrEndIndex = html.indexOf(Table.TR_CLOSER, tableIndex);
+				String str = html.substring(tableIndex, tableCloserIndex);
+				html = html.replace(str, empty);
+				tables.add(t);
+			}
+		}
+		return tables;
 	}
 
 	static class Table {
@@ -157,7 +172,13 @@ public class Utilities {
 		public static final String TABLE_CLOSER = "</table>";
 		public static final String TR_OPENER = "<tr";
 		public static final String TR_CLOSER = "</tr>";
+		/**
+		 * start index of the table tag start
+		 */
 		public int startIndex;
+		/**
+		 * the last index of the close table tag
+		 */
 		public int endIndex;
 		public int firstTrStartIndex;
 		public int firstTrEndIndex;

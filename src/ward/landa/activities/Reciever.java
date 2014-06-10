@@ -4,13 +4,14 @@ import java.util.Set;
 
 import org.jsoup.Jsoup;
 
-import utilites.DBManager;
+import utils.DBManager;
+import utils.GCMUtils;
+import utils.Utilities;
+import utils.Utilities.PostListener;
 import ward.landa.Course;
-import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
-import ward.landa.activities.Utilities.PostListener;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

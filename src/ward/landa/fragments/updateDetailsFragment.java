@@ -2,9 +2,9 @@ package ward.landa.fragments;
 
 import org.jsoup.examples.HtmlToPlainText;
 
+import utils.Utilities;
 import ward.landa.R;
 import ward.landa.Update;
-import ward.landa.activities.Utilities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -36,7 +36,7 @@ public class updateDetailsFragment extends Fragment {
 		String Cont=getArguments().getString("content");
 		subject.setText(u.getSubject());
 		dateTime.setText(u.getDateTime());
-		String tmp=Utilities.FetchTableTagHtml(u.getText());
+		String tmp=Utilities.removeTableFirstTrHtml(u.getText());
 		String jsob = Utilities.html2Text(tmp==null?u.getText():tmp);
 		content.setText(jsob);
 	}

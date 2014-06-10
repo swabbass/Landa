@@ -9,17 +9,18 @@ import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import utilites.ConnectionDetector;
-import utilites.DBManager;
-import utilites.JSONParser;
+
+import utils.ConnectionDetector;
+import utils.DBManager;
+import utils.GCMUtils;
+import utils.JSONParser;
+import utils.Utilities;
 import ward.landa.AboutActivity;
 import ward.landa.ExpandableTextView;
-import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Update;
 import ward.landa.activities.Settings;
 import ward.landa.activities.SettingsActivity;
-import ward.landa.activities.Utilities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,7 +33,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -86,45 +86,7 @@ public class FragmentUpdates extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
-		Log.d("Fragment", "on resume updates");
-
-		uR = new updateReciever();
-		IntentFilter intentFilter = new IntentFilter(
-				"com.google.android.c2dm.intent.RECEIVE");
-		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-		getActivity().registerReceiver(uR, intentFilter);
-
-		super.onResume();
-	}
-
-	@Override
-	public void onStop() {
-		Log.d("Fragment", "on stop updates");
-
-		super.onStop();
-	}
-
-	@Override
-	public void onStart() {
-
-		Log.d("Fragment", "on start updates");
-		super.onStart();
-	}
-
-	@Override
-	public void onPause() {
-		if (uR != null) {
-
-			getActivity().unregisterReceiver(uR);
-		}
-		Log.d("Fragment", "on pause updates");
-		super.onPause();
-	}
-
-	@Override
 	public void onAttach(Activity activity) {
-		Log.d("Fragment", "on attach updates");
 		try {
 			callBack = (updateCallback) activity;
 			setHasOptionsMenu(true);
@@ -135,6 +97,40 @@ public class FragmentUpdates extends Fragment {
 		}
 
 		super.onAttach(activity);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		root = inflater.inflate(R.layout.updates_frag_list, container, false);
+		initlizeFragment(root);
+		initlizeListners();
+		initlizeDataForFragment();
+		return root;
+	}
+
+	@Override
+	public void onResume() {
+		uR = new updateReciever();
+		IntentFilter intentFilter = new IntentFilter(
+				"com.google.android.c2dm.intent.RECEIVE");
+		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+		getActivity().registerReceiver(uR, intentFilter);
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	public void onPause() {
+		if (uR != null) {
+
+			getActivity().unregisterReceiver(uR);
+		}
+		super.onPause();
 	}
 
 	@Override
@@ -233,6 +229,12 @@ public class FragmentUpdates extends Fragment {
 
 				switch (item.getItemId()) {
 				case R.id.deleteUpdate:
+					for (Update u : uAdapter.getSelected()) {
+						updates.remove(u);
+						db_mngr.deleteUpdate(u);
+					}
+					Collections.sort(updates);
+					uAdapter.notifyDataSetChanged();
 					mode.finish();
 					break;
 				}
@@ -294,18 +296,6 @@ public class FragmentUpdates extends Fragment {
 		sc.setAbsListView(l);
 		l.setAdapter(sc);
 
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		Log.d("Fragment", "on create updates");
-		root = inflater.inflate(R.layout.updates_frag_list, container, false);
-		initlizeFragment(root);
-		initlizeListners();
-		initlizeDataForFragment();
-
-		return root;
 	}
 
 	/**
@@ -376,45 +366,36 @@ public class FragmentUpdates extends Fragment {
 				ViewGroup parent) {
 
 			View v = convertView;
-			TextView title;
-			TextView time;
-			ExpandableTextView subject;
 			final Update u = updates.get(position);
 			if (v == null) {
 				v = inflater.inflate(R.layout.updates_item, parent, false);
-				v.setTag(R.id.title_updateLable,
-						v.findViewById(R.id.title_updateLable));
-				v.setTag(R.id.contentTextBox,
-						v.findViewById(R.id.contentTextBox));
-				v.setTag(R.id.update_timeLable,
-						v.findViewById(R.id.update_timeLable));
-				v.setTag(R.id.pinImageView, v.findViewById(R.id.pinImageView));
-				v.setTag(R.id.popUpMenu, v.findViewById(R.id.popUpMenu));
+				UpdateViewHolder viewHolder = new UpdateViewHolder();
+				viewHolder.title = (TextView) v
+						.findViewById(R.id.title_updateLable);
+				viewHolder.subject = (ExpandableTextView) v
+						.findViewById(R.id.contentTextBox);
+				viewHolder.time = (TextView) v
+						.findViewById(R.id.update_timeLable);
+				viewHolder.pin = (ImageView) v.findViewById(R.id.pinImageView);
+				viewHolder.popUp = (ImageView) v.findViewById(R.id.popUpMenu);
+				v.setTag(viewHolder);
 
 			}
-			ImageView pin = (ImageView) v.getTag(R.id.pinImageView);
-			subject = (ExpandableTextView) v.getTag(R.id.contentTextBox);
-			title = (TextView) v.getTag(R.id.title_updateLable);
-			title.setText(u.getSubject());
-			String tmp = Utilities.FetchTableTagHtml(u.getText());
-			
-			String jsob = Utilities.html2Text(tmp==null?u.getText():tmp);
-			subject.setText(jsob);
-			time = (TextView) v.getTag(R.id.update_timeLable);
-			time.setText(u.getDateTime());
+			final UpdateViewHolder viewHolder = (UpdateViewHolder) v.getTag();
+			viewHolder.title.setText(u.getSubject());
+			viewHolder.subject.setText(u.getText());
+			viewHolder.time.setText(u.getDateTime());
 			if (u.isPinned()) {
-				pin.setVisibility(ImageView.VISIBLE);
+				viewHolder.pin.setVisibility(ImageView.VISIBLE);
 			} else {
-				pin.setVisibility(ImageView.INVISIBLE);
+				viewHolder.pin.setVisibility(ImageView.INVISIBLE);
 			}
-			final ImageView popUp = (ImageView) v.getTag(R.id.popUpMenu);
-
-			popUp.setOnClickListener(new OnClickListener() {
+			viewHolder.popUp.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					boolean popUpStatus = showPopUpWindow(popUp, u, position,
-							u.isPopUpOpend());
+					boolean popUpStatus = showPopUpWindow(viewHolder.popUp, u,
+							position, u.isPopUpOpend());
 					u.setPopUpOpend(popUpStatus);
 				}
 			});
@@ -510,6 +491,14 @@ public class FragmentUpdates extends Fragment {
 			return false;
 		}
 
+		/**
+		 * toggling that the given update is selected or not
+		 * 
+		 * @param u
+		 *            selected update
+		 * @param isSelected
+		 *            true if selected ,false otherwise
+		 */
 		public void toggleSelection(Update u, boolean isSelected) {
 
 			if (isSelected) {
@@ -523,10 +512,28 @@ public class FragmentUpdates extends Fragment {
 			}
 		}
 
+		/**
+		 * 
+		 * @return all selected items from the list view
+		 */
 		public List<Update> getSelected() {
 			return this.selected_items;
 		}
 
+	}
+
+	/**
+	 * A Class that holds the Views for the list view adapter
+	 * 
+	 * @author wabbass
+	 * 
+	 */
+	static class UpdateViewHolder {
+		TextView title;
+		TextView time;
+		ExpandableTextView subject;
+		ImageView pin;
+		ImageView popUp;
 	}
 
 	/**

@@ -1,38 +1,27 @@
 package ward.landa.fragments;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import utilites.DBManager;
+import utils.DBManager;
 import ward.landa.Course;
 import ward.landa.R;
-import ward.landa.R.string;
 import ward.landa.Teacher;
 import ward.landa.ImageUtilities.CircleImageView;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
@@ -41,15 +30,6 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingRightInAnimationAdapter;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
-import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.squareup.picasso.Picasso;
 
 public class CourseFragment extends Fragment {
@@ -61,7 +41,6 @@ public class CourseFragment extends Fragment {
 	ExpandableListAdapter exAdapter;
 	int courseID;
 	int imgId;
-
 	String courseName;
 	String courseDesription;
 	TextView courseNameLable;
@@ -176,7 +155,7 @@ public class CourseFragment extends Fragment {
 		private HashMap<String, List<String>> _listTimes;
 		private LayoutInflater inflater;
 		private AlarmCallBack listner;
-
+		
 		public ExpandableListAdapter(Context context, List<Teacher> teachers,
 				HashMap<String, List<String>> listTimes, AlarmCallBack lister) {
 			this._context = context;

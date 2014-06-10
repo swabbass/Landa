@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter.CountDownFormatter;
 
-import utilites.DBManager;
+import utils.DBManager;
 import ward.landa.Course;
 import ward.landa.CourseNotification;
 import ward.landa.R;

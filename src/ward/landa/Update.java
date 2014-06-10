@@ -10,7 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 
-import ward.landa.activities.Utilities;
+import utils.Utilities;
 
 import android.text.Html;
 
@@ -28,6 +28,7 @@ public class Update implements Serializable, Comparable<Update> {
 	private String urlToJason;
 	private boolean pinned;
 	private boolean popUpOpend;
+
 	public Update(String subject, String dateTime, String text) {
 		setSubject(subject);
 		setDateTime(dateTime);
@@ -65,13 +66,14 @@ public class Update implements Serializable, Comparable<Update> {
 		return text;
 	}
 
-
 	public boolean isToobig() {
 		return text.length() > 300;
 	}
 
 	public void setText(String text) {
-		this.text =text;
+		String tmp = Utilities.removeTableFirstTrHtml(text);
+		tmp=Utilities.html2Text(tmp == null ? text : tmp);
+		this.text =tmp ;
 
 		// Html.fromHtml(text).toString();
 	}

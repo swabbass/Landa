@@ -1,4 +1,4 @@
-package ward.landa;
+package ward.landa.ImageUtilities;
 
 import android.content.Context;
 import android.util.AttributeSet;

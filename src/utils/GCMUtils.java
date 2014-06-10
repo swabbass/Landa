@@ -1,4 +1,4 @@
-package ward.landa;
+package utils;
 
 import java.io.IOException;
 
@@ -9,9 +9,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import utilites.DBManager;
+import ward.landa.Course;
+import ward.landa.R;
+import ward.landa.Teacher;
+import ward.landa.R.string;
 import ward.landa.activities.Settings;
-import ward.landa.activities.Utilities;
 
 import android.content.Context;
 import android.content.Intent;

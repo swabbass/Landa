@@ -1,4 +1,4 @@
-package utilites;
+package utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBManager {
-	public static final String DB_NAME = "db_LANDA";// ׳”׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳“
+	public static final String DB_NAME = "db_LANDA";// ׳�?׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳�?
 													// ׳©׳�
-	public static final int DB_VER = 12;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
+	public static final int DB_VER = 12;// ׳�?׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳�?׳’׳¨׳¡׳�?
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -615,11 +615,11 @@ public class DBManager {
  * 
  */
 class dbTeacher {
-	public static final String TEACHERS_TABLE = "Teachers";// ׳”׳˜׳‘׳�׳” ׳©׳�
+	public static final String TEACHERS_TABLE = "Teachers";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
 	public static final String UID = "id";
 	public static final String ID_NUMBER = "id_number";
 	public static final String FIRST_NAME = "first_name";//
-	public static final String LAST_NAME = "last_name";// ׳”׳˜׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
+	public static final String LAST_NAME = "last_name";// ׳�?׳�?׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String EMAIL = "email";
 	public static final String FACULTY = "faculty";
 	public static final String IMAGE_URL = "image_url";
@@ -678,13 +678,13 @@ class dbCourse {
  * 
  */
 class dbUpdate {
-	public static final String UPDATES_TABLE = "updates";// ׳”׳˜׳‘׳�׳” ׳©׳�
+	public static final String UPDATES_TABLE = "updates";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
 	public static final String UID = "id";
 	public static final String UPDATE_ID = "subject_id";
 	public static final String UPDATE_SUBJECT = "subject";
-	public static final String UPDATE_CONTENT = "content";// ׳”׳�׳©׳™׳�׳” ׳©׳�
-	public static final String UPDATE_PINNED = "pinned"; // ׳”׳˜׳§׳¡׳˜
-	public static final String UPDATE_DATE = "date";// ׳”׳˜׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
+	public static final String UPDATE_CONTENT = "content";// ׳�?׳�׳©׳™׳�׳�? ׳©׳�
+	public static final String UPDATE_PINNED = "pinned"; // ׳�?׳�?׳§׳¡׳�?
+	public static final String UPDATE_DATE = "date";// ׳�?׳�?׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String UPDATE_URL = "url";
 	public final static String CREATE = "create table " + UPDATES_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + UPDATE_ID

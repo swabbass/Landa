@@ -3,22 +3,19 @@ package ward.landa.fragments;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import utilites.ConnectionDetector;
-import utilites.DBManager;
-import utilites.JSONParser;
+import utils.ConnectionDetector;
+import utils.DBManager;
+import utils.GCMUtils;
+import utils.JSONParser;
+import utils.Utilities;
 import ward.landa.Course;
-import ward.landa.GCMUtils;
 import ward.landa.R;
-import ward.landa.ImageUtilities.BitmapUtils;
-import ward.landa.ImageUtilities.UILTools;
 import ward.landa.activities.Settings;
-import ward.landa.activities.Utilities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -52,10 +49,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.squareup.picasso.Picasso;
@@ -280,7 +273,6 @@ public class FragmentCourses extends Fragment {
 		LayoutInflater inflater = null;
 		Context cxt = null;
 		Resources res;
-		BitmapUtils bmpUtils;
 		int searched;
 
 		public void setCourses(List<Course> courses, int search) {
@@ -296,7 +288,6 @@ public class FragmentCourses extends Fragment {
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			this.res = res;
 			this.searched = search;
-			this.bmpUtils = new BitmapUtils(cxt);
 
 		}
 
@@ -322,30 +313,27 @@ public class FragmentCourses extends Fragment {
 		public View getView(int position, View view, ViewGroup parent) {
 
 			View v = view;
-			final ImageView picture;
-			TextView name;
-			ImageView alarm;
+
 			final Course c = (Course) getItem(position);
 			if (v == null) {
+				CourseViewHolder viewHolder = new CourseViewHolder();
 				v = inflater.inflate(R.layout.course_item_grid, parent, false);
-				v.setTag(R.id.list_image, v.findViewById(R.id.list_image));
-				v.setTag(R.id.title, v.findViewById(R.id.title));
-				v.setTag(R.id.alarm_course_image_view,
-						v.findViewById(R.id.alarm_course_image_view));
+				viewHolder.picture = (ImageView) v
+						.findViewById(R.id.list_image);
+				viewHolder.name = (TextView)v.findViewById(R.id.title);
+				viewHolder.alarm = (ImageView) v
+						.findViewById(R.id.alarm_course_image_view);
+				v.setTag(viewHolder);
 			}
-			picture = (ImageView) v.getTag(R.id.list_image);
-			ImageAware image = new ImageViewAware(picture, false);
-			name = (TextView) v.getTag(R.id.title);
-			alarm = (ImageView) v.getTag(R.id.alarm_course_image_view);
+			CourseViewHolder viewHolder = (CourseViewHolder) v.getTag();
 			if (c.getNotify() == 0) {
-				alarm.setVisibility(ImageView.INVISIBLE);
+				viewHolder.alarm.setVisibility(ImageView.INVISIBLE);
 			} else if (c.getNotify() == 1) {
-				alarm.setVisibility(ImageView.VISIBLE);
+				viewHolder.alarm.setVisibility(ImageView.VISIBLE);
 			}
 			Target target = new Target() {
 				@Override
 				public void onBitmapFailed(Drawable arg0) {
-					// TODO Auto-generated method stub
 					c.setDownloadedImage(false);
 				}
 
@@ -365,24 +353,29 @@ public class FragmentCourses extends Fragment {
 
 				@Override
 				public void onPrepareLoad(Drawable arg0) {
-					// TODO Auto-generated method stub
 
 				}
 
 			};
 			if (!c.isDownloadedImage()) {
 				Picasso.with(cxt).load(c.getImageUrl())
-						.error(R.drawable.ic_launcher).into(picture);
+						.error(R.drawable.ic_launcher).into(viewHolder.picture);
 				Picasso.with(cxt).load(c.getImageUrl()).into(target);
 			} else {
 				Picasso.with(cxt).load(new File(c.getImagePath()))
-						.error(R.drawable.ic_launcher).into(picture);
+						.error(R.drawable.ic_launcher).into(viewHolder.picture);
 			}
 
-			name.setText(c.getName());
+			viewHolder.name.setText(c.getName());
 			return v;
 		}
 
+	}
+
+	static class CourseViewHolder {
+		ImageView picture;
+		TextView name;
+		ImageView alarm;
 	}
 
 	/**
