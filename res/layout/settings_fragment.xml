@@ -14,7 +14,7 @@
         android:textColor="#0082f7"
         android:textSize="18sp" />
 
-    <CheckBox
+    <Switch
         android:id="@+id/workshopChkBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         android:textColor="#e0e0e0"
         android:textSize="18sp" />
 
-    <CheckBox
+    <Switch
         android:id="@+id/UpdatecheckBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,6 +51,7 @@
         android:id="@+id/languageChoice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="2"
         android:checkedButton="@+id/radioHE"
         android:orientation="horizontal"
         android:weightSum="3" >
@@ -70,14 +71,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Ar"
-            android:textColor="#e0e0e0" />
-
-        <RadioButton
-            android:id="@+id/radioEn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="En"
             android:textColor="#e0e0e0" />
 
     </RadioGroup>

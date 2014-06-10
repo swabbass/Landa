@@ -4,6 +4,7 @@ import org.jsoup.examples.HtmlToPlainText;
 
 import ward.landa.R;
 import ward.landa.Update;
+import ward.landa.activities.Utilities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -35,6 +36,8 @@ public class updateDetailsFragment extends Fragment {
 		String Cont=getArguments().getString("content");
 		subject.setText(u.getSubject());
 		dateTime.setText(u.getDateTime());
-		content.setText(Html.fromHtml(u.getText()).toString());
+		String tmp=Utilities.FetchTableTagHtml(u.getText());
+		String jsob = Utilities.html2Text(tmp==null?u.getText():tmp);
+		content.setText(jsob);
 	}
 }

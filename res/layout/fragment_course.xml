@@ -22,10 +22,7 @@
         android:childDivider="?android:attr/listDivider"
         android:divider="?android:attr/listDivider"
         android:dividerHeight="1dp"
-       
-        
-        >
-	
+        android:groupIndicator="@null" >
     </ExpandableListView>
 
     <ImageView

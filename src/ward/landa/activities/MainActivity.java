@@ -101,9 +101,10 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		forceRTLIfSupported();
-		setContentView(R.layout.activity_main);
 
+		setContentView(R.layout.activity_main);
+		loadSettings();
+		forceRTLIfSupported();
 		jParser = new JSONParser();
 		alarm = new Reciever();
 
@@ -116,7 +117,7 @@ public class MainActivity extends FragmentActivity implements
 
 		initlizeImageLoad();
 		initlizeDataBase();
-		loadSettings();
+
 		loadRegsetrationData();
 		setLocalLang();
 		setTitle(R.string.app_name);
@@ -125,26 +126,24 @@ public class MainActivity extends FragmentActivity implements
 			initlizeDrawerNavigation();
 		else {
 			initlizeSpinner();
+			ListView l = (ListView) findViewById(R.id.left_drawer);
+			l.setVisibility(DrawerLayout.GONE);
 		}
 		overridePendingTransition(android.R.anim.fade_in,
 				android.R.anim.fade_out);
 		initlizePager();
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		String msg = "First time ?! You will have to connect to internet in order to use Landa application";
-		String notFirstTome = "You have no internet connection ,connect to internet to get last updates and information!";
 		if (connection_detector.isConnectingToInternet())
 			initlizeGCM();
 		else {
-			Toast.makeText(getApplicationContext(), isReg ? notFirstTome : msg,
-					Toast.LENGTH_LONG).show();
-			showDialogNoconnection((!isReg||!isCourses||!isTutuors)?true:false);
+			showDialogNoconnection((!isReg || !isCourses || !isTutuors) ? true
+					: false);
 		}
 		super.onStart();
 	}
 
 	@Override
 	protected void onResume() {
-
 		int savedPos = getSharedPreferences("Position", MODE_PRIVATE).getInt(
 				"viewPager", -1);
 		if (savedPos != -1) {
@@ -157,7 +156,6 @@ public class MainActivity extends FragmentActivity implements
 	protected void onPause() {
 		Log.e("Fragment", "Main Activity paused");
 		SharedPreferences shP = getSharedPreferences("Position", MODE_PRIVATE);
-
 		SharedPreferences.Editor ed = shP.edit();
 		ed.putInt("viewPager", mViewPager.getCurrentItem());
 		ed.commit();
@@ -167,12 +165,6 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onStop() {
 		Log.e("Fragment", "Main Activity stopped");
-		/*
-		 * SharedPreferences shP=getSharedPreferences("Position", MODE_PRIVATE);
-		 * 
-		 * SharedPreferences.Editor ed=shP.edit(); // ed.putInt("viewPager",-1);
-		 * ed.commit();
-		 */
 		super.onStop();
 	}
 
@@ -270,6 +262,7 @@ public class MainActivity extends FragmentActivity implements
 			if (connection_detector.isConnectingToInternet()) {
 				task = new registerGcm();
 				task.execute();
+				
 			}
 		}
 
@@ -328,7 +321,8 @@ public class MainActivity extends FragmentActivity implements
 				R.string.settings), R.drawable.ic_action_settings,
 				FragmentTypes.SETTINGS));
 		items.add(new DrawerSubSectionItem(getResources().getString(
-				R.string.about), R.drawable.ic_action_about, FragmentTypes.ABOUT));
+				R.string.about), R.drawable.ic_action_about,
+				FragmentTypes.ABOUT));
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		draweList = (ListView) findViewById(R.id.left_drawer);
 		draweAdapter dAdapter = new draweAdapter(getApplicationContext());
@@ -412,8 +406,8 @@ public class MainActivity extends FragmentActivity implements
 			startActivity(i);
 			break;
 		case 4:
-			 Intent s = new Intent(this, AboutActivity.class);
-			  startActivity(s);	 
+			Intent s = new Intent(this, AboutActivity.class);
+			startActivity(s);
 			break;
 		}
 		return true;
@@ -692,6 +686,7 @@ public class MainActivity extends FragmentActivity implements
 		protected void onPostExecute(String result) {
 			if (isReg) {
 				saveRegstrationData(true, st);
+				Settings.saveSettings(getApplicationContext(), localLang, true, true);
 			}
 			super.onPostExecute(result);
 		}
@@ -848,10 +843,12 @@ public class MainActivity extends FragmentActivity implements
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 	private void forceRTLIfSupported() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			getWindow().getDecorView().setLayoutDirection(
-					View.LAYOUT_DIRECTION_RTL);
+			if (!Settings.getLocalLang().equals(Settings.ENGLISH))
+				getWindow().getDecorView().setLayoutDirection(
+						View.LAYOUT_DIRECTION_RTL);
 			rtlSupported = true;
 		} else {
+
 			rtlSupported = false;
 		}
 	}
@@ -860,8 +857,8 @@ public class MainActivity extends FragmentActivity implements
 		SharedPreferences sh = getSharedPreferences(GCMUtils.DATA,
 				Activity.MODE_PRIVATE);
 		isReg = sh.getBoolean(GCMUtils.REGSITER, false);
-		isTutuors=sh.getBoolean(GCMUtils.LOAD_COURSES, false);
-		isCourses=sh.getBoolean(GCMUtils.LOAD_TEACHERS, false);
+		isTutuors = sh.getBoolean(GCMUtils.LOAD_COURSES, false);
+		isCourses = sh.getBoolean(GCMUtils.LOAD_TEACHERS, false);
 		regKey = sh.getString(GCMUtils.REG_KEY, null);
 
 	}
@@ -937,7 +934,7 @@ public class MainActivity extends FragmentActivity implements
 									initlizeGCM();
 									initlizePager();
 
-								} else if (!isReg||!isTutuors||!isCourses) {
+								} else if (!isReg || !isTutuors || !isCourses) {
 									finish();
 								}
 

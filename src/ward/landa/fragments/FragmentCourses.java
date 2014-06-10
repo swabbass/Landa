@@ -83,7 +83,6 @@ public class FragmentCourses extends Fragment {
 	public JSONParser jParser;
 	reciever corseRsvr;
 	ConnectionDetector connectionDetector;
-	private static ImageLoader imageLoader;
 
 	@Override
 	public void onStop() {
@@ -165,6 +164,13 @@ public class FragmentCourses extends Fragment {
 		super.onAttach(activity);
 	}
 
+	/**
+	 * showing dialog of no connection and handles the states if its first time
+	 * then close else offline mood working the data base information
+	 * 
+	 * @param isfirst
+	 *            true first time ,false otherwise
+	 */
 	private void showDialogNoconnection(boolean isfirst) {
 		new AlertDialog.Builder(getActivity())
 				.setCancelable(false)
@@ -192,6 +198,9 @@ public class FragmentCourses extends Fragment {
 						}).show();
 	}
 
+	/**
+	 * loading the Courses from data base and attach the adapter to the gridview
+	 */
 	private void loadFromDataBase() {
 		courses = null;
 		courses = db_mngr.getCursorAllWithCourses();
@@ -210,10 +219,6 @@ public class FragmentCourses extends Fragment {
 
 		root = inflater.inflate(R.layout.courses_frag_grid, container, false);
 		g = (GridView) root.findViewById(R.id.gridviewcourses);
-		imageLoader = UILTools.initlizeImageLoad(UILTools.initilizeImageLoader(
-				UILTools.initlizeImageDisplay(R.drawable.ic_launcher,
-						R.drawable.ic_launcher, R.drawable.ic_launcher),
-				getActivity()), getActivity());
 
 		connectionDetector = new ConnectionDetector(getActivity());
 		jParser = new JSONParser();
@@ -226,10 +231,10 @@ public class FragmentCourses extends Fragment {
 		boolean isConnected = connectionDetector.isConnectingToInternet();
 		if (!loadFromDb && isConnected) {
 			new loadDataFromBackend().execute();
-		} else if(loadFromDb) {
+		} else if (loadFromDb) {
 			loadFromDataBase();
 
-		} 
+		}
 
 		g.setOnItemClickListener(new OnItemClickListener() {
 
@@ -246,6 +251,13 @@ public class FragmentCourses extends Fragment {
 		return root;
 	}
 
+	/**
+	 * Searching for course name withen the courses
+	 * 
+	 * @param st
+	 *            Course name (string to search or sub string )
+	 * @return List<Course> that matches the search
+	 */
 	public List<Course> search(String st) {
 		searced.clear();
 		for (Course c : courses) {
@@ -256,6 +268,12 @@ public class FragmentCourses extends Fragment {
 		return searced;
 	}
 
+	/**
+	 * Handles the gridview items and inflate them
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	static class coursesAdapter extends BaseAdapter {
 
 		List<Course> courses;
@@ -367,6 +385,14 @@ public class FragmentCourses extends Fragment {
 
 	}
 
+	/**
+	 * fetching data from back end for the first time when fetching fails due to
+	 * connectivity failuer then resting the data base and the settings so the
+	 * next time launch the app as first time
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	class loadDataFromBackend extends AsyncTask<String, String, String> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		boolean allOk = false;
@@ -417,12 +443,12 @@ public class FragmentCourses extends Fragment {
 					toSave.add(tmp);
 				}
 				if (connectionDetector.isConnectingToInternet())
-				allOk = true;
+					allOk = true;
 			} catch (JSONException e) {
 				Log.e(GCMUtils.TAG, e.toString());
 				if (!connectionDetector.isConnectingToInternet()) {
 					Log.e(GCMUtils.TAG, "faild no internet ");
-				
+
 				}
 
 				return "";
@@ -434,7 +460,8 @@ public class FragmentCourses extends Fragment {
 		protected void onPostExecute(String result) {
 			pDialog.dismiss();
 			if (allOk) {
-				saveLoadedCoursesState(true);
+				Utilities.saveDownloadOnceStatus(true, GCMUtils.LOAD_COURSES,
+						getActivity());
 
 				for (Course c : toSave) {
 					db_mngr.insertCourse(c);
@@ -450,7 +477,17 @@ public class FragmentCourses extends Fragment {
 				g.setAdapter(sb);
 
 			} else {
+				/*
+				 * failing to fetch data from back end then reset the data base
+				 * and the settings to launch as first time for the next launch
+				 */
 				db_mngr.clearDb();
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_TEACHERS,
+						getActivity());
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_UPDATES,
+						getActivity());
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_COURSES,
+						getActivity());
 				showDialogNoconnection(!loadFromDb);
 			}
 			super.onPostExecute(result);
@@ -458,6 +495,13 @@ public class FragmentCourses extends Fragment {
 
 	}
 
+	/**
+	 * Handles Messages that sent from back end adding,Updating,deleting
+	 * Workshop and notifiying the user about that
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	class reciever extends BroadcastReceiver {
 
 		@Override
@@ -484,15 +528,6 @@ public class FragmentCourses extends Fragment {
 			}
 
 		}
-
-	}
-
-	public void saveLoadedCoursesState(boolean b) {
-		SharedPreferences sh = getActivity().getSharedPreferences(
-				GCMUtils.DATA, Activity.MODE_PRIVATE);
-		SharedPreferences.Editor ed = sh.edit();
-		ed.putBoolean(GCMUtils.LOAD_COURSES, b);
-		ed.commit();
 
 	}
 

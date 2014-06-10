@@ -10,6 +10,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import utilites.DBManager;
+import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
 
 import android.content.Context;
@@ -53,6 +54,7 @@ public class GCMUtils {
 			DBManager dbmngr, Intent intent)
 
 	{
+		Settings.initlizeSettings(cxt);
 		Teacher tmp = new Teacher(intent.getStringExtra("fname"),
 				intent.getStringExtra("lname"),
 				intent.getStringExtra("email"),
@@ -62,13 +64,15 @@ public class GCMUtils {
 			if (dbmngr.getTeacherByIdNumber(tmp.getId_number()) == null) {
 				tmp.setDownloadedImage(false);
 				dbmngr.insertTeacher(tmp);
-				Utilities.showNotification(cxt, "new Teacher", tmp.getName()
+				if(Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt,  cxt.getResources().getString(R.string.TeacherAdded), tmp.getName()
 						+ " " + tmp.getLast_name());
 
 			} else {
 
 				dbmngr.updateTeacher(tmp);
-				Utilities.showNotification(cxt, "Teacher Updated",
+				if(Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt,  cxt.getResources().getString(R.string.TeacherUpdated),
 						tmp.getName() + " " + tmp.getLast_name());
 			}
 
@@ -76,13 +80,14 @@ public class GCMUtils {
 		{
 			
 			dbmngr.deleteTeacher(tmp);
-			Utilities.showNotification(cxt, "Teacher Deleted", tmp.getName()+" "+tmp.getLast_name());
+			Utilities.showNotification(cxt,  cxt.getResources().getString(R.string.TeacherDeleted), tmp.getName()+" "+tmp.getLast_name());
 		}
 		return tmp;
 	}
 	public static Course HandleWorkshop(String action, Context cxt,
 			DBManager dbmngr, Intent intent)
 	{
+		Settings.initlizeSettings(cxt);
 		Course cTmp=new Course(intent.getStringExtra("subject_name")
 				, intent.getStringExtra("day"),
 				intent.getStringExtra("time_from"), 
@@ -94,12 +99,14 @@ public class GCMUtils {
 			if(dbmngr.getCourseById(Integer.toString(cTmp.getCourseID()))==null)
 			{
 				dbmngr.insertCourse(cTmp);
-				Utilities.showNotification(cxt, "Course Added",
+				if(Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt,  cxt.getResources().getString(R.string.CourseAdded),
 						cTmp.getName() + " ");
 			}
 			else{
 				dbmngr.UpdateCourse(cTmp, 0);
-				Utilities.showNotification(cxt, "Course Updated",
+				if(Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt,  cxt.getResources().getString(R.string.CourseUpdated),
 						cTmp.getName() + " ");
 			}
 		}
@@ -107,7 +114,8 @@ public class GCMUtils {
 		{
 			if(dbmngr.deleteCourse(cTmp))
 			{
-				Utilities.showNotification(cxt, "Course Removed",
+				if(Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt, cxt.getResources().getString(R.string.CourseDeleted),
 						cTmp.getName() + " ");
 			}
 		}

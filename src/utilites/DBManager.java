@@ -17,7 +17,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBManager {
 	public static final String DB_NAME = "db_LANDA";// ׳”׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳“
 													// ׳©׳�
-	public static final int DB_VER = 11;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
+	public static final int DB_VER = 12;// ׳”׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳”׳’׳¨׳¡׳”
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -62,6 +62,11 @@ public class DBManager {
 
 	}
 
+	/**
+	 * Adding teacher to data base 
+	 * @param teacher Given teacher to add 
+	 * @return UID in the data base ,-1 if not added 
+	 */
 	public long insertTeacher(Teacher teacher) {
 		SQLiteDatabase teacher_db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -80,6 +85,11 @@ public class DBManager {
 		return id;
 	}
 
+	/**
+	 * Adding update to data base 
+	 * @param update Given update to add 
+	 * @return UID in the data base ,-1 if not added 
+	 */
 	public long insertUpdate(Update update) {
 		SQLiteDatabase updated_db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -88,11 +98,17 @@ public class DBManager {
 		values.put(dbUpdate.UPDATE_CONTENT, update.getText());
 		values.put(dbUpdate.UPDATE_DATE, update.getDateTime());
 		values.put(dbUpdate.UPDATE_URL, update.getUrl());
+		values.put(dbUpdate.UPDATE_PINNED, Boolean.toString(update.isPinned()));
 		long id = updated_db.insert(dbUpdate.UPDATES_TABLE, null, values);
 		updated_db.close();
 		return id;
 	}
 
+	/**
+	 * Adding course to data base 
+	 * @param course Given course to add 
+	 * @return UID in the data base ,-1 if not added 
+	 */
 	public long insertCourse(Course course) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -111,6 +127,12 @@ public class DBManager {
 		return id;
 	}
 
+	/**
+	 * Update course in db with given course
+	 * @param course Updated course to update in the data base 
+	 * @param notify 1 enable notificatins for this course else 0
+	 * @return 
+	 */
 	public boolean UpdateCourse(Course course, int notify) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -134,10 +156,17 @@ public class DBManager {
 				null) > 0;
 		// TODO add isdownload image and save the image and when update course
 		// update for all subjects
-		
+
 		db.close();
-		return res ;
+		return res;
 	}
+
+	/**
+	 * update thet the given course notification status by notifiy
+	 * @param course  course to update 
+	 * @param notify 1 enable notificatins for this course else 0
+	 * @return  success true ,false otherwise
+	 */
 	public boolean UpdateCourseNotification(Course course, int notify) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -150,10 +179,17 @@ public class DBManager {
 				null) > 0;
 		// TODO add isdownload image and save the image and when update course
 		// update for all subjects
-		
+
 		db.close();
-		return res ;
+		return res;
 	}
+
+	/**
+	 * update image status for Course in db 
+	 * @param course Course to update
+	 * @param downloaded true downlaoded ,false otherwise 
+	 * @return  success true ,false otherwise
+	 */
 	public boolean UpdateCourseImageDownloaded(Course course, boolean downloaded) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -166,27 +202,37 @@ public class DBManager {
 				null) > 0;
 		// TODO add isdownload image and save the image and when update course
 		// update for all subjects
-		
+
 		db.close();
-		return res ;
+		return res;
 	}
 
-	public boolean UpdateTeacherImageDownloaded(Teacher teacher, boolean downloaded) {
+	/**
+	 * update image status for teacher in db 
+	 * @param teacher teacher to update
+	 * @param downloaded true downlaoded ,false otherwise 
+	 * @return  success true ,false otherwise
+	 */
+	public boolean UpdateTeacherImageDownloaded(Teacher teacher,
+			boolean downloaded) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(dbTeacher.DOWNLOADED_IMAGE, Boolean.toString(downloaded));
-		boolean res = db.update(
-				dbTeacher.TEACHERS_TABLE,
-				values,
+		boolean res = db.update(dbTeacher.TEACHERS_TABLE, values,
 				dbTeacher.ID_NUMBER + " = "
-						+ getSQLText(teacher.getId_number()),
-				null) > 0;
+						+ getSQLText(teacher.getId_number()), null) > 0;
 		// TODO add isdownload image and save the image and when update course
 		// update for all subjects
-		
+
 		db.close();
-		return res ;
+		return res;
 	}
+
+	/**
+	 *  update teacher info in db
+	 * @param teacher updated teacher
+	 * @return  success true ,false otherwise
+	 */
 	public boolean updateTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -206,6 +252,11 @@ public class DBManager {
 		return res;
 	}
 
+	/**
+	 * Update update in the db 
+	 * @param update Updated update 
+	 * @return  success true ,false otherwise
+	 */
 	public boolean updateUpdate(Update update) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -213,6 +264,7 @@ public class DBManager {
 		values.put(dbUpdate.UPDATE_CONTENT, update.getText());
 		values.put(dbUpdate.UPDATE_DATE, update.getDateTime());
 		values.put(dbUpdate.UPDATE_URL, update.getUrl());
+		values.put(dbUpdate.UPDATE_PINNED, Boolean.toString(update.isPinned()));
 		boolean res = database.update(dbUpdate.UPDATES_TABLE, values,
 				dbUpdate.UPDATE_ID + " = " + getSQLText(update.getUpdate_id()),
 				null) > 0;
@@ -220,6 +272,11 @@ public class DBManager {
 		return res;
 	}
 
+	/**
+	 * deletes teacher in the db 
+	 * @param  teacher to delete
+	 * @return  success true ,false otherwise
+	 */
 	public boolean deleteTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		boolean b = database.delete(dbTeacher.TEACHERS_TABLE,
@@ -229,6 +286,11 @@ public class DBManager {
 		return b;
 	}
 
+	/**
+	 * deletes course from db 
+	 * @param course course to delte 
+	 * @return success true ,false otherwise
+	 */
 	public boolean deleteCourse(Course course) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		boolean b = database.delete(dbCourse.COURSE_TABLE, dbCourse.COURSE_ID
@@ -238,6 +300,11 @@ public class DBManager {
 		return b;
 	}
 
+	/**
+	 * deletes update from db 
+	 * @param update update to delete
+	 * @return success true ,false otherwise
+	 */
 	public boolean deleteUpdate(Update update) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		boolean b = database.delete(dbUpdate.UPDATES_TABLE, dbUpdate.UPDATE_ID
@@ -246,21 +313,36 @@ public class DBManager {
 		return b;
 	}
 
-	public boolean clearDb()
-	{
+	/**
+	 * resetting the data base deleting all the data 
+	 * @return true resetting success ,otherwise false
+	 */
+	public boolean clearDb() {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		boolean b = database.delete(dbUpdate.UPDATES_TABLE, null, null) > 0;
 		boolean b1 = database.delete(dbCourse.COURSE_TABLE, null, null) > 0;
 		boolean b2 = database.delete(dbTeacher.TEACHERS_TABLE, null, null) > 0;
 		database.close();
-		return b&&b1&&b2;
+		return b && b1 && b2;
 	}
+
+	/**
+	 * adding ' char inorder to handle sql text with comparison
+	 *  example : hane => 'hane'
+	 * @param text text to add 
+	 * @return string well formatted for sql query 
+	 */
 	public String getSQLText(String text) {
 		char c = 34;
 		Character ch = Character.valueOf(c);
 		return ch.toString() + text + ch.toString();
 	}
 
+	/**
+	 * gets all notified courses that user wanted to be notified
+	 * 
+	 * @return list of notified courses from db
+	 */
 	public List<Course> getAllNotifiedCourses() {
 		Cursor cursor;
 
@@ -285,6 +367,11 @@ public class DBManager {
 		return result;
 	}
 
+	/**
+	 * Gets list of teachers from db
+	 * 
+	 * @return list of teachers from db
+	 */
 	public List<Teacher> getCursorAllTeachers() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -317,19 +404,26 @@ public class DBManager {
 		return res;
 	}
 
+	/**
+	 * Get all updates from db
+	 * 
+	 * @return list f updates
+	 */
 	public List<Update> getCursorAllUpdates() {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(dbUpdate.UPDATES_TABLE, new String[] {
 				dbUpdate.UPDATE_ID, dbUpdate.UPDATE_SUBJECT,
 				dbUpdate.UPDATE_CONTENT, dbUpdate.UPDATE_DATE,
-				dbUpdate.UPDATE_URL }, null, null, null, null,
-				dbUpdate.UPDATE_DATE + " DESC");
+				dbUpdate.UPDATE_URL, dbUpdate.UPDATE_PINNED }, null, null,
+				null, null, dbUpdate.UPDATE_DATE + " DESC");
 		List<Update> updates = new ArrayList<Update>();
 		while (cursor.moveToNext()) {
 			Update u = new Update(cursor.getString(0), cursor.getString(1),
-					cursor.getString(3), cursor.getString(2));
+					cursor.getString(3), cursor.getString(2),
+					Boolean.valueOf(cursor.getString(5)));
 			u.setUrl(cursor.getString(4));
+			u.setPinned(Boolean.valueOf(cursor.getString(5)));
 			updates.add(u);
 		}
 		database.close();
@@ -337,20 +431,20 @@ public class DBManager {
 		return updates;
 	}
 
+	/**
+	 * Gets all Courses from the db no duplicates
+	 * 
+	 * @return list of all the courses from the db
+	 */
 	public List<Course> getCursorAllWithCourses() {
 		List<Course> notified = getAllNotifiedCourses();
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
 		cursor = database.query(false, dbCourse.COURSE_TABLE, new String[] {
-				dbCourse.COURSE_ID,
-				dbCourse.COURSE_NAME,
-				dbCourse.TEACHER_ID,
-				dbCourse.COURSE_PLACE, 
-				dbCourse.COURSE_DAY,
-				dbCourse.COURSE_TIME_FROM, 
-				dbCourse.COURSE_TIME_TO,
-				dbCourse.SUBJECT_ID, 
-				dbCourse.DOWNLOADED_IMAGE }, null, null,
+				dbCourse.COURSE_ID, dbCourse.COURSE_NAME, dbCourse.TEACHER_ID,
+				dbCourse.COURSE_PLACE, dbCourse.COURSE_DAY,
+				dbCourse.COURSE_TIME_FROM, dbCourse.COURSE_TIME_TO,
+				dbCourse.SUBJECT_ID, dbCourse.DOWNLOADED_IMAGE }, null, null,
 				dbCourse.SUBJECT_ID, null, null, null);
 		List<Course> courses = new ArrayList<Course>();
 		while (cursor.moveToNext()) {
@@ -378,6 +472,13 @@ public class DBManager {
 		return courses;
 	}
 
+	/**
+	 * Gets the teachers for given Course
+	 * 
+	 * @param name
+	 *            course name
+	 * @return list og teachers that teaching the given course
+	 */
 	public List<Teacher> getTeachersForCourse(String name) {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -408,6 +509,13 @@ public class DBManager {
 		return teachers;
 	}
 
+	/**
+	 * Get Teacher from data base by teacher id number
+	 * 
+	 * @param idNum
+	 *            String id number
+	 * @return the matching teacher ,null otherwise
+	 */
 	public Teacher getTeacherByIdNumber(String idNum) {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -430,6 +538,13 @@ public class DBManager {
 
 	}
 
+	/**
+	 * Gets the course from db by course id
+	 * 
+	 * @param id
+	 *            Database UID for the courser
+	 * @return the matching course ,null otherwise
+	 */
 	public Course getCourseById(String id) {
 		Cursor cursor;
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -460,25 +575,45 @@ public class DBManager {
 
 	}
 
-	public Cursor getTeachersForCourse(String teacher_id, String course_name) {
-		Cursor cursor;
-		SQLiteDatabase database = dbHelper.getReadableDatabase();
-		cursor = database.query(dbTeacher.TEACHERS_TABLE, new String[] {
-				dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
-				dbTeacher.EMAIL, dbTeacher.LOCAL_IMAGE_PATH, },
-				dbTeacher.ID_NUMBER + " = " + getSQLText(teacher_id), null,
-				null, null, null);
-		database.close();
-
-		return cursor;
-	}
-
+	/**
+	 * Gets the teacher
+	 * 
+	 * @param teacher_id
+	 * @param course_name
+	 * @return
+	 */
+	/*
+	 * public Cursor getTeachersForCourse(String teacher_id, String course_name)
+	 * { Cursor cursor; SQLiteDatabase database =
+	 * dbHelper.getReadableDatabase(); cursor =
+	 * database.query(dbTeacher.TEACHERS_TABLE, new String[] {
+	 * dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
+	 * dbTeacher.EMAIL, dbTeacher.LOCAL_IMAGE_PATH, }, dbTeacher.ID_NUMBER +
+	 * " = " + getSQLText(teacher_id), null, null, null, null);
+	 * database.close();
+	 * 
+	 * return cursor; }
+	 */
+	/**
+	 * replace escaped qoutes
+	 * 
+	 * @param s
+	 *            string to replace
+	 * @return string with legal escaped qoutes
+	 */
 	public static String removeQoutes(String s) {
 		return s.replace("\"", "");
 	}
 
 }
 
+/**
+ * Class that Demonstrates the Tutors Table in data base contans String Column
+ * names and create sql script
+ * 
+ * @author wabbass
+ * 
+ */
 class dbTeacher {
 	public static final String TEACHERS_TABLE = "Teachers";// ׳”׳˜׳‘׳�׳” ׳©׳�
 	public static final String UID = "id";
@@ -504,6 +639,13 @@ class dbTeacher {
 
 }
 
+/**
+ * Class that Demonstrates the Courses Table in data base contans String Column
+ * names and create sql script
+ * 
+ * @author wabbass
+ * 
+ */
 class dbCourse {
 	public static final String COURSE_TABLE = "Courses";
 	public static final String UID = "id";
@@ -528,18 +670,26 @@ class dbCourse {
 			+ " text not null, " + NOTIFIED + " NUMERIC not null " + " );";
 }
 
+/**
+ * Class that Demonstrates the Updates Table in data base contans String Column
+ * names and create sql script
+ * 
+ * @author wabbass
+ * 
+ */
 class dbUpdate {
 	public static final String UPDATES_TABLE = "updates";// ׳”׳˜׳‘׳�׳” ׳©׳�
 	public static final String UID = "id";
 	public static final String UPDATE_ID = "subject_id";
 	public static final String UPDATE_SUBJECT = "subject";
 	public static final String UPDATE_CONTENT = "content";// ׳”׳�׳©׳™׳�׳” ׳©׳�
-															// ׳”׳˜׳§׳¡׳˜
+	public static final String UPDATE_PINNED = "pinned"; // ׳”׳˜׳§׳¡׳˜
 	public static final String UPDATE_DATE = "date";// ׳”׳˜׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String UPDATE_URL = "url";
 	public final static String CREATE = "create table " + UPDATES_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + UPDATE_ID
 			+ " text not null, " + UPDATE_SUBJECT + " text not null, "
-			+ UPDATE_CONTENT + " text not null, " + UPDATE_DATE
-			+ " text not null, " + UPDATE_URL + " text not null" + ");";
+			+ UPDATE_CONTENT + " text not null, " + UPDATE_PINNED
+			+ " text not null, " + UPDATE_DATE + " text not null, "
+			+ UPDATE_URL + " text not null" + ");";
 }

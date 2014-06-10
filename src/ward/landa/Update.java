@@ -14,7 +14,7 @@ import ward.landa.activities.Utilities;
 
 import android.text.Html;
 
-public class Update implements Serializable {
+public class Update implements Serializable, Comparable<Update> {
 	/**
 	 * 
 	 */
@@ -26,7 +26,8 @@ public class Update implements Serializable {
 	private String dateTime;
 	private String url;
 	private String urlToJason;
-
+	private boolean pinned;
+	private boolean popUpOpend;
 	public Update(String subject, String dateTime, String text) {
 		setSubject(subject);
 		setDateTime(dateTime);
@@ -39,11 +40,14 @@ public class Update implements Serializable {
 		this.setUrlToJason(urlToJSon);
 	}
 
-	public Update(String id, String subject, String dateTime, String text) {
+	public Update(String id, String subject, String dateTime, String text,
+			boolean pinned) {
 		setUpdate_id(id);
 		setSubject(subject);
 		setDateTime(dateTime);
 		setText(text);
+		this.pinned = false;
+		this.setPopUpOpend(false);
 
 	}
 
@@ -61,22 +65,13 @@ public class Update implements Serializable {
 		return text;
 	}
 
-	public String getSmallText() {
-		if (text.length() > 200) {
-			for (int i = 200; i < text.length(); i++) {
-				if (text.charAt(i) == ' ')
-					return new String(text.substring(0, i) + "...");
-			}
-		}
-		return text;
-	}
 
 	public boolean isToobig() {
 		return text.length() > 300;
 	}
 
 	public void setText(String text) {
-		this.text = text;
+		this.text =text;
 
 		// Html.fromHtml(text).toString();
 	}
@@ -96,11 +91,6 @@ public class Update implements Serializable {
 	public void setSubject(String subject) {
 
 		String mamn = Jsoup.parse(subject).text();
-		/*
-		 * mamn = URLEncoder.encode(mamn, "UTF-8");
-		 * mamn=StringEscapeUtils.escapeJava(mamn); mamn=URLDecoder.decode(mamn,
-		 * "UTF-8");
-		 */
 		this.subject = Utilities.replacer(new StringBuffer(mamn));
 
 	}
@@ -135,6 +125,32 @@ public class Update implements Serializable {
 
 	public void setUrlToJason(String urlToJason) {
 		this.urlToJason = urlToJason;
+	}
+
+	public boolean isPinned() {
+		return pinned;
+	}
+
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
+
+	@Override
+	public int compareTo(Update another) {
+		if (isPinned() && !another.isPinned()) {
+			return -1;
+		} else if (!isPinned() && another.isPinned()) {
+			return 1;
+		} else
+			return another.getDateTime().compareTo(dateTime);
+	}
+
+	public boolean isPopUpOpend() {
+		return popUpOpend;
+	}
+
+	public void setPopUpOpend(boolean popUpOpend) {
+		this.popUpOpend = popUpOpend;
 	}
 
 }

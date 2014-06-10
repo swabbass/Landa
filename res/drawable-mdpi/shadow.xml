@@ -4,39 +4,39 @@
      <!-- Drop Shadow Stack -->
      <item>
         <shape>
-              <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
+              <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
             <solid android:color="#00CCCCCC" />
         </shape>
     </item>
      <item>
         <shape>
-             <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
+             <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
             <solid android:color="#10CCCCCC" />
         </shape>
     </item>
      <item>
         <shape>
-             <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
-            <solid android:color="#20CCCCCC" />
+          <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#20404040" />
         </shape>
     </item>
      <item>
         <shape>
-             <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
-            <solid android:color="#30CCCCCC" />
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#30404040" />
         </shape>
     </item>
     <item>
         <shape>
-           <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
-            <solid android:color="#50CCCCCC" />
+           <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#50404040" />
         </shape>
     </item>
 
     <!-- Background -->
     <item>
 	<shape>
-            <solid android:color="#ffffff" />
+            <solid android:color="#55404040" />
 	    <corners android:radius="6dp" />
 	</shape>
     </item>

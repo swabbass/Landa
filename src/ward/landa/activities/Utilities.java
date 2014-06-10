@@ -15,6 +15,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 
 import utilites.ConnectionDetector;
 import utilites.JSONParser;
@@ -26,8 +27,10 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ActionBar.Tab;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,6 +40,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.InputFilter.LengthFilter;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
@@ -45,17 +52,132 @@ public class Utilities {
 	public static final String NEW_UPDATE = "new_Update";
 	private static final int notfyId = 12;
 
-	
-	
-	
-	
-	
-	
+	public static void saveDownloadOnceStatus(boolean b, final String key,
+			Context cxt) {
+		SharedPreferences sh = cxt.getSharedPreferences(GCMUtils.DATA,
+				Activity.MODE_PRIVATE);
+		SharedPreferences.Editor ed = sh.edit();
+		ed.putBoolean(key, b);
+		ed.commit();
+
+	}
+
+	/**
+	 * removes all kind of tags like <13455> will be removed
+	 * 
+	 * @param inp
+	 *            html text input
+	 * @return
+	 */
+	public static String html2Text(String inp) {
+		boolean intag = false;
+		String outp = "";
+
+		for (int i = 0; i < inp.length(); ++i) {
+
+			char c = inp.charAt(i);
+			if (!intag && inp.charAt(i) == '<') {
+				intag = true;
+				continue;
+			}
+			if (intag && inp.charAt(i) != '>') {
+
+				continue;
+			}
+			if (intag && inp.charAt(i) == '>') {
+				intag = false;
+				continue;
+			}
+			if (!intag) {
+				outp = outp + inp.charAt(i);
+			}
+		}
+		return outp;
+	}
+
+	public static String FetchTableTagHtml(String html) {
+		boolean intag = false;
+		String outp = null;
+		//List<Table> tables = getTableTags(html);
+		/*for(Table t : tables)
+		{
+			String remove=html.substring(t.firstTrStartIndex, t.firstTrEndIndex);
+			html=html.replace(remove, "");
+			tables=getTableTags(html);
+		}*/
+		int firstTrTag = html.indexOf("<tr");
+		int lastTrTag = html.indexOf("</tr>") + "</tr>".length();
+		String firstTr = null;
+		if (firstTrTag != -1 && lastTrTag != -1)
+			firstTr = html.substring(firstTrTag, lastTrTag);
+		if (firstTr != null)
+			outp = html.replace(firstTr, "");
+
+		return outp;
+	}
+
+	private static List<Table> getTableTags(String html) {
+		List<Table> tabels = new ArrayList<Table>();
+		for (int i = 0; i < html.length(); ++i) {
+			char c = html.charAt(i);
+			if (c == '<') {
+				if (Table.TABLE_OPENER.length() + i - 1 < html.length()) {
+					int x = -1;
+					if (html.charAt(i + 1) == 't' && html.charAt(i + 2) == 'a'
+							&& html.charAt(i + 3) == 'b'
+							&& html.charAt(i + 4) == 'l'){
+						if ((x = html.indexOf(Table.TABLE_OPENER, i)) != -1) {
+							Table t = new Table();
+							t.startIndex = x;
+							t.endIndex = html.indexOf(Table.TABLE_CLOSER, i);
+							t.firstTrEndIndex = html
+									.indexOf(Table.TR_OPENER, i);
+							t.firstTrStartIndex = html.indexOf(Table.TR_CLOSER,
+									i);
+							tabels.add(t);
+						} else {
+							continue;
+						}
+				} else {
+					continue;
+				}
+				}
+				else{
+					break;
+				}
+			} else {
+				continue;
+			}
+		}
+		return tabels;
+	}
+
+	static class Table {
+		public static final String TABLE_OPENER = "<table";
+		public static final String TABLE_CLOSER = "</table>";
+		public static final String TR_OPENER = "<tr";
+		public static final String TR_CLOSER = "</tr>";
+		public int startIndex;
+		public int endIndex;
+		public int firstTrStartIndex;
+		public int firstTrEndIndex;
+
+		public Table() {
+			// TODO Auto-generated constructor stub
+		}
+	}
+
 	public static InputMethodManager getInputMethodManager(Activity activity) {
 		return (InputMethodManager) activity
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 	}
 
+	/**
+	 * 
+	 * @param outBuffer
+	 *            String buffer of the text to replace % and escaped characters
+	 * @return Formated String with replaced tags and encodded
+	 */
 	public static String replacer(StringBuffer outBuffer) {
 
 		String data = outBuffer.toString();
@@ -84,6 +206,12 @@ public class Utilities {
 		return data;
 	}
 
+	/**
+	 * 
+	 * @param hebrewDay
+	 *            day in hebrew language
+	 * @return Calendar.SUNDAY- Calendar.THURSDAY
+	 */
 	public static int dayWeekNumber(String hebrewDay) {
 
 		switch (hebrewDay.replaceAll("\\s", "")) {
@@ -102,49 +230,18 @@ public class Utilities {
 		return -1;
 	}
 
-	public static int calculateInSampleSize(BitmapFactory.Options options,
-			int reqWidth, int reqHeight) {
-		// Raw height and width of image
-		final int height = options.outHeight;
-		final int width = options.outWidth;
-		int inSampleSize = 1;
-
-		if (height > reqHeight || width > reqWidth) {
-
-			final int halfHeight = height / 2;
-			final int halfWidth = width / 2;
-
-			// Calculate the largest inSampleSize value that is a power of 2 and
-			// keeps both
-			// height and width larger than the requested height and width.
-			while ((halfHeight / inSampleSize) > reqHeight
-					&& (halfWidth / inSampleSize) > reqWidth) {
-				inSampleSize *= 2;
-			}
-		}
-
-		return inSampleSize;
-	}
-
-	public static Bitmap decodeSampledBitmapFromResource(Resources res,
-			int resId, int reqWidth, int reqHeight) {
-
-		// First decode with inJustDecodeBounds=true to check dimensions
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeResource(res, resId, options);
-
-		// Calculate inSampleSize
-		options.inSampleSize = calculateInSampleSize(options, reqWidth,
-				reqHeight);
-
-		// Decode bitmap with inSampleSize set
-		options.inJustDecodeBounds = false;
-		return BitmapFactory.decodeResource(res, resId, options);
-	}
-
-	/*
-	 * sends msgs fort covActivity
+	/**
+	 * 
+	 * @param context
+	 *            Context
+	 * @param message
+	 *            Message to send to BoroadCastReciever
+	 * @param time
+	 *            Time day hour minute seconds milliseconds
+	 * @param title
+	 *            Title of the message
+	 * @param Action
+	 *            Action type for intent
 	 */
 	public static void displayMessage(Context context, String message,
 			String time, String title, String Action) {
@@ -155,6 +252,15 @@ public class Utilities {
 		context.sendBroadcast(intent);
 	}
 
+	/**
+	 * 
+	 * @param context
+	 *            Context
+	 * @param update
+	 *            Update object to send to broadcasrreciever
+	 * @param Action
+	 *            ActionType for intent
+	 */
 	public static void displayMessageUpdate(Context context, Update update,
 			String Action) {
 		Intent intent = new Intent(Action);
@@ -230,7 +336,7 @@ public class Utilities {
 				String content = jObj.getString("post_content");
 				String date = jObj.getString("post_date");
 				String url = jObj.getString("guid");
-				u = new Update(id, title, date, content);
+				u = new Update(id, title, date, content, false);
 				u.setUrl(url);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -250,11 +356,24 @@ public class Utilities {
 		return u;
 	}
 
+	/**
+	 * after getting Update for an existed update call back
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	public static interface PostListener {
 		public void onPostUpdateDownloaded(Update u);
-		
+
 	}
 
+	/**
+	 * AsyncTask to Fetch Update from the internet by post id given from the
+	 * push notification
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	public static class fetchUpdateFromBackEndTask extends
 			AsyncTask<String, String, Update> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -294,7 +413,7 @@ public class Utilities {
 						u = new Update(update.getString("id"),
 								update.getString("title"),
 								update.getString("date"),
-								update.getString("content"));
+								update.getString("content"), false);
 						u.setUrl(update.getString("url"));
 
 						downloadOk = true;
@@ -323,6 +442,16 @@ public class Utilities {
 
 	}
 
+	/**
+	 * Shows notification on the notification bar
+	 * 
+	 * @param context
+	 *            Context
+	 * @param title
+	 *            Notification title
+	 * @param text
+	 *            Notification text content (info)
+	 */
 	public static void showNotification(Context context, String title,
 			String text) {
 

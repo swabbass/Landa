@@ -6,7 +6,7 @@
     android:orientation="horizontal" >
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/pinImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/imageView1"
+        android:layout_alignRight="@+id/pinImageView"
         android:src="@drawable/ic_action_time" />
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toLeftOf="@+id/pinImageView"
         android:layout_toRightOf="@+id/switch1"
         android:fontFamily="davidNew.tff"
         android:text="Medium Text"
@@ -52,7 +52,7 @@
         android:id="@+id/placeLable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView1"
+        android:layout_alignBottom="@+id/pinImageView"
         android:layout_alignLeft="@+id/switch1"
         android:layout_alignRight="@+id/dTLable"
         android:fontFamily="davidNew.tff"

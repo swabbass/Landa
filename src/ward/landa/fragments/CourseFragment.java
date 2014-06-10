@@ -12,6 +12,7 @@ import ward.landa.Course;
 import ward.landa.R;
 import ward.landa.R.string;
 import ward.landa.Teacher;
+import ward.landa.ImageUtilities.CircleImageView;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -279,7 +280,7 @@ public class CourseFragment extends Fragment {
 						v.findViewById(R.id.teacherCourseName));
 
 			}
-			ImageView teacherAvatar = (ImageView) v
+			CircleImageView teacherAvatar = (CircleImageView) v
 					.getTag(R.id.tutorSmallAvatar);
 			ImageView alarmMe = (ImageView) v.getTag(R.id.alaramMe);
 			if (isExpanded) {

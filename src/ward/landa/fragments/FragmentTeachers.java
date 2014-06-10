@@ -2,7 +2,6 @@ package ward.landa.fragments;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
@@ -14,15 +13,8 @@ import utilites.JSONParser;
 import ward.landa.GCMUtils;
 import ward.landa.R;
 import ward.landa.Teacher;
-import ward.landa.ImageUtilities.BitmapUtils;
-import ward.landa.ImageUtilities.UILTools;
-import ward.landa.activities.MainActivity;
 import ward.landa.activities.Settings;
 import ward.landa.activities.Utilities;
-import ward.landa.fragments.FragmentCourses.reciever;
-import ward.landa.fragments.FragmentUpdates.downloadRecentUpdates;
-import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -37,7 +29,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.speech.RecognizerResultsIntent;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -50,28 +41,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.google.android.gms.internal.fb;
-import com.google.android.gms.wallet.LineItem.Role;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
-import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.squareup.picasso.Picasso.LoadedFrom;
+import com.squareup.picasso.Target;
 
 public class FragmentTeachers extends Fragment {
 
@@ -89,7 +69,6 @@ public class FragmentTeachers extends Fragment {
 	View root;
 	EditText search;
 	Spinner spinner;
-	private static ImageLoader imageLoader;
 
 	@Override
 	public void onStop() {
@@ -111,9 +90,21 @@ public class FragmentTeachers extends Fragment {
 	}
 
 	public interface callbackTeacher {
+		/**
+		 * handles the click action on teacher
+		 * 
+		 * @param t
+		 *            Teacher Object that had been clicked
+		 */
 		public void OnTeacherItemClick(Teacher t);
 	}
 
+	/**
+	 * initlize the search editbox and handles the actions from the edit box
+	 * 
+	 * @param v
+	 *            root view where the search is located
+	 */
 	private void initlizeSearchEngine(View v) {
 
 		search = (EditText) v.findViewById(R.id.teacher_txt_search);
@@ -166,7 +157,7 @@ public class FragmentTeachers extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		getActivity().getMenuInflater().inflate(R.menu.teacher_menu, menu);
 		View v = (View) menu.findItem(R.id.teacher_menu_search).getActionView();
-		
+
 		if (!getArguments().getBoolean("rtl"))
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
 		initlizeSearchEngine(v);
@@ -174,7 +165,6 @@ public class FragmentTeachers extends Fragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -201,12 +191,6 @@ public class FragmentTeachers extends Fragment {
 			Bundle savedInstanceState) {
 		root = inflater.inflate(R.layout.teacher_custom_grid, container, false);
 		connectionDetector = new ConnectionDetector(getActivity());
-		imageLoader = UILTools.initlizeImageLoad(UILTools.initilizeImageLoader(
-				UILTools.initlizeImageDisplay(R.drawable.person,
-						R.drawable.person, R.drawable.person), getActivity()),
-				getActivity());
-		
-		
 		db_mngr = new DBManager(getActivity());
 		SharedPreferences sh = getActivity().getSharedPreferences(
 				GCMUtils.DATA, Activity.MODE_PRIVATE);
@@ -241,6 +225,10 @@ public class FragmentTeachers extends Fragment {
 		return root;
 	}
 
+	/**
+	 * fetching teachers data from the data base and sets the adapter to
+	 * gridview
+	 */
 	private void loadFromDataBase() {
 		tutors = null;
 		tutors = db_mngr.getCursorAllTeachers();
@@ -252,12 +240,17 @@ public class FragmentTeachers extends Fragment {
 
 	}
 
+	/**
+	 * custom adapter that handles the grid items
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	static class gridAdabter extends BaseAdapter {
 
 		LayoutInflater inflater;
 		List<Teacher> l;
 		Resources res;
-		BitmapUtils bmpUtils;
 		Context cxt;
 		int searched = 0;
 
@@ -273,7 +266,6 @@ public class FragmentTeachers extends Fragment {
 			this.l = l;
 			this.res = res;
 			this.searched = search;
-			this.bmpUtils = new BitmapUtils(context);
 		}
 
 		@Override
@@ -308,7 +300,6 @@ public class FragmentTeachers extends Fragment {
 			}
 			picture = (ImageView) v.getTag(R.id.picture);
 			name = (TextView) v.getTag(R.id.text);
-			ImageAware image = new ImageViewAware(picture, false);
 			final Teacher teacher = (Teacher) getItem(pos);
 			Target target = new Target() {
 				@Override
@@ -353,6 +344,13 @@ public class FragmentTeachers extends Fragment {
 		}
 	}
 
+	/**
+	 * boradcast reciver that handles messages from the backend
+	 * adding,updating,removing tutors and notifiying the user about that
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	class TeacherReciever extends BroadcastReceiver {
 
 		@Override
@@ -381,6 +379,13 @@ public class FragmentTeachers extends Fragment {
 
 	}
 
+	/**
+	 * Asynctask to fetch the data for teachers from the backend and when
+	 * success saving the data in data base
+	 * 
+	 * @author wabbass
+	 * 
+	 */
 	class loadDataFromBackend extends AsyncTask<String, String, String> {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		boolean allOk = false;
@@ -429,7 +434,7 @@ public class FragmentTeachers extends Fragment {
 					Log.e(GCMUtils.TAG, "faild no internet ");
 
 				}
-				db_mngr.clearDb();
+
 				return "";
 			}
 			return "";
@@ -439,7 +444,8 @@ public class FragmentTeachers extends Fragment {
 		protected void onPostExecute(String result) {
 			pDialog.dismiss();
 			if (allOk) {
-				saveLoadedTeachersState(true);
+				Utilities.saveDownloadOnceStatus(true, GCMUtils.LOAD_TEACHERS,
+						getActivity());
 				for (Teacher t : tutors) {
 					db_mngr.insertTeacher(t);
 				}
@@ -461,13 +467,29 @@ public class FragmentTeachers extends Fragment {
 				});
 
 			} else {
+				db_mngr.clearDb();
 				showDialogNoconnection(!toFetchDataFromDB);
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_TEACHERS,
+						getActivity());
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_UPDATES,
+						getActivity());
+				Utilities.saveDownloadOnceStatus(false, GCMUtils.LOAD_COURSES,
+						getActivity());
+
 			}
 			super.onPostExecute(result);
 		}
 
 	}
 
+	/**
+	 * showing dialog with message that there is no connection if its first time
+	 * the app will close otherwise will load data from database and woll be
+	 * offline mood
+	 * 
+	 * @param isfirst
+	 *            true ,for first time lunching,false otherwise
+	 */
 	private void showDialogNoconnection(boolean isfirst) {
 		new AlertDialog.Builder(getActivity())
 				.setCancelable(false)
@@ -495,52 +517,4 @@ public class FragmentTeachers extends Fragment {
 						}).show();
 	}
 
-	private void saveLoadedTeachersState(boolean flag) {
-		SharedPreferences sh = getActivity().getSharedPreferences(
-				GCMUtils.DATA, Activity.MODE_PRIVATE);
-		SharedPreferences.Editor ed = sh.edit();
-		ed.putBoolean(GCMUtils.LOAD_TEACHERS, flag);
-		ed.commit();
-	}
-
-	private List<Teacher> filterCords() {
-		List<Teacher> cords = new ArrayList<Teacher>();
-		for (Teacher t : tutors) {
-
-			if (!t.getPosition().equals(utilites.Role.TUTOR.name())) {
-				cords.add(t);
-			}
-		}
-		return cords;
-	}
-
-	private List<Teacher> filterTutors() {
-		List<Teacher> tutor = new ArrayList<Teacher>();
-		for (Teacher t : tutors) {
-
-			if (t.getPosition().equals(utilites.Role.TUTOR.name())) {
-				tutor.add(t);
-			}
-		}
-		return tutor;
-	}
-
-
-	private boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		switch (itemPosition) {
-		case 0:
-			gAdapter.setL(tutors, 0);
-			gAdapter.notifyDataSetChanged();
-			break;
-		case 1:
-			gAdapter.setL(filterCords(), 1);
-			gAdapter.notifyDataSetChanged();
-			break;
-		case 2:
-			gAdapter.setL(filterTutors(), 1);
-			gAdapter.notifyDataSetChanged();
-			break;
-		}
-		return true;
-	}
 }

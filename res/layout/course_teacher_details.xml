@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/ward.landa"
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="110dp"
@@ -17,7 +18,7 @@
         android:text="TextView"
         android:textColor="#E0E0E0" />
 
-    <ImageView
+    <ward.landa.ImageUtilities.CircleImageView
         android:id="@+id/tutorSmallAvatar"
         android:layout_width="80dp"
         android:layout_height="80dp"
@@ -25,8 +26,10 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/person" />
+        
+        android:src="@drawable/person"
+        app:border_color="#e0e0e0"
+        app:border_width="2dp" />
 
     <TextView
         android:id="@+id/teacherFacultyLable"

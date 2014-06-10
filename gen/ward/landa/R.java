@@ -15,9 +15,7 @@ public final class R {
         public static final int slideup=0x7f040003;
     }
     public static final class array {
-        public static final int drawer_array=0x7f0a0002;
-        public static final int filter_teacher=0x7f0a0001;
-        public static final int planets_array=0x7f0a0000;
+        public static final int drawer_array=0x7f0a0000;
     }
     public static final class attr {
         /** 
@@ -55,6 +53,25 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int adUnitId=0x7f010002;
+        /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int border_color=0x7f010012;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int border_width=0x7f010011;
         /** <p>Must be a floating point value, such as "<code>1.2</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -109,6 +126,103 @@ containing a value of this type.
 </table>
          */
         public static final int mapType=0x7f010003;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>reveal</code></td><td>0</td><td></td></tr>
+<tr><td><code>dismiss</code></td><td>1</td><td></td></tr>
+<tr><td><code>choice</code></td><td>2</td><td></td></tr>
+</table>
+         */
+        public static final int swipeActionLeft=0x7f01001b;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>reveal</code></td><td>0</td><td></td></tr>
+<tr><td><code>dismiss</code></td><td>1</td><td></td></tr>
+<tr><td><code>choice</code></td><td>2</td><td></td></tr>
+</table>
+         */
+        public static final int swipeActionRight=0x7f01001c;
+        /** <p>Must be an integer value, such as "<code>100</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int swipeAnimationTime=0x7f010014;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int swipeBackView=0x7f010019;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int swipeCloseAllItemsWhenMoveList=0x7f010017;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int swipeDrawableChecked=0x7f01001d;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int swipeDrawableUnchecked=0x7f01001e;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int swipeFrontView=0x7f010018;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>none</code></td><td>0</td><td></td></tr>
+<tr><td><code>both</code></td><td>1</td><td></td></tr>
+<tr><td><code>right</code></td><td>2</td><td></td></tr>
+<tr><td><code>left</code></td><td>3</td><td></td></tr>
+</table>
+         */
+        public static final int swipeMode=0x7f01001a;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int swipeOffsetLeft=0x7f010015;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int swipeOffsetRight=0x7f010016;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int swipeOpenOnLongPress=0x7f010013;
         /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -252,129 +366,145 @@ containing a value of this type.
         public static final int expander_open_holo_dark=0x7f02002b;
         public static final int feedback_icon=0x7f02002c;
         public static final int filter=0x7f02002d;
-        public static final int focused=0x7f020050;
+        public static final int focused=0x7f020056;
         public static final int highlight=0x7f02002e;
         public static final int ic_action_about=0x7f02002f;
         public static final int ic_action_alarms=0x7f020030;
-        public static final int ic_action_new_email=0x7f020031;
-        public static final int ic_action_place=0x7f020032;
-        public static final int ic_action_settings=0x7f020033;
-        public static final int ic_action_time=0x7f020034;
-        public static final int ic_drawer=0x7f020035;
-        public static final int ic_launcher=0x7f020036;
-        public static final int ic_plusone_medium_off_client=0x7f020037;
-        public static final int ic_plusone_small_off_client=0x7f020038;
-        public static final int ic_plusone_standard_off_client=0x7f020039;
-        public static final int ic_plusone_tall_off_client=0x7f02003a;
-        public static final int join=0x7f02003b;
-        public static final int megaphone=0x7f02003c;
-        public static final int megaphone_after=0x7f02003d;
-        public static final int news=0x7f02003e;
-        public static final int person=0x7f02003f;
-        public static final int selected=0x7f020051;
-        public static final int shadow=0x7f020040;
-        public static final int shadow_bg_blue=0x7f020041;
-        public static final int shadow_bg_greem=0x7f020042;
-        public static final int shadow_bg_red=0x7f020043;
-        public static final int shadow_bg_yellow=0x7f020044;
-        public static final int shadowcourse=0x7f020045;
-        public static final int shadowevent=0x7f020046;
-        public static final int shadowteacher=0x7f020047;
-        public static final int shadowupdate=0x7f020048;
-        public static final int show_icpn=0x7f020049;
-        public static final int transparentshadow=0x7f02004a;
-        public static final int tutor_icon=0x7f02004b;
-        public static final int update_icon_new=0x7f02004c;
-        public static final int updates_icon=0x7f02004d;
-        public static final int web_hi_rewhites_512=0x7f02004e;
-        public static final int x=0x7f02004f;
+        public static final int ic_action_discard=0x7f020031;
+        public static final int ic_action_new_email=0x7f020032;
+        public static final int ic_action_overflow=0x7f020033;
+        public static final int ic_action_place=0x7f020034;
+        public static final int ic_action_remove=0x7f020035;
+        public static final int ic_action_settings=0x7f020036;
+        public static final int ic_action_time=0x7f020037;
+        public static final int ic_drawer=0x7f020038;
+        public static final int ic_launcher=0x7f020039;
+        public static final int ic_plusone_medium_off_client=0x7f02003a;
+        public static final int ic_plusone_small_off_client=0x7f02003b;
+        public static final int ic_plusone_standard_off_client=0x7f02003c;
+        public static final int ic_plusone_tall_off_client=0x7f02003d;
+        public static final int join=0x7f02003e;
+        public static final int megaphone=0x7f02003f;
+        public static final int megaphone_after=0x7f020040;
+        public static final int news=0x7f020041;
+        public static final int person=0x7f020042;
+        public static final int pin=0x7f020043;
+        public static final int pin_icon=0x7f020044;
+        public static final int selected=0x7f020057;
+        public static final int shadow=0x7f020045;
+        public static final int shadow_bg_blue=0x7f020046;
+        public static final int shadow_bg_greem=0x7f020047;
+        public static final int shadow_bg_red=0x7f020048;
+        public static final int shadow_bg_yellow=0x7f020049;
+        public static final int shadowcourse=0x7f02004a;
+        public static final int shadowevent=0x7f02004b;
+        public static final int shadowteacher=0x7f02004c;
+        public static final int shadowupdate=0x7f02004d;
+        public static final int show_icpn=0x7f02004e;
+        public static final int transparentshadow=0x7f02004f;
+        public static final int tutor_icon=0x7f020050;
+        public static final int unpin_icon=0x7f020051;
+        public static final int update_icon_new=0x7f020052;
+        public static final int updates_icon=0x7f020053;
+        public static final int web_hi_rewhites_512=0x7f020054;
+        public static final int x=0x7f020055;
     }
     public static final class id {
-        public static final int AboutAvtivity=0x7f060005;
-        public static final int FrameLayout1=0x7f060037;
-        public static final int LinearLayout1=0x7f060048;
-        public static final int RelativeLayout1=0x7f060013;
-        public static final int UpdatecheckBox=0x7f06002d;
-        public static final int about=0x7f060052;
-        public static final int action_settings=0x7f06004f;
-        public static final int alaramMe=0x7f06001a;
-        public static final int alarm_course_image_view=0x7f060016;
-        public static final int container=0x7f06000d;
-        public static final int contentTextBox=0x7f06004c;
-        public static final int courseAvatar=0x7f060025;
-        public static final int courseLable=0x7f060024;
-        public static final int courseTeachers=0x7f060021;
-        public static final int course_menu_search=0x7f060050;
-        public static final int course_txt_search=0x7f060029;
-        public static final int dTLable=0x7f060035;
-        public static final int deleteUpdate=0x7f060054;
-        public static final int draweSectionLable=0x7f06001d;
-        public static final int drawerIcon=0x7f06001e;
-        public static final int drawerTextView=0x7f06001f;
-        public static final int drawer_layout=0x7f06000e;
-        public static final int emailTeacher=0x7f06003b;
-        public static final int emailTeacherLable=0x7f06003e;
-        public static final int facultyTeacher=0x7f06003f;
-        public static final int facultyTeacherLable=0x7f06003d;
-        public static final int feedbackImg=0x7f060023;
-        public static final int fragment_container=0x7f06000f;
-        public static final int generalLable=0x7f06002b;
-        public static final int gridview=0x7f060038;
-        public static final int gridviewcourses=0x7f06001c;
+        public static final int AboutAvtivity=0x7f06000b;
+        public static final int FrameLayout1=0x7f06003f;
+        public static final int LinearLayout1=0x7f060050;
+        public static final int RelativeLayout1=0x7f060019;
+        public static final int UpdatecheckBox=0x7f060036;
+        public static final int about=0x7f06005a;
+        public static final int action_settings=0x7f060057;
+        public static final int alaramMe=0x7f060020;
+        public static final int alarm_course_image_view=0x7f06001c;
+        public static final int both=0x7f060005;
+        public static final int choice=0x7f06000a;
+        public static final int container=0x7f060013;
+        public static final int contentTextBox=0x7f060054;
+        public static final int courseAvatar=0x7f06002a;
+        public static final int courseLable=0x7f060029;
+        public static final int courseTeachers=0x7f060026;
+        public static final int course_menu_search=0x7f060058;
+        public static final int course_txt_search=0x7f060032;
+        public static final int dTLable=0x7f06003d;
+        public static final int deletePopUpAction=0x7f06002f;
+        public static final int deleteSingleUpdate=0x7f06005e;
+        public static final int deleteUpdate=0x7f06005c;
+        public static final int dismiss=0x7f060009;
+        public static final int draweSectionLable=0x7f060023;
+        public static final int drawerIcon=0x7f060024;
+        public static final int drawerTextView=0x7f060025;
+        public static final int drawer_layout=0x7f060014;
+        public static final int emailTeacher=0x7f060043;
+        public static final int emailTeacherLable=0x7f060046;
+        public static final int facultyTeacher=0x7f060047;
+        public static final int facultyTeacherLable=0x7f060045;
+        public static final int feedbackImg=0x7f060028;
+        public static final int fragment_container=0x7f060015;
+        public static final int generalLable=0x7f060034;
+        public static final int gridview=0x7f060040;
+        public static final int gridviewcourses=0x7f060022;
         public static final int hybrid=0x7f060004;
-        public static final int imageView1=0x7f060006;
-        public static final int imageView2=0x7f060033;
-        public static final int imgAttention=0x7f06004d;
-        public static final int languageChoice=0x7f06002f;
-        public static final int languageLabel=0x7f06002e;
-        public static final int languageLable=0x7f060022;
-        public static final int left_drawer=0x7f060012;
-        public static final int list_image=0x7f060014;
-        public static final int nameteacher=0x7f060040;
+        public static final int imageView2=0x7f06003b;
+        public static final int languageChoice=0x7f060038;
+        public static final int languageLabel=0x7f060037;
+        public static final int languageLable=0x7f060027;
+        public static final int left=0x7f060007;
+        public static final int left_drawer=0x7f060018;
+        public static final int list_image=0x7f06001a;
+        public static final int nameteacher=0x7f060048;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int pager=0x7f060010;
-        public static final int pager_title_strip=0x7f060011;
-        public static final int picture=0x7f060026;
-        public static final int placeLable=0x7f060036;
-        public static final int positionteacher=0x7f06003c;
-        public static final int positionteacherLable=0x7f06003a;
-        public static final int radioAr=0x7f060031;
-        public static final int radioEn=0x7f060032;
-        public static final int radioHE=0x7f060030;
-        public static final int replace_layout=0x7f06001b;
+        public static final int pager=0x7f060016;
+        public static final int pager_title_strip=0x7f060017;
+        public static final int picture=0x7f06002b;
+        public static final int pinImageView=0x7f06000c;
+        public static final int pinPopUpAction=0x7f06002e;
+        public static final int pinUpdate=0x7f06005d;
+        public static final int placeLable=0x7f06003e;
+        public static final int popUpMenu=0x7f060053;
+        public static final int popUpRealtive=0x7f06002d;
+        public static final int positionteacher=0x7f060044;
+        public static final int positionteacherLable=0x7f060042;
+        public static final int radioAr=0x7f06003a;
+        public static final int radioHE=0x7f060039;
+        public static final int replace_layout=0x7f060021;
+        public static final int reveal=0x7f060008;
+        public static final int right=0x7f060006;
         public static final int satellite=0x7f060002;
-        public static final int scrollView1=0x7f060044;
-        public static final int sendEmail=0x7f060041;
-        public static final int settings=0x7f060051;
-        public static final int settingsContainer=0x7f06002a;
-        public static final int spinnerFilterteacher=0x7f060020;
-        public static final int switch1=0x7f060034;
-        public static final int teacherCourseName=0x7f060017;
-        public static final int teacherFacultyLable=0x7f060018;
-        public static final int teacher_menu_search=0x7f060053;
-        public static final int teacher_picture=0x7f060039;
-        public static final int teacher_txt_search=0x7f060028;
+        public static final int scrollView1=0x7f06004c;
+        public static final int sendEmail=0x7f060049;
+        public static final int settings=0x7f060059;
+        public static final int settingsContainer=0x7f060033;
+        public static final int switch1=0x7f06003c;
+        public static final int teacherCourseName=0x7f06001d;
+        public static final int teacherFacultyLable=0x7f06001e;
+        public static final int teacher_menu_search=0x7f06005b;
+        public static final int teacher_picture=0x7f060041;
+        public static final int teacher_txt_search=0x7f060031;
         public static final int terrain=0x7f060003;
-        public static final int text=0x7f060027;
-        public static final int textView1=0x7f060008;
-        public static final int textView2=0x7f060009;
-        public static final int textView3=0x7f06000a;
-        public static final int textView4=0x7f06000b;
-        public static final int textView5=0x7f060007;
-        public static final int textView6=0x7f06000c;
-        public static final int title=0x7f060015;
-        public static final int title_updateLable=0x7f06004b;
-        public static final int tutorDetailContainer=0x7f060042;
-        public static final int tutorSmallAvatar=0x7f060019;
-        public static final int updateDetailContentLable=0x7f060047;
-        public static final int updateDetailDateTimeLable=0x7f060046;
-        public static final int updateDetailSubjectLable=0x7f060045;
-        public static final int updateDetailsContainer=0x7f060043;
-        public static final int update_timeLable=0x7f06004e;
-        public static final int updatesItem=0x7f06004a;
-        public static final int updates_listView=0x7f060049;
-        public static final int workshopChkBox=0x7f06002c;
+        public static final int text=0x7f06002c;
+        public static final int textView1=0x7f06000e;
+        public static final int textView2=0x7f06000f;
+        public static final int textView3=0x7f060010;
+        public static final int textView4=0x7f060011;
+        public static final int textView5=0x7f06000d;
+        public static final int textView6=0x7f060012;
+        public static final int title=0x7f06001b;
+        public static final int title_updateLable=0x7f060055;
+        public static final int tutorDetailContainer=0x7f06004a;
+        public static final int tutorSmallAvatar=0x7f06001f;
+        public static final int unpinPopUpAction=0x7f060030;
+        public static final int updateDetailContentLable=0x7f06004f;
+        public static final int updateDetailDateTimeLable=0x7f06004e;
+        public static final int updateDetailSubjectLable=0x7f06004d;
+        public static final int updateDetailsContainer=0x7f06004b;
+        public static final int update_timeLable=0x7f060056;
+        public static final int updatesItem=0x7f060052;
+        public static final int updates_listView=0x7f060051;
+        public static final int workshopChkBox=0x7f060035;
     }
     public static final class integer {
         public static final int card_flip_time_full=0x7f080001;
@@ -390,11 +520,11 @@ containing a value of this type.
         public static final int courses_frag_grid=0x7f030005;
         public static final int drawe_section=0x7f030006;
         public static final int draweritem=0x7f030007;
-        public static final int filter_spinner=0x7f030008;
-        public static final int fragment_about=0x7f030009;
-        public static final int fragment_course=0x7f03000a;
-        public static final int fragment_update_detail=0x7f03000b;
-        public static final int grid_textimg_item=0x7f03000c;
+        public static final int fragment_about=0x7f030008;
+        public static final int fragment_course=0x7f030009;
+        public static final int fragment_update_detail=0x7f03000a;
+        public static final int grid_textimg_item=0x7f03000b;
+        public static final int pop_up_layout=0x7f03000c;
         public static final int search_layout=0x7f03000d;
         public static final int search_layout_courses=0x7f03000e;
         public static final int settings_activity=0x7f03000f;
@@ -418,16 +548,35 @@ containing a value of this type.
         public static final int main=0x7f0c0005;
         public static final int teacher_menu=0x7f0c0006;
         public static final int update_contextual_menu=0x7f0c0007;
+        public static final int update_pop_up_menu=0x7f0c0008;
     }
     public static final class string {
         public static final int AC=0x7f070029;
+        public static final int CordAdded=0x7f070038;
+        public static final int CordDeleted=0x7f070036;
+        public static final int CordUpdated=0x7f070037;
+        public static final int CourseAdded=0x7f070032;
+        public static final int CourseDeleted=0x7f070030;
+        public static final int CourseUpdated=0x7f070031;
+        public static final int Email=0x7f07003c;
+        public static final int Faculty=0x7f07003d;
         public static final int General=0x7f07001e;
         public static final int Navigation=0x7f07001d;
+        public static final int Place=0x7f07003a;
+        public static final int Role=0x7f07003e;
         public static final int SC=0x7f07002a;
+        public static final int TeacherAdded=0x7f070035;
+        public static final int TeacherDeleted=0x7f070033;
+        public static final int TeacherUpdated=0x7f070034;
+        public static final int Time=0x7f07003b;
+        public static final int UpdateDeleted=0x7f07002d;
+        public static final int UpdatePinned=0x7f07002e;
+        public static final int UpdateUnPinned=0x7f07002f;
+        public static final int WorkshopAlarm=0x7f070039;
         public static final int about=0x7f070027;
         public static final int aboutText=0x7f07001b;
-        public static final int action_settings=0x7f07002f;
-        public static final int action_websearch=0x7f070031;
+        public static final int action_settings=0x7f070041;
+        public static final int action_websearch=0x7f070045;
         public static final int app_name=0x7f070020;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
@@ -524,18 +673,20 @@ containing a value of this type.
          */
         public static final int common_signin_button_text_long=0x7f070013;
         public static final int courses=0x7f070021;
-        public static final int developedby=0x7f070030;
+        public static final int delete=0x7f070044;
+        public static final int developedby=0x7f070042;
         public static final int drawer_close=0x7f070022;
         public static final int drawer_open=0x7f070023;
         public static final int headTitle=0x7f07001a;
-        public static final int hello_world=0x7f07002e;
+        public static final int hello_world=0x7f070040;
         public static final int navigateTo=0x7f07001c;
         public static final int noConntection=0x7f07002c;
         public static final int noConntectionMsgFirsttime=0x7f07002b;
+        public static final int pin=0x7f070043;
         public static final int selected=0x7f070024;
         public static final int settings=0x7f07001f;
         public static final int teachers=0x7f070025;
-        public static final int title_activity_about=0x7f07002d;
+        public static final int title_activity_about=0x7f07003f;
         public static final int tutor=0x7f070028;
         public static final int updates=0x7f070026;
     }
@@ -650,6 +801,52 @@ containing a value of this type.
           @attr name ward.landa:adUnitId
         */
         public static final int AdsAttrs_adUnitId = 2;
+        /** Attributes that can be used with a CircleImageView.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #CircleImageView_border_color ward.landa:border_color}</code></td><td></td></tr>
+           <tr><td><code>{@link #CircleImageView_border_width ward.landa:border_width}</code></td><td></td></tr>
+           </table>
+           @see #CircleImageView_border_color
+           @see #CircleImageView_border_width
+         */
+        public static final int[] CircleImageView = {
+            0x7f010011, 0x7f010012
+        };
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#border_color}
+          attribute's value can be found in the {@link #CircleImageView} array.
+
+
+          <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:border_color
+        */
+        public static final int CircleImageView_border_color = 1;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#border_width}
+          attribute's value can be found in the {@link #CircleImageView} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:border_width
+        */
+        public static final int CircleImageView_border_width = 0;
         /** Attributes that can be used with a MapAttrs.
            <p>Includes the following attributes:</p>
            <table>
@@ -894,5 +1091,211 @@ containing a value of this type.
           @attr name ward.landa:zOrderOnTop
         */
         public static final int MapAttrs_zOrderOnTop = 13;
+        /** Attributes that can be used with a SwipeListView.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #SwipeListView_swipeActionLeft ward.landa:swipeActionLeft}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeActionRight ward.landa:swipeActionRight}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeAnimationTime ward.landa:swipeAnimationTime}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeBackView ward.landa:swipeBackView}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeCloseAllItemsWhenMoveList ward.landa:swipeCloseAllItemsWhenMoveList}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeDrawableChecked ward.landa:swipeDrawableChecked}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeDrawableUnchecked ward.landa:swipeDrawableUnchecked}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeFrontView ward.landa:swipeFrontView}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeMode ward.landa:swipeMode}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeOffsetLeft ward.landa:swipeOffsetLeft}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeOffsetRight ward.landa:swipeOffsetRight}</code></td><td></td></tr>
+           <tr><td><code>{@link #SwipeListView_swipeOpenOnLongPress ward.landa:swipeOpenOnLongPress}</code></td><td></td></tr>
+           </table>
+           @see #SwipeListView_swipeActionLeft
+           @see #SwipeListView_swipeActionRight
+           @see #SwipeListView_swipeAnimationTime
+           @see #SwipeListView_swipeBackView
+           @see #SwipeListView_swipeCloseAllItemsWhenMoveList
+           @see #SwipeListView_swipeDrawableChecked
+           @see #SwipeListView_swipeDrawableUnchecked
+           @see #SwipeListView_swipeFrontView
+           @see #SwipeListView_swipeMode
+           @see #SwipeListView_swipeOffsetLeft
+           @see #SwipeListView_swipeOffsetRight
+           @see #SwipeListView_swipeOpenOnLongPress
+         */
+        public static final int[] SwipeListView = {
+            0x7f010013, 0x7f010014, 0x7f010015, 0x7f010016,
+            0x7f010017, 0x7f010018, 0x7f010019, 0x7f01001a,
+            0x7f01001b, 0x7f01001c, 0x7f01001d, 0x7f01001e
+        };
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeActionLeft}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>reveal</code></td><td>0</td><td></td></tr>
+<tr><td><code>dismiss</code></td><td>1</td><td></td></tr>
+<tr><td><code>choice</code></td><td>2</td><td></td></tr>
+</table>
+          @attr name ward.landa:swipeActionLeft
+        */
+        public static final int SwipeListView_swipeActionLeft = 8;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeActionRight}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>reveal</code></td><td>0</td><td></td></tr>
+<tr><td><code>dismiss</code></td><td>1</td><td></td></tr>
+<tr><td><code>choice</code></td><td>2</td><td></td></tr>
+</table>
+          @attr name ward.landa:swipeActionRight
+        */
+        public static final int SwipeListView_swipeActionRight = 9;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeAnimationTime}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be an integer value, such as "<code>100</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:swipeAnimationTime
+        */
+        public static final int SwipeListView_swipeAnimationTime = 1;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeBackView}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name ward.landa:swipeBackView
+        */
+        public static final int SwipeListView_swipeBackView = 6;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeCloseAllItemsWhenMoveList}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:swipeCloseAllItemsWhenMoveList
+        */
+        public static final int SwipeListView_swipeCloseAllItemsWhenMoveList = 4;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeDrawableChecked}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name ward.landa:swipeDrawableChecked
+        */
+        public static final int SwipeListView_swipeDrawableChecked = 10;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeDrawableUnchecked}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name ward.landa:swipeDrawableUnchecked
+        */
+        public static final int SwipeListView_swipeDrawableUnchecked = 11;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeFrontView}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name ward.landa:swipeFrontView
+        */
+        public static final int SwipeListView_swipeFrontView = 5;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeMode}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>none</code></td><td>0</td><td></td></tr>
+<tr><td><code>both</code></td><td>1</td><td></td></tr>
+<tr><td><code>right</code></td><td>2</td><td></td></tr>
+<tr><td><code>left</code></td><td>3</td><td></td></tr>
+</table>
+          @attr name ward.landa:swipeMode
+        */
+        public static final int SwipeListView_swipeMode = 7;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeOffsetLeft}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:swipeOffsetLeft
+        */
+        public static final int SwipeListView_swipeOffsetLeft = 2;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeOffsetRight}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:swipeOffsetRight
+        */
+        public static final int SwipeListView_swipeOffsetRight = 3;
+        /**
+          <p>This symbol is the offset where the {@link ward.landa.R.attr#swipeOpenOnLongPress}
+          attribute's value can be found in the {@link #SwipeListView} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name ward.landa:swipeOpenOnLongPress
+        */
+        public static final int SwipeListView_swipeOpenOnLongPress = 0;
     };
 }

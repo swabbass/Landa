@@ -1,10 +1,15 @@
 package ward.landa.fragments;
 
+import java.io.File;
+
+import com.squareup.picasso.Picasso;
+
 import utilites.Role;
 import ward.landa.R;
 import ward.landa.R.id;
 import ward.landa.R.layout;
 import ward.landa.Teacher;
+import ward.landa.ImageUtilities.CircleImageView;
 import ward.landa.activities.Utilities;
 import android.content.Intent;
 import android.graphics.Picture;
@@ -25,7 +30,7 @@ public class teacherFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.teacherfragmentlayout, container,
 				false);
-		ImageView img = (ImageView) root.findViewById(R.id.teacher_picture);
+		CircleImageView img = (CircleImageView) root.findViewById(R.id.teacher_picture);
 		TextView name = (TextView) root.findViewById(R.id.nameteacher);
 		TextView email = (TextView) root.findViewById(R.id.emailTeacher);
 		TextView faculty = (TextView) root.findViewById(R.id.facultyTeacher);
@@ -35,7 +40,8 @@ public class teacherFragment extends Fragment {
 		if (ext != null) {
 
 			t = (Teacher) ext.getSerializable("teacher");
-			img.setImageURI(t.getUriFromLocal());
+
+			Picasso.with(getActivity()).load(new File(t.getImageLocalPath())).into(img);
 			getActivity().setTitle(t.getName());
 			name.setText(t.getName() + " " + t.getLast_name());
 			email.setText(t.getEmail());

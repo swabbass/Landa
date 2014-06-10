@@ -2,9 +2,12 @@ package ward.landa.activities;
 
 import java.util.Set;
 
+import org.jsoup.Jsoup;
+
 import utilites.DBManager;
 import ward.landa.Course;
 import ward.landa.GCMUtils;
+import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
 import ward.landa.activities.Utilities.PostListener;
@@ -26,6 +29,7 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 		Log.d("wordpress", "" + intent.getAction());
 		Set<String> keys = intent.getExtras().keySet();
 		this.cxt = context;
+		Settings.initlizeSettings(context);
 		for (String key : keys) {
 			Log.d("wordpress", key + " : " + intent.getExtras().getString(key));
 		}
@@ -33,21 +37,20 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 				.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
 			dbmngr = new DBManager(context);
 			if (intent.getStringExtra("Type") != null) {
-				String t=intent.getStringExtra("Type");
-				if(t.contains("INSTRUCTOR"))
-				{
-					GCMUtils.HandleInstructor(t,context, dbmngr, intent);
-				}
-				else if(t.contains("WORKSHOP")){
-				GCMUtils.HandleWorkshop(t, context, dbmngr, intent);
+				String t = intent.getStringExtra("Type");
+				if (t.contains("INSTRUCTOR")) {
+					GCMUtils.HandleInstructor(t, context, dbmngr, intent);
+				} else if (t.contains("WORKSHOP")) {
+					GCMUtils.HandleWorkshop(t, context, dbmngr, intent);
 				}
 			} else {
 				Update u = Utilities.generateUpdateFromExtras(
 						intent.getExtras(), context);
 				if (u != null && u.getUrlToJason() == null) {
 					dbmngr.insertUpdate(u);
-					Utilities.showNotification(context, u.getSubject(),
-							Html.fromHtml(u.getText()).toString());
+					if (Settings.isToNotifyUpdates())
+						Utilities.showNotification(context, u.getSubject(),
+								Jsoup.parse(u.getText()).text());
 				} else {
 					Utilities.fetchUpdateFromBackEndTask task = new Utilities.fetchUpdateFromBackEndTask(
 							context, this);
@@ -57,9 +60,13 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 		}
 		if (intent.getAction().equals(Settings.WARD_LANDA_ALARM)) {
 			Course c = (Course) intent.getSerializableExtra("course");
-			String s = String.format("׳�׳§׳•׳� : %s \n ׳©׳¢׳” : %s",
-					c.getPlace(), c.getTimeFrom());
-			Utilities.showNotification(context, c.getName(), s);
+			String s = String.format("%s : %s \n  %s : %s", cxt.getResources()
+					.getString(R.string.Place), c.getPlace(), cxt
+					.getResources().getString(R.string.Time), c.getTimeFrom());
+			if (Settings.isToNotifyCourse())
+				Utilities.showNotification(context, cxt.getResources()
+						.getString(R.string.WorkshopAlarm) + " " + c.getName(),
+						s);
 		}
 
 	}
@@ -68,7 +75,10 @@ public class Reciever extends BroadcastReceiver implements PostListener {
 	public void onPostUpdateDownloaded(Update u) {
 		if (u != null && cxt != null) {
 			dbmngr.updateUpdate(u);
-			Utilities.showNotification(cxt, u.getSubject(), Html.fromHtml(u.getText()).toString());
+			Settings.initlizeSettings(cxt);
+			if (Settings.isToNotifyUpdates())
+				Utilities.showNotification(cxt, u.getSubject(),
+						Html.fromHtml(u.getText()).toString());
 		}
 
 	}
