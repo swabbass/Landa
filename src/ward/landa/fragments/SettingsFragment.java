@@ -3,6 +3,7 @@ package ward.landa.fragments;
 
 import ward.landa.R;
 import ward.landa.activities.Settings;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Switch;
+import android.widget.TextView;
 
 public class SettingsFragment extends Fragment implements OnClickListener {
 
@@ -21,10 +23,22 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 	RadioGroup langChoice;
 	boolean updateMe,workshopMe;
 	String localLang;
+	TextView version;
 	private void initlizeUI(View root) {
 	updatesChkbox=(Switch)root.findViewById(R.id.UpdatecheckBox);
 	workshopsChkbox=(Switch)root.findViewById(R.id.workshopChkBox);
 	langChoice=(RadioGroup)root.findViewById(R.id.languageChoice);
+	version =(TextView)root.findViewById(R.id.version);
+	try {
+		String versionName = getActivity().getPackageManager()
+			    .getPackageInfo(getActivity().getPackageName(), 0).versionName;
+		version.setText(versionName);
+	} catch (NameNotFoundException e) {
+		// TODO Auto-generated catch block
+		version.setText("1.0");
+		return;
+		
+	}
 	}
 	
 	private void loadSettings() {

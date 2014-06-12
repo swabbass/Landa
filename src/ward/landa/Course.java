@@ -27,6 +27,9 @@ public class Course implements Serializable {
 	private int notify;
 	private int subject_id;
 	private boolean downloadedImage;
+	public Course(String sub_id) {
+		this.subject_id=Integer.valueOf(sub_id);
+	}
 	public Course(String name,String day,String timeFrom,String timeTo,String place)
 	{
 		this.name=name;

@@ -114,10 +114,11 @@ public class MainActivity extends FragmentActivity implements
 		Log.e("Fragment", "Main Activity started");
 		connection_detector = new ConnectionDetector(getApplicationContext());
 		initlizeDataBase();
-
+		//checkPicsFromServer();
 		loadRegsetrationData();
 		setLocalLang();
 		setTitle(R.string.app_name);
+		
 		initlizeFragments();
 		if (rtlSupported)
 			initlizeDrawerNavigation();
@@ -246,6 +247,7 @@ public class MainActivity extends FragmentActivity implements
 
 	// ------------------------------Initlizations --------------------\\
 
+	
 	private void initlizeGCM() {
 		gcm = GoogleCloudMessaging.getInstance(this);
 		if (!isReg) {
@@ -277,7 +279,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private void initlizeDataBase() {
 		db_mngr = new DBManager(getApplicationContext());
-
+		db_mngr.checkForDownloadedImages();
 	}
 
 	private void initlizeFragments() {

@@ -41,10 +41,14 @@ public class Teacher implements Serializable {
 		timesForEachCourse = new HashMap<String, List<String>>();
 	}
 
+	public Teacher(String id_number) {
+		this.id_number = id_number;
+	}
+
 	public Teacher(String fname, String lname, String email, String id_number,
 			String pos, String faculty) {
 
-		this.id_number=id_number;
+		this.id_number = id_number;
 		setId_number(id_number);
 		setName(fname);
 		setLast_name(lname);
@@ -58,11 +62,11 @@ public class Teacher implements Serializable {
 		setDownloadedImage(false);
 		timesForEachCourse = new HashMap<String, List<String>>();
 	}
+
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof Teacher)
-		{
-			Teacher t=(Teacher)o;
+		if (o instanceof Teacher) {
+			Teacher t = (Teacher) o;
 			return getId_number().equals(t.getId_number());
 		}
 		return false;
@@ -73,26 +77,26 @@ public class Teacher implements Serializable {
 		timesForEachCourse.put(course_name, times);
 
 	}
-	public void addTimeToCourse(String name,String time)
-	{
-		List<String> times=timesForEachCourse.get(name);
-		if(times==null)
-		{
-			times=new ArrayList<String>();
+
+	public void addTimeToCourse(String name, String time) {
+		List<String> times = timesForEachCourse.get(name);
+		if (times == null) {
+			times = new ArrayList<String>();
 			timesForEachCourse.put(name, times);
 		}
 		times.add(time);
 	}
+
 	public void removeCourse(String course_name) {
 
 		timesForEachCourse.remove(course_name);
 
 	}
 
-	public List<String> getTimePlaceForCourse(String course_name)
-	{
+	public List<String> getTimePlaceForCourse(String course_name) {
 		return timesForEachCourse.get(course_name);
 	}
+
 	@Override
 	public String toString() {
 		return getName() + " " + getLast_name();
@@ -143,7 +147,6 @@ public class Teacher implements Serializable {
 	public void setPosition(String position) {
 		this.position = position;
 	}
-	
 
 	public String getFaculty() {
 		return faculty;
@@ -201,9 +204,9 @@ public class Teacher implements Serializable {
 			HashMap<String, List<String>> timesForEachCourse) {
 		this.timesForEachCourse = timesForEachCourse;
 	}
-	public Uri getUriFromLocal()
-	{
-		File f=new File(this.imageLocalPath);
+
+	public Uri getUriFromLocal() {
+		File f = new File(this.imageLocalPath);
 		return Uri.fromFile(f);
 	}
 }

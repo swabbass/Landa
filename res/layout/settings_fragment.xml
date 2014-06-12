@@ -51,7 +51,6 @@
         android:id="@+id/languageChoice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
         android:checkedButton="@+id/radioHE"
         android:orientation="horizontal"
         android:weightSum="3" >
@@ -74,5 +73,25 @@
             android:textColor="#e0e0e0" />
 
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/versionLabel"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text="גרסה"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#0082f7"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="1.0"
+        android:textColor="#e0e0e0"
+        android:textSize="18sp" />
 
 </LinearLayout>

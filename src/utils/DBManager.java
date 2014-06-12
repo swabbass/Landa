@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import ward.landa.Course;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
+import ward.landa.activities.Settings;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,9 +17,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBManager {
-	public static final String DB_NAME = "db_LANDA";// ׳�?׳ ׳™׳×׳•׳ ׳™׳� ׳�׳¡׳�?
-													// ׳©׳�
-	public static final int DB_VER = 12;// ׳�?׳ ׳×׳•׳ ׳™׳� ׳�׳¡ ׳©׳� ׳�?׳’׳¨׳¡׳�?
+	public static final String DB_NAME = "db_LANDA";
+
+	public static final int DB_VER = 12;
 
 	DB_HELPER dbHelper;
 	Context cxt;
@@ -63,9 +65,11 @@ public class DBManager {
 	}
 
 	/**
-	 * Adding teacher to data base 
-	 * @param teacher Given teacher to add 
-	 * @return UID in the data base ,-1 if not added 
+	 * Adding teacher to data base
+	 * 
+	 * @param teacher
+	 *            Given teacher to add
+	 * @return UID in the data base ,-1 if not added
 	 */
 	public long insertTeacher(Teacher teacher) {
 		SQLiteDatabase teacher_db = dbHelper.getWritableDatabase();
@@ -86,9 +90,11 @@ public class DBManager {
 	}
 
 	/**
-	 * Adding update to data base 
-	 * @param update Given update to add 
-	 * @return UID in the data base ,-1 if not added 
+	 * Adding update to data base
+	 * 
+	 * @param update
+	 *            Given update to add
+	 * @return UID in the data base ,-1 if not added
 	 */
 	public long insertUpdate(Update update) {
 		SQLiteDatabase updated_db = dbHelper.getWritableDatabase();
@@ -105,9 +111,11 @@ public class DBManager {
 	}
 
 	/**
-	 * Adding course to data base 
-	 * @param course Given course to add 
-	 * @return UID in the data base ,-1 if not added 
+	 * Adding course to data base
+	 * 
+	 * @param course
+	 *            Given course to add
+	 * @return UID in the data base ,-1 if not added
 	 */
 	public long insertCourse(Course course) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -129,9 +137,12 @@ public class DBManager {
 
 	/**
 	 * Update course in db with given course
-	 * @param course Updated course to update in the data base 
-	 * @param notify 1 enable notificatins for this course else 0
-	 * @return 
+	 * 
+	 * @param course
+	 *            Updated course to update in the data base
+	 * @param notify
+	 *            1 enable notificatins for this course else 0
+	 * @return
 	 */
 	public boolean UpdateCourse(Course course, int notify) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -163,9 +174,12 @@ public class DBManager {
 
 	/**
 	 * update thet the given course notification status by notifiy
-	 * @param course  course to update 
-	 * @param notify 1 enable notificatins for this course else 0
-	 * @return  success true ,false otherwise
+	 * 
+	 * @param course
+	 *            course to update
+	 * @param notify
+	 *            1 enable notificatins for this course else 0
+	 * @return success true ,false otherwise
 	 */
 	public boolean UpdateCourseNotification(Course course, int notify) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -185,10 +199,13 @@ public class DBManager {
 	}
 
 	/**
-	 * update image status for Course in db 
-	 * @param course Course to update
-	 * @param downloaded true downlaoded ,false otherwise 
-	 * @return  success true ,false otherwise
+	 * update image status for Course in db
+	 * 
+	 * @param course
+	 *            Course to update
+	 * @param downloaded
+	 *            true downlaoded ,false otherwise
+	 * @return success true ,false otherwise
 	 */
 	public boolean UpdateCourseImageDownloaded(Course course, boolean downloaded) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -197,9 +214,8 @@ public class DBManager {
 		boolean res = db.update(
 				dbCourse.COURSE_TABLE,
 				values,
-				dbCourse.COURSE_ID + " = "
-						+ getSQLText(Integer.toString(course.getCourseID())),
-				null) > 0;
+				dbCourse.SUBJECT_ID + " = "
+						+ getSQLText(course.getSubject_id_string()), null) > 0;
 		// TODO add isdownload image and save the image and when update course
 		// update for all subjects
 
@@ -208,10 +224,13 @@ public class DBManager {
 	}
 
 	/**
-	 * update image status for teacher in db 
-	 * @param teacher teacher to update
-	 * @param downloaded true downlaoded ,false otherwise 
-	 * @return  success true ,false otherwise
+	 * update image status for teacher in db
+	 * 
+	 * @param teacher
+	 *            teacher to update
+	 * @param downloaded
+	 *            true downlaoded ,false otherwise
+	 * @return success true ,false otherwise
 	 */
 	public boolean UpdateTeacherImageDownloaded(Teacher teacher,
 			boolean downloaded) {
@@ -229,9 +248,11 @@ public class DBManager {
 	}
 
 	/**
-	 *  update teacher info in db
-	 * @param teacher updated teacher
-	 * @return  success true ,false otherwise
+	 * update teacher info in db
+	 * 
+	 * @param teacher
+	 *            updated teacher
+	 * @return success true ,false otherwise
 	 */
 	public boolean updateTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -253,9 +274,11 @@ public class DBManager {
 	}
 
 	/**
-	 * Update update in the db 
-	 * @param update Updated update 
-	 * @return  success true ,false otherwise
+	 * Update update in the db
+	 * 
+	 * @param update
+	 *            Updated update
+	 * @return success true ,false otherwise
 	 */
 	public boolean updateUpdate(Update update) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -273,9 +296,11 @@ public class DBManager {
 	}
 
 	/**
-	 * deletes teacher in the db 
-	 * @param  teacher to delete
-	 * @return  success true ,false otherwise
+	 * deletes teacher in the db
+	 * 
+	 * @param teacher
+	 *            to delete
+	 * @return success true ,false otherwise
 	 */
 	public boolean deleteTeacher(Teacher teacher) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -287,8 +312,10 @@ public class DBManager {
 	}
 
 	/**
-	 * deletes course from db 
-	 * @param course course to delte 
+	 * deletes course from db
+	 * 
+	 * @param course
+	 *            course to delte
 	 * @return success true ,false otherwise
 	 */
 	public boolean deleteCourse(Course course) {
@@ -301,8 +328,10 @@ public class DBManager {
 	}
 
 	/**
-	 * deletes update from db 
-	 * @param update update to delete
+	 * deletes update from db
+	 * 
+	 * @param update
+	 *            update to delete
 	 * @return success true ,false otherwise
 	 */
 	public boolean deleteUpdate(Update update) {
@@ -314,7 +343,8 @@ public class DBManager {
 	}
 
 	/**
-	 * resetting the data base deleting all the data 
+	 * resetting the data base deleting all the data
+	 * 
 	 * @return true resetting success ,otherwise false
 	 */
 	public boolean clearDb() {
@@ -327,10 +357,12 @@ public class DBManager {
 	}
 
 	/**
-	 * adding ' char inorder to handle sql text with comparison
-	 *  example : hane => 'hane'
-	 * @param text text to add 
-	 * @return string well formatted for sql query 
+	 * adding ' char inorder to handle sql text with comparison example : hane
+	 * => 'hane'
+	 * 
+	 * @param text
+	 *            text to add
+	 * @return string well formatted for sql query
 	 */
 	public String getSQLText(String text) {
 		char c = 34;
@@ -576,24 +608,81 @@ public class DBManager {
 	}
 
 	/**
-	 * Gets the teacher
+	 * loops over the database and checks the images path if they existed
+	 * ,otherwise set the value downloaded to false
 	 * 
-	 * @param teacher_id
-	 * @param course_name
-	 * @return
+	 * This in case of user deleting the images manually
 	 */
-	/*
-	 * public Cursor getTeachersForCourse(String teacher_id, String course_name)
-	 * { Cursor cursor; SQLiteDatabase database =
-	 * dbHelper.getReadableDatabase(); cursor =
-	 * database.query(dbTeacher.TEACHERS_TABLE, new String[] {
-	 * dbTeacher.ID_NUMBER, dbTeacher.FIRST_NAME, dbTeacher.LAST_NAME,
-	 * dbTeacher.EMAIL, dbTeacher.LOCAL_IMAGE_PATH, }, dbTeacher.ID_NUMBER +
-	 * " = " + getSQLText(teacher_id), null, null, null, null);
-	 * database.close();
-	 * 
-	 * return cursor; }
-	 */
+	public void checkForDownloadedImages() {
+		Cursor courses = null, tutors;
+		SQLiteDatabase database = dbHelper.getWritableDatabase();
+		courses = database.query(dbCourse.COURSE_TABLE,
+				new String[] { dbCourse.SUBJECT_ID }, null, null, null, null,
+				null);
+	
+		
+		while (courses.moveToNext()) {
+			String path = Settings.picFromAbsoulotePath + courses.getString(0)
+					+ ".png";
+			if (!Utilities.checkIfImageExistsInSd(path)) {
+				UpdateCourseImageDownloaded(new Course(courses.getString(0)),
+						false);
+			}
+
+		}
+		database.close();
+		database = dbHelper.getWritableDatabase();
+		tutors = database.query(dbTeacher.TEACHERS_TABLE,
+				new String[] { dbTeacher.ID_NUMBER }, null, null, null, null,
+				null);
+		while (tutors.moveToNext()) {
+			String path = Settings.picFromAbsoulotePath + tutors.getString(0)
+					+ ".png";
+			if (!Utilities.checkIfImageExistsInSd(path)) {
+				UpdateTeacherImageDownloaded(new Teacher(tutors.getString(0)),
+						false);
+			}
+
+		}
+		database.close();
+	}
+
+	public List<File> getImagesFiles()
+	{
+		Cursor courses = null, tutors;
+		List<File> files=new ArrayList<File>();
+		SQLiteDatabase database = dbHelper.getWritableDatabase();
+		courses = database.query(dbCourse.COURSE_TABLE,
+				new String[] { dbCourse.SUBJECT_ID }, null, null, null, null,
+				null);
+	
+		
+		while (courses.moveToNext()) {
+			String path = Settings.picFromAbsoulotePath + courses.getString(0)
+					+ ".png";
+			if (Utilities.checkIfImageExistsInSd(path)) {
+				File f=new File(path);
+				files.add(f);
+			}
+
+		}
+		database.close();
+		database = dbHelper.getWritableDatabase();
+		tutors = database.query(dbTeacher.TEACHERS_TABLE,
+				new String[] { dbTeacher.ID_NUMBER }, null, null, null, null,
+				null);
+		while (tutors.moveToNext()) {
+			String path = Settings.picFromAbsoulotePath + tutors.getString(0)
+					+ ".png";
+			if (Utilities.checkIfImageExistsInSd(path)) {
+				File f=new File(path);
+				files.add(f);
+			}
+
+		}
+		database.close();
+		return files;
+	}
 	/**
 	 * replace escaped qoutes
 	 * 
@@ -615,11 +704,12 @@ public class DBManager {
  * 
  */
 class dbTeacher {
-	public static final String TEACHERS_TABLE = "Teachers";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
+	public static final String TEACHERS_TABLE = "Teachers";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
 	public static final String UID = "id";
 	public static final String ID_NUMBER = "id_number";
 	public static final String FIRST_NAME = "first_name";//
-	public static final String LAST_NAME = "last_name";// ׳�?׳�?׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
+	public static final String LAST_NAME = "last_name";// ׳�?׳�?׳�׳₪׳•׳�
+														// ׳�׳¡׳₪׳¨
 	public static final String EMAIL = "email";
 	public static final String FACULTY = "faculty";
 	public static final String IMAGE_URL = "image_url";
@@ -678,13 +768,13 @@ class dbCourse {
  * 
  */
 class dbUpdate {
-	public static final String UPDATES_TABLE = "updates";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
+	public static final String UPDATES_TABLE = "updates";// ׳�?׳�?׳‘׳�׳�? ׳©׳�
 	public static final String UID = "id";
 	public static final String UPDATE_ID = "subject_id";
 	public static final String UPDATE_SUBJECT = "subject";
-	public static final String UPDATE_CONTENT = "content";// ׳�?׳�׳©׳™׳�׳�? ׳©׳�
-	public static final String UPDATE_PINNED = "pinned"; // ׳�?׳�?׳§׳¡׳�?
-	public static final String UPDATE_DATE = "date";// ׳�?׳�?׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
+	public static final String UPDATE_CONTENT = "content";// ׳�?׳�׳©׳™׳�׳�? ׳©׳�
+	public static final String UPDATE_PINNED = "pinned"; // ׳�?׳�?׳§׳¡׳�?
+	public static final String UPDATE_DATE = "date";// ׳�?׳�?׳�׳₪׳•׳� ׳�׳¡׳₪׳¨
 	public static final String UPDATE_URL = "url";
 	public final static String CREATE = "create table " + UPDATES_TABLE + " ("
 			+ UID + " INTEGER PRIMARY KEY AUTOINCREMENT," + UPDATE_ID

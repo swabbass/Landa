@@ -5,18 +5,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import ward.landa.Course;
 import ward.landa.R;
 import ward.landa.Teacher;
 import ward.landa.Update;
@@ -50,6 +54,7 @@ public class Utilities {
 
 	public static final String NEW_UPDATE = "new_Update";
 	private static final int notfyId = 12;
+	public static HashMap<String, String> files;
 
 	/**
 	 * Saving the download data once per key in the Shared Perfrences
@@ -290,6 +295,20 @@ public class Utilities {
 	}
 
 	/**
+	 * Checks if the given path to file is existed !
+	 * 
+	 * @param localPath
+	 *            Path to file
+	 * @return true existed ,otherwise false
+	 */
+	public static boolean checkIfImageExistsInSd(String localPath) {
+
+		File f = new File(localPath);
+		return f.exists();
+
+	}
+
+	/**
 	 * @param imageName
 	 *            : image name is the id with suffix .jpg
 	 * 
@@ -315,7 +334,16 @@ public class Utilities {
 
 		File file = new File(localPath);
 		try {
-			file.createNewFile();
+			if(!file.createNewFile())
+			{
+				if(file.delete())
+				{
+					file.createNewFile();
+				}
+				else{
+					throw new IOException("y3nn roma ");
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -462,6 +490,8 @@ public class Utilities {
 		}
 
 	}
+
+
 
 	/**
 	 * Shows notification on the notification bar

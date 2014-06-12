@@ -28,7 +28,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.08"

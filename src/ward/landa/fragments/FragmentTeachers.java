@@ -3,6 +3,8 @@ package ward.landa.fragments;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +52,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.squareup.picasso.Cache;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.LoadedFrom;
 import com.squareup.picasso.Target;
@@ -114,7 +117,7 @@ public class FragmentTeachers extends Fragment {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-		
+
 				if (s.length() != 0) {
 					gAdapter.setL(search(s.toString()), 1);
 					gAdapter.notifyDataSetChanged();
@@ -140,13 +143,11 @@ public class FragmentTeachers extends Fragment {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-			
 
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-			
 
 			}
 		});
@@ -316,11 +317,11 @@ public class FragmentTeachers extends Fragment {
 						public void run() {
 							Utilities.saveImageToSD(
 									teacher.getImageLocalPath(), arg0);
-
+							teacher.setDownloadedImage(true);
+						
 						}
 					}).start();
-					teacher.setDownloadedImage(true);
-					db_mngr.UpdateTeacherImageDownloaded(teacher, true);
+
 				}
 
 				@Override
@@ -330,6 +331,7 @@ public class FragmentTeachers extends Fragment {
 				}
 
 			};
+			db_mngr.UpdateTeacherImageDownloaded(teacher, true);
 			if (!teacher.isDownloadedImage()) {
 				Picasso.with(cxt).load(teacher.getImageUrl())
 						.error(R.drawable.ic_launcher).into(viewHolder.picture);
@@ -364,6 +366,7 @@ public class FragmentTeachers extends Fragment {
 					.compareTo("com.google.android.c2dm.intent.RECEIVE") == 0) {
 				if (intent.getStringExtra("Type") != null) {
 					if (intent.getStringExtra("Type").contains("INSTRUCTOR")) {
+						abortBroadcast();
 						String type = intent.getStringExtra("Type");
 						Teacher t = GCMUtils.HandleInstructor(type, context,
 								db_mngr, intent);
@@ -375,8 +378,49 @@ public class FragmentTeachers extends Fragment {
 						sb.setAbsListView(gridView);
 						gridView.setAdapter(sb);
 						sb.notifyDataSetChanged();
+					} else if (intent.getStringExtra("Type").contains(
+							"TEACHER_PIC")) {
 						abortBroadcast();
+						String id_number = intent.getStringExtra("Image");
+						final String[] file = id_number.split(Pattern
+								.quote("."));
+						final Teacher t = new Teacher(file[0]);
+						Target target = new Target() {
+							@Override
+							public void onBitmapFailed(Drawable arg0) {
+								// TODO Auto-generated method stub
+							}
+
+							@Override
+							public void onBitmapLoaded(final Bitmap arg0,
+									LoadedFrom arg1) {
+								Utilities.saveImageToSD(
+										Settings.picFromAbsoulotePath + file[0]
+												+ ".png", arg0);
+								gAdapter.notifyDataSetChanged();
+							/*	int index=tutors.indexOf(t);
+								Teacher tmp=tutors.get(index);
+								tmp.setImageLocalPath(Settings.picFromAbsoulotePath + file[0]
+												+ "-new.png");
+								tutors.set(index, tmp);*/
+
+							}
+
+							@Override
+							public void onPrepareLoad(Drawable arg0) {
+								// TODO Auto-generated method stub
+
+							}
+
+						};
+
+						
+						Picasso.with(getActivity())
+								.load("http://nlanda.technion.ac.il/LandaSystem/pics/"
+										+ file[0] + ".png").into(target);
+						
 					}
+
 				}
 			}
 
